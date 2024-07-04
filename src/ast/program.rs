@@ -2,7 +2,10 @@ use pest::iterators::Pairs;
 
 use crate::{env::Environment, error::AlthreadError, parser::Rule};
 
-use super::stmt::Stmt;
+use super::{
+    block::{parse_block, parse_shared_block},
+    stmt::Stmt,
+};
 
 #[derive(Debug)]
 pub struct Program {
@@ -14,19 +17,18 @@ pub struct Program {
 impl Program {
     pub fn build(pairs: Pairs<Rule>, env: &mut Environment) -> Result<Self, AlthreadError> {
         let mut main_block = None;
-        let shared_block = None;
+        let mut shared_block = None;
         let always_block = None;
 
         for pair in pairs {
             match pair.as_rule() {
                 Rule::main_block => {
                     env.push_table();
-                    main_block = Some(Self::parse_block(pair.into_inner(), env)?);
+                    main_block = Some(parse_block(pair.into_inner(), env)?);
                     env.pop_table();
                 }
                 Rule::shared_block => {
-                    // TODO : implement shared block
-                    unimplemented!();
+                    shared_block = Some(parse_shared_block(pair.into_inner(), env)?);
                 }
                 Rule::always_block => {
                     // TODO : implement always block
@@ -42,18 +44,5 @@ impl Program {
             shared_block,
             always_block,
         })
-    }
-
-    pub fn parse_block(
-        pairs: Pairs<Rule>,
-        env: &mut Environment,
-    ) -> Result<Vec<Stmt>, AlthreadError> {
-        let mut stmts = Vec::new();
-
-        for pair in pairs {
-            stmts.push(Stmt::build(pair, env)?);
-        }
-
-        Ok(stmts)
     }
 }

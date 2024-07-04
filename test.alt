@@ -1,8 +1,13 @@
+shared {
+    let a = 7;
+}
+
 main {
-    let a: int = 5;
-    let b = a;
+    const b = a;
     let c;
     const d: bool;
     const e = true;
     let f = "coucou";
+    b=7;
+    print(f);
 }

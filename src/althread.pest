@@ -9,14 +9,15 @@ block      = _{ "{" ~ stmt* ~ "}" }
 decl_block = _{ "{" ~ decl_stmt* ~ "}" }
 cond_block = _{ "{" ~ expr_stmt* ~ "}" }
 
-stmt = _{ expr_stmt | print_stmt | if_stmt | while_stmt | block | assign_stmt | decl_stmt }
+stmt = _{ assign_stmt | expr_stmt | print_stmt | if_stmt | while_stmt | block | decl_stmt }
 
 decl_stmt    = _{ decl ~ ";" }
 decl         =  { decl_keyword ~ IDENTIFIER ~ (":" ~ DATATYPE)? ~ ("=" ~ expr)? }
 decl_keyword =  { "let" | "const" }
 
 assign_stmt = _{ assignment ~ ";" }
-assignment  =  { IDENTIFIER ~ "=" ~ expr ~ ";" }
+assignment  =  { IDENTIFIER ~ assign_op ~ expr }
+assign_op   =  { "=" | "+=" | "-=" | "*=" | "/=" | "%=" }
 
 print_stmt = { "print" ~ "(" ~ expr ~ ")" ~ ";" }
 if_stmt    = { "if" ~ "(" ~ expr ~ ")" ~ block ~ ("else" ~ block)? }
