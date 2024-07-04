@@ -1,10 +1,7 @@
 use symbol_table::{Symbol, SymbolTable};
 
 use crate::{
-    ast::{
-        datatype::DataType,
-        expr::{Expr, PrimaryExpr},
-    },
+    ast::{datatype::DataType, expr::PrimaryExpr},
     error::AlthreadError,
 };
 
@@ -57,35 +54,6 @@ impl Environment {
         };
 
         current_symbol_table.insert(identifier, symbol);
-        Ok(())
-    }
-
-    pub fn insert_global_symbol(
-        &mut self,
-        identifier: String,
-        datatype: DataType,
-        mutable: bool,
-        value: Option<PrimaryExpr>,
-    ) -> Result<(), AlthreadError> {
-        let global_symbol_table = self.symbol_tables.first_mut().ok_or_else(|| {
-            AlthreadError::error(0, 0, "No global symbol table found".to_string())
-        })?;
-
-        if global_symbol_table.contains_key(&identifier) {
-            return Err(AlthreadError::error(
-                0,
-                0,
-                format!("Symbol {} already exists in global scope", identifier),
-            ));
-        }
-
-        let symbol = Symbol {
-            datatype,
-            mutable,
-            value,
-        };
-
-        global_symbol_table.insert(identifier, symbol);
         Ok(())
     }
 
