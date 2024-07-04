@@ -4,7 +4,7 @@ use pest::{
     pratt_parser::PrattParser,
 };
 
-use crate::{error::AlthreadError, parser::Rule};
+use crate::{env::Environment, error::AlthreadError, parser::Rule};
 
 use super::datatype::DataType;
 
@@ -31,57 +31,103 @@ lazy_static! {
 
 #[derive(Debug)]
 pub enum Expr {
+    Primary(PrimaryExpr),
+    Binary(BinExpr),
+    Unary(UnExpr),
+}
+
+impl Expr {
+    pub fn build(pairs: Pairs<Rule>, env: &Environment) -> ExprResult {
+        PRATT_PARSER
+            .map_primary(|pair| PrimaryExpr::build(pair, env))
+            .map_infix(|lhs, op, rhs| BinExpr::build(lhs, op, rhs, env))
+            .map_prefix(|op, rhs| UnExpr::build(op, rhs, env))
+            .parse(pairs)
+    }
+
+    pub fn default(datatype: &DataType) -> Self {
+        let primary = match datatype {
+            DataType::Int => PrimaryExpr::Int(0),
+            DataType::Float => PrimaryExpr::Float(0.0),
+            DataType::Bool => PrimaryExpr::Bool(false),
+            DataType::String => PrimaryExpr::String("".to_string()),
+            DataType::Void => PrimaryExpr::Null,
+        };
+
+        Self::Primary(primary)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum PrimaryExpr {
     Null,
     Int(i64),
     Float(f64),
     Bool(bool),
     String(String),
     Identifier(String),
-    BinOp {
-        op: BinOp,
-        lhs: Box<Expr>,
-        rhs: Box<Expr>,
-    },
-    UnOp {
-        op: UnOp,
-        lhs: Box<Expr>,
-    },
 }
 
-impl Expr {
-    pub fn build(pairs: Pairs<Rule>) -> ExprResult {
-        PRATT_PARSER
-            .map_primary(Self::parse_primary)
-            .map_infix(Self::parse_infix)
-            .map_prefix(Self::parse_prefix)
-            .parse(pairs)
-    }
-
-    pub fn default(datatype: &DataType) -> Self {
-        match datatype {
-            DataType::Int => Self::Int(0),
-            DataType::Float => Self::Float(0.0),
-            DataType::Bool => Self::Bool(false),
-            DataType::String => Self::String("".to_string()),
-            _ => Self::Null,
-        }
-    }
-
-    fn parse_primary(pair: Pair<Rule>) -> ExprResult {
+impl PrimaryExpr {
+    pub fn build(pair: Pair<Rule>, env: &Environment) -> Result<Expr, AlthreadError> {
         let expr = match pair.as_rule() {
-            Rule::BOOLEAN => Self::Bool(pair.as_str() == "true"),
+            Rule::NULL => Self::Null,
             Rule::INTEGER => Self::Int(pair.as_str().parse::<i64>().unwrap()),
             Rule::FLOAT => Self::Float(pair.as_str().parse::<f64>().unwrap()),
+            Rule::BOOLEAN => Self::Bool(pair.as_str() == "true"),
             Rule::STRING => Self::String(pair.as_str().to_string()),
-            Rule::IDENTIFIER => Self::Identifier(pair.as_str().to_string()),
-            Rule::NULL => Self::Null,
-            Rule::expr => Self::build(pair.into_inner())?,
-            _ => unreachable!("{:?}", pair),
+            Rule::IDENTIFIER => Self::build_identifier(pair.as_str().to_string(), env)?,
+            _ => unreachable!("{:?}", pair.as_rule()),
         };
-        Ok(expr)
+
+        Ok(Expr::Primary(expr))
     }
 
-    fn parse_infix(lhs: ExprResult, op: Pair<Rule>, rhs: ExprResult) -> ExprResult {
+    pub fn build_identifier(
+        identifier: String,
+        env: &Environment,
+    ) -> Result<PrimaryExpr, AlthreadError> {
+        let symbol = env.get_symbol(&identifier)?;
+        match &symbol.value {
+            Some(value) => Ok(value.clone()),
+            None => {
+                println!("{}: {:?}", identifier, symbol);
+                Ok(PrimaryExpr::Identifier(identifier))
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum BinOp {
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Eq,
+    Ne,
+    Gt,
+    Ge,
+    Lt,
+    Le,
+    And,
+    Or,
+}
+
+#[derive(Debug)]
+pub struct BinExpr {
+    pub lhs: Box<Expr>,
+    pub op: BinOp,
+    pub rhs: Box<Expr>,
+}
+
+impl BinExpr {
+    fn build(
+        lhs: ExprResult,
+        op: Pair<Rule>,
+        rhs: ExprResult,
+        env: &Environment,
+    ) -> Result<Expr, AlthreadError> {
         let op = match op.as_rule() {
             Rule::add => BinOp::Add,
             Rule::sub => BinOp::Sub,
@@ -100,50 +146,46 @@ impl Expr {
         let lhs = lhs?;
         let rhs = rhs?;
 
-        DataType::from_bin_expr(&op, &lhs, &rhs)?;
+        DataType::from_bin_expr(&lhs, &op, &rhs, env)?;
 
-        Ok(Self::BinOp {
+        Ok(Expr::Binary(Self {
             op,
             lhs: Box::new(lhs),
             rhs: Box::new(rhs),
-        })
+        }))
     }
+}
 
-    fn parse_prefix(op: Pair<Rule>, lhs: ExprResult) -> ExprResult {
+#[derive(Debug, Clone)]
+pub enum UnOp {
+    Not,
+    Neg,
+}
+
+#[derive(Debug)]
+pub struct UnExpr {
+    pub op: UnOp,
+    pub rhs: Box<Expr>,
+}
+
+impl UnExpr {
+    pub fn build(
+        op: Pair<Rule>,
+        rhs: ExprResult,
+        env: &Environment,
+    ) -> Result<Expr, AlthreadError> {
         let op = match op.as_rule() {
             Rule::not => UnOp::Not,
             Rule::sub => UnOp::Neg,
             _ => unreachable!("{:?}", op),
         };
-        let lhs = lhs?;
+        let rhs = rhs?;
 
-        DataType::from_un_expr(&op, &lhs)?;
+        DataType::from_un_expr(&op, &rhs, env)?;
 
-        Ok(Self::UnOp {
+        Ok(Expr::Unary(Self {
             op,
-            lhs: Box::new(lhs),
-        })
+            rhs: Box::new(rhs),
+        }))
     }
-}
-
-#[derive(Debug)]
-pub enum BinOp {
-    Add,
-    Sub,
-    Mul,
-    Div,
-    Eq,
-    Ne,
-    Gt,
-    Ge,
-    Lt,
-    Le,
-    And,
-    Or,
-}
-
-#[derive(Debug)]
-pub enum UnOp {
-    Not,
-    Neg,
 }

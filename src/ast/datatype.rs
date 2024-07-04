@@ -1,10 +1,10 @@
 use pest::iterators::Pair;
 
-use crate::{error::AlthreadError, parser::Rule};
+use crate::{env::Environment, error::AlthreadError, parser::Rule};
 
-use super::expr::{BinOp, Expr, UnOp};
+use super::expr::{BinOp, Expr, PrimaryExpr, UnOp};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum DataType {
     Int,
     Float,
@@ -25,22 +25,36 @@ impl DataType {
         }
     }
 
-    pub fn from_expr(expr: &Expr) -> Result<Self, AlthreadError> {
+    pub fn from_expr(expr: &Expr, env: &Environment) -> Result<Self, AlthreadError> {
         match expr {
-            Expr::Int(_) => Ok(DataType::Int),
-            Expr::Float(_) => Ok(DataType::Float),
-            Expr::Bool(_) => Ok(DataType::Bool),
-            Expr::String(_) => Ok(DataType::String),
-            Expr::Null => Ok(DataType::Void),
-            Expr::Identifier(_) => Ok(DataType::Void),
-            Expr::BinOp { op, lhs, rhs } => Self::from_bin_expr(op, lhs, rhs),
-            Expr::UnOp { op, lhs } => Self::from_un_expr(op, lhs),
+            Expr::Primary(expr) => Self::from_primary_expr(expr, env),
+            Expr::Binary(expr) => Self::from_bin_expr(&expr.lhs, &expr.op, &expr.rhs, env),
+            Expr::Unary(expr) => Self::from_un_expr(&expr.op, &expr.rhs, env),
         }
     }
 
-    pub fn from_bin_expr(op: &BinOp, lhs: &Expr, rhs: &Expr) -> Result<Self, AlthreadError> {
-        let lhs_type = Self::from_expr(lhs)?;
-        let rhs_type = Self::from_expr(rhs)?;
+    pub fn from_primary_expr(expr: &PrimaryExpr, env: &Environment) -> Result<Self, AlthreadError> {
+        match expr {
+            PrimaryExpr::Int(_) => Ok(DataType::Int),
+            PrimaryExpr::Float(_) => Ok(DataType::Float),
+            PrimaryExpr::Bool(_) => Ok(DataType::Bool),
+            PrimaryExpr::String(_) => Ok(DataType::String),
+            PrimaryExpr::Null => Ok(DataType::Void),
+            PrimaryExpr::Identifier(ident) => {
+                let symbol = env.get_symbol(ident)?;
+                Ok(symbol.datatype.clone())
+            }
+        }
+    }
+
+    pub fn from_bin_expr(
+        lhs: &Expr,
+        op: &BinOp,
+        rhs: &Expr,
+        env: &Environment,
+    ) -> Result<Self, AlthreadError> {
+        let lhs_type = Self::from_expr(lhs, env)?;
+        let rhs_type = Self::from_expr(rhs, env)?;
         if lhs_type != rhs_type {
             return Err(AlthreadError::error(0, 0, "Mismatched types".to_string()));
         }
@@ -67,8 +81,8 @@ impl DataType {
         }
     }
 
-    pub fn from_un_expr(op: &UnOp, lhs: &Expr) -> Result<Self, AlthreadError> {
-        let lhs_type = Self::from_expr(lhs)?;
+    pub fn from_un_expr(op: &UnOp, rhs: &Expr, env: &Environment) -> Result<Self, AlthreadError> {
+        let lhs_type = Self::from_expr(rhs, env)?;
 
         match op {
             UnOp::Not => {

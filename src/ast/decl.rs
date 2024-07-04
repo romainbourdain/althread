@@ -1,8 +1,11 @@
 use pest::iterators::Pairs;
 
-use crate::{error::AlthreadError, parser::Rule};
+use crate::{env::Environment, error::AlthreadError, parser::Rule};
 
-use super::{datatype::DataType, expr::Expr};
+use super::{
+    datatype::DataType,
+    expr::{Expr, PrimaryExpr},
+};
 
 #[derive(Debug)]
 pub struct Decl {
@@ -13,10 +16,10 @@ pub struct Decl {
 }
 
 impl Decl {
-    pub fn build(pairs: Pairs<Rule>) -> Result<Self, AlthreadError> {
+    pub fn build(pairs: Pairs<Rule>, env: &mut Environment) -> Result<Self, AlthreadError> {
         let mut decl = Decl {
             identifier: "".to_string(),
-            value: Expr::Null,
+            value: Expr::Primary(PrimaryExpr::Null),
             datatype: DataType::Void,
             mutable: false,
         };
@@ -26,18 +29,24 @@ impl Decl {
                 Rule::IDENTIFIER => decl.identifier = pair.as_str().to_string(),
                 Rule::DATATYPE => decl.datatype = DataType::build(pair)?,
                 Rule::decl_keyword => decl.mutable = pair.as_str() == "let",
-                Rule::expr => decl.value = Expr::build(pair.into_inner())?,
+                Rule::expr => decl.value = Expr::build(pair.into_inner(), env)?,
                 _ => unreachable!(),
             }
         }
 
-        Self::evaluate_type(&mut decl)?;
+        Self::evaluate_type(&mut decl, env)?;
+        env.insert_symbol(
+            decl.identifier.clone(),
+            decl.datatype.clone(),
+            decl.mutable,
+            None,
+        )?;
 
         Ok(decl)
     }
 
-    fn evaluate_type(&mut self) -> Result<(), AlthreadError> {
-        let value_type = DataType::from_expr(&self.value)?;
+    fn evaluate_type(&mut self, env: &Environment) -> Result<(), AlthreadError> {
+        let value_type = DataType::from_expr(&self.value, env)?;
 
         match (&self.datatype, &value_type) {
             (_, DataType::Void) => self.value = Expr::default(&self.datatype),

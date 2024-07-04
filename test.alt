@@ -1,6 +1,8 @@
 main {
-    let a: int = 7*5;
-    let b = 7.0+3.4;
+    let a: int = 5;
+    let b = a;
     let c;
     const d: bool;
+    const e = true;
+    let f = "coucou";
 }

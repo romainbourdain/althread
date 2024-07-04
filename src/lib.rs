@@ -1,4 +1,5 @@
 mod ast;
+mod env;
 mod error;
 mod parser;
 
@@ -9,6 +10,7 @@ use std::{
 };
 
 use ast::program::Program;
+use env::Environment;
 use error::AlthreadError;
 use parser::parse;
 
@@ -45,7 +47,10 @@ fn run(source: String) -> Result<(), AlthreadError> {
         e
     })?;
 
-    let prog = Program::build(pairs).map_err(|e| {
+    let mut env = Environment::new();
+    env.push_table();
+
+    let prog = Program::build(pairs, &mut env).map_err(|e| {
         e.report("Semantic Error".to_string());
         e
     })?;

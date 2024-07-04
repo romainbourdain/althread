@@ -1,6 +1,6 @@
 use pest::iterators::Pair;
 
-use crate::{error::AlthreadError, parser::Rule};
+use crate::{env::Environment, error::AlthreadError, parser::Rule};
 
 use super::{decl::Decl, expr::Expr};
 
@@ -11,10 +11,10 @@ pub enum Stmt {
 }
 
 impl Stmt {
-    pub fn build(pair: Pair<Rule>) -> Result<Self, AlthreadError> {
+    pub fn build(pair: Pair<Rule>, env: &mut Environment) -> Result<Self, AlthreadError> {
         match pair.as_rule() {
-            Rule::decl => Ok(Self::Decl(Decl::build(pair.into_inner())?)),
-            Rule::expr => Ok(Self::Expr(Expr::build(pair.into_inner())?)),
+            Rule::decl => Ok(Self::Decl(Decl::build(pair.into_inner(), env)?)),
+            Rule::expr => Ok(Self::Expr(Expr::build(pair.into_inner(), env)?)),
             _ => unreachable!(),
         }
     }
