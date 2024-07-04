@@ -1,0 +1,64 @@
+program = _{ SOI ~ struct_block* ~ EOI }
+
+struct_block = _{ main_block | shared_block | always_block }
+main_block   =  { "main" ~ block }
+shared_block =  { "shared" ~ decl_block }
+always_block =  { "always" ~ cond_block }
+
+block      = _{ "{" ~ stmt* ~ "}" }
+decl_block = _{ "{" ~ decl_stmt* ~ "}" }
+cond_block = _{ "{" ~ expr_stmt* ~ "}" }
+
+stmt = _{ expr_stmt | print_stmt | if_stmt | while_stmt | block | assign_stmt | decl_stmt }
+
+decl_stmt    = _{ decl ~ ";" }
+decl         =  { decl_keyword ~ IDENTIFIER ~ (":" ~ DATATYPE)? ~ ("=" ~ expr)? }
+decl_keyword =  { "let" | "const" }
+
+assign_stmt = _{ assignment ~ ";" }
+assignment  =  { IDENTIFIER ~ "=" ~ expr ~ ";" }
+
+print_stmt = { "print" ~ "(" ~ expr ~ ")" ~ ";" }
+if_stmt    = { "if" ~ "(" ~ expr ~ ")" ~ block ~ ("else" ~ block)? }
+while_stmt = { "while" ~ "(" ~ expr ~ ")" ~ block }
+
+expr_stmt = _{ expr ~ ";" }
+expr      =  { prefix? ~ primary ~ (infix ~ prefix? ~ primary)* }
+infix     = _{ add | sub | mul | div | mod | eq | ne | lt | le | gt | ge | and | or }
+prefix    = _{ neg | not }
+add       =  { "+" }
+sub       =  { "-" }
+mul       =  { "*" }
+div       =  { "/" }
+mod       =  { "%" }
+eq        =  { "==" }
+ne        =  { "!=" }
+lt        =  { "<" }
+le        =  { "<=" }
+gt        =  { ">" }
+ge        =  { ">=" }
+and       =  { "&&" }
+or        =  { "||" }
+neg       =  { "-" }
+not       =  { "!" }
+
+primary = _{ BOOLEAN | FLOAT | INTEGER | STRING | IDENTIFIER | NULL | "(" ~ expr ~ ")" }
+
+DATATYPE = { "bool" | "int" | "float" | "void" | "string" }
+
+INTEGER    = @{ ASCII_DIGIT+ }
+FLOAT      = @{ ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT* }
+STRING     = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
+IDENTIFIER = @{ !(RESERVED_IDENTIFIER ~ !IDENTIFIER_CHAR) ~ ASCII_ALPHA ~ IDENTIFIER_CHAR* }
+BOOLEAN    = @{ "true" | "false" }
+NULL       = @{ "null" }
+
+IDENTIFIER_CHAR     = _{ ASCII_ALPHANUMERIC | "_" }
+RESERVED_IDENTIFIER =  { "let" | "const" | "print" | "true" | "false" | "null" | "main" | "shared" | "always" }
+
+WHITESPACE = _{ " " | "\t" | NEWLINE }
+NEWLINE    = _{ "\n" | "\r" | "\r\n" }
+
+COMMENT        = _{ INLINE_COMMENT | BLOCK_COMMENT }
+INLINE_COMMENT = _{ "//" ~ (!NEWLINE ~ ANY)* }
+BLOCK_COMMENT  = _{ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }

@@ -1,0 +1,6 @@
+main {
+    let a: int = 7*5;
+    let b = 7.0+3.4;
+    let c;
+    const d: bool;
+}
