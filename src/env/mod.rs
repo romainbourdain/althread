@@ -8,14 +8,16 @@ use crate::{
 pub mod symbol_table;
 
 #[derive(Debug)]
-pub struct Environment {
+pub struct Environment<'a> {
     pub symbol_tables: Vec<SymbolTable>,
+    pub global_table: &'a mut SymbolTable,
 }
 
-impl Environment {
-    pub fn new() -> Self {
+impl<'a> Environment<'a> {
+    pub fn new(global_table: &'a mut SymbolTable) -> Self {
         Self {
             symbol_tables: Vec::new(),
+            global_table,
         }
     }
 
@@ -35,10 +37,10 @@ impl Environment {
         mutable: bool,
         value: Option<PrimaryExpr>,
     ) -> Result<(), AlthreadError> {
-        let current_symbol_table: &mut std::collections::HashMap<String, Symbol> = self
+        let current_symbol_table = self
             .symbol_tables
             .last_mut()
-            .ok_or_else(|| AlthreadError::error(0, 0, "No symbol table found".to_string()))?;
+            .unwrap_or(&mut self.global_table);
 
         if current_symbol_table.contains_key(&identifier) {
             return Err(AlthreadError::error(
@@ -66,6 +68,11 @@ impl Environment {
                 return Ok(symbol);
             }
         }
+
+        if let Some(symbol) = self.global_table.get(identifier) {
+            return Ok(symbol);
+        }
+
         Err(AlthreadError::error(
             0,
             0,

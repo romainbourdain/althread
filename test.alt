@@ -3,7 +3,8 @@ shared {
 }
 
 main {
-    let b = a;
+    let b: int = a<;
+    b = 7;
     let c = 3;
     {
     const d = c;
@@ -13,7 +14,7 @@ main {
     b=7;
     print(f);
 
-    while (true) {
+    while (c > 0) {
         let b = 5;
     }
 

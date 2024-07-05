@@ -10,7 +10,7 @@ use std::{
 };
 
 use ast::program::Program;
-use env::Environment;
+use env::{symbol_table::SymbolTable, Environment};
 use error::AlthreadError;
 use parser::parse;
 
@@ -47,15 +47,14 @@ fn run(source: String) -> Result<(), AlthreadError> {
         e
     })?;
 
-    let mut env = Environment::new();
-    env.push_table();
+    let mut global_table = SymbolTable::new();
+    let mut env = Environment::new(&mut global_table);
 
     let prog = Program::build(pairs, &mut env).map_err(|e| {
         e.report("Semantic Error".to_string());
         e
     })?;
 
-    env.pop_table();
     println!("{:#?}", prog);
     Ok(())
 }
