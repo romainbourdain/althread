@@ -12,4 +12,14 @@ main {
     let f = "hello world";
     b=7;
     print(f);
+
+    while (true) {
+        let b = 5;
+    }
+
+    if (b == 4) {
+        c += 3;
+    } else {
+        c += 1;
+    }
 }

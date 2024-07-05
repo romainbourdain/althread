@@ -4,7 +4,7 @@ use crate::{env::Environment, error::AlthreadError, parser::Rule};
 
 use super::{
     assign::Assign,
-    block::{parse_block, Block},
+    block::{parse_block, Block, IfBlock, WhileBlock},
     decl::Decl,
     expr::Expr,
 };
@@ -16,6 +16,8 @@ pub enum Stmt {
     Print(Expr),
     Block(Block),
     Assign(Assign),
+    IfStmt(IfBlock),
+    WhileStmt(WhileBlock),
 }
 
 impl Stmt {
@@ -27,8 +29,10 @@ impl Stmt {
                 pair.into_inner().next().unwrap().into_inner(),
                 env,
             )?)),
-            Rule::block_stmt => Ok(Self::Block(parse_block(pair.into_inner(), env)?)),
+            Rule::block => Ok(Self::Block(parse_block(pair.into_inner(), env)?)),
             Rule::assignment => Ok(Self::Assign(Assign::build(pair.into_inner(), env)?)),
+            Rule::if_stmt => Ok(Self::IfStmt(IfBlock::build(pair.into_inner(), env)?)),
+            Rule::while_stmt => Ok(Self::WhileStmt(WhileBlock::build(pair.into_inner(), env)?)),
             _ => unreachable!(),
         }
     }

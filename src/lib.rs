@@ -55,8 +55,7 @@ fn run(source: String) -> Result<(), AlthreadError> {
         e
     })?;
 
-    println!("{:#?}", prog);
-
     env.pop_table();
+    println!("{:#?}", prog);
     Ok(())
 }
