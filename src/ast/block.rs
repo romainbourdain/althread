@@ -1,4 +1,4 @@
-use pest::iterators::{Pair, Pairs};
+use pest::iterators::Pairs;
 
 use crate::{env::Environment, error::AlthreadError, parser::Rule};
 
