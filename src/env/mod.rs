@@ -20,11 +20,12 @@ impl Environment {
     }
 
     pub fn push_table(&mut self) {
+        println!("push scope");
         self.symbol_tables.push(SymbolTable::new());
     }
 
     pub fn pop_table(&mut self) {
-        self.symbol_tables.pop();
+        println!("pop scope: {:?}", self.symbol_tables.pop());
     }
 
     pub fn insert_symbol(
@@ -52,6 +53,8 @@ impl Environment {
             mutable,
             value,
         };
+
+        println!("inserting symbol: {}", identifier);
 
         current_symbol_table.insert(identifier, symbol);
         Ok(())

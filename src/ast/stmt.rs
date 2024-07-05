@@ -27,7 +27,7 @@ impl Stmt {
                 pair.into_inner().next().unwrap().into_inner(),
                 env,
             )?)),
-            Rule::block => Ok(Self::Block(parse_block(pair.into_inner(), env)?)),
+            Rule::block_stmt => Ok(Self::Block(parse_block(pair.into_inner(), env)?)),
             Rule::assignment => Ok(Self::Assign(Assign::build(pair.into_inner(), env)?)),
             _ => unreachable!(),
         }

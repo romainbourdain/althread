@@ -3,11 +3,13 @@ shared {
 }
 
 main {
-    const b = a;
-    let c;
-    const d: bool;
+    let b = a;
+    let c = 3;
+    {
+    const d = c;
+    }
     const e = true;
-    let f = "coucou";
+    let f = "hello world";
     b=7;
     print(f);
 }

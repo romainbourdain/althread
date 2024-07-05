@@ -23,9 +23,7 @@ impl Program {
         for pair in pairs {
             match pair.as_rule() {
                 Rule::main_block => {
-                    env.push_table();
                     main_block = Some(parse_block(pair.into_inner(), env)?);
-                    env.pop_table();
                 }
                 Rule::shared_block => {
                     shared_block = Some(parse_shared_block(pair.into_inner(), env)?);

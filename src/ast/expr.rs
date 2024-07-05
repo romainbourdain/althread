@@ -90,10 +90,7 @@ impl PrimaryExpr {
         let symbol = env.get_symbol(&identifier)?;
         match &symbol.value {
             Some(value) => Ok(value.clone()),
-            None => {
-                println!("{}: {:?}", identifier, symbol);
-                Ok(PrimaryExpr::Identifier(identifier))
-            }
+            None => Ok(PrimaryExpr::Identifier(identifier)),
         }
     }
 }
