@@ -60,7 +60,7 @@ impl DataType {
         }
 
         match op {
-            BinOp::Add | BinOp::Sub | BinOp::Mul | BinOp::Div => {
+            BinOp::Add | BinOp::Sub | BinOp::Mul | BinOp::Div | BinOp::Mod => {
                 if (lhs_type != DataType::Int) && (lhs_type != DataType::Float) {
                     return Err(AlthreadError::error(0, 0, "Invalid types".to_string()));
                 }

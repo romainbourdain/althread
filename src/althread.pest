@@ -13,9 +13,10 @@ decl_stmt    = _{ decl ~ ";" }
 decl         =  { decl_keyword ~ IDENTIFIER ~ (":" ~ DATATYPE)? ~ ("=" ~ expr)? }
 decl_keyword =  { "let" | "const" }
 
-assign_stmt = _{ assignment ~ ";" }
-assignment  =  { IDENTIFIER ~ assign_op ~ expr }
-assign_op   =  { "=" | "+=" | "-=" | "*=" | "/=" | "%=" }
+assign_stmt     = _{ assignment ~ ";" }
+assignment      =  { IDENTIFIER ~ assign_op ~ expr | IDENTIFIER ~ assign_unary_op }
+assign_op       =  { "=" | "+=" | "-=" | "*=" | "/=" | "%=" }
+assign_unary_op =  { "++" | "--" }
 
 print_stmt = { "print" ~ "(" ~ expr ~ ")" ~ ";" }
 if_stmt    = { "if" ~ "(" ~ expr ~ ")" ~ block ~ ("else" ~ block)? }
@@ -23,13 +24,13 @@ while_stmt = { "while" ~ "(" ~ expr ~ ")" ~ block }
 
 expr_stmt = _{ expr ~ ";" }
 expr      =  { prefix? ~ primary ~ (infix ~ prefix? ~ primary)* }
-infix     = _{ add | sub | mul | div | mod | eq | ne | lt | le | gt | ge | and | or }
+infix     = _{ add | sub | mul | div | modulo | eq | ne | lt | le | gt | ge | and | or }
 prefix    = _{ neg | not }
 add       =  { "+" }
 sub       =  { "-" }
 mul       =  { "*" }
 div       =  { "/" }
-mod       =  { "%" }
+modulo    =  { "%" }
 eq        =  { "==" }
 ne        =  { "!=" }
 lt        =  { "<" }

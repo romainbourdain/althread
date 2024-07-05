@@ -23,7 +23,9 @@ lazy_static! {
                 | Op::infix(Rule::lt, Assoc::Left)
                 | Op::infix(Rule::le, Assoc::Left))
             .op(Op::infix(Rule::add, Assoc::Left) | Op::infix(Rule::sub, Assoc::Left))
-            .op(Op::infix(Rule::mul, Assoc::Left) | Op::infix(Rule::div, Assoc::Left))
+            .op(Op::infix(Rule::mul, Assoc::Left)
+                | Op::infix(Rule::div, Assoc::Left)
+                | Op::infix(Rule::modulo, Assoc::Left))
             .op(Op::prefix(Rule::not))
             .op(Op::prefix(Rule::sub))
     };
@@ -101,6 +103,7 @@ pub enum BinOp {
     Sub,
     Mul,
     Div,
+    Mod,
     Eq,
     Ne,
     Gt,
@@ -130,6 +133,7 @@ impl BinExpr {
             Rule::sub => BinOp::Sub,
             Rule::mul => BinOp::Mul,
             Rule::div => BinOp::Div,
+            Rule::modulo => BinOp::Mod,
             Rule::eq => BinOp::Eq,
             Rule::ne => BinOp::Ne,
             Rule::gt => BinOp::Gt,

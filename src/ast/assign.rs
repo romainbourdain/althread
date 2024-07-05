@@ -8,7 +8,7 @@ use super::{
 };
 
 #[derive(Debug)]
-pub enum AssignOp {
+pub enum AssignBinOp {
     Assign,
     AddAssign,
     SubAssign,
@@ -19,16 +19,16 @@ pub enum AssignOp {
 
 #[derive(Debug)]
 pub struct Assign {
-    pub identifier: String,
-    pub op: AssignOp,
-    pub value: Expr,
+    identifier: String,
+    op: AssignBinOp,
+    value: Expr,
 }
 
 impl Assign {
     pub fn build(pairs: Pairs<Rule>, env: &Environment) -> Result<Self, AlthreadError> {
         let mut assign = Assign {
             identifier: "".to_string(),
-            op: AssignOp::Assign,
+            op: AssignBinOp::Assign,
             value: Expr::Primary(PrimaryExpr::Null),
         };
 
@@ -37,16 +37,24 @@ impl Assign {
                 Rule::IDENTIFIER => assign.identifier = pair.as_str().to_string(),
                 Rule::assign_op => {
                     assign.op = match pair.as_str() {
-                        "=" => AssignOp::Assign,
-                        "+=" => AssignOp::AddAssign,
-                        "-=" => AssignOp::SubAssign,
-                        "*=" => AssignOp::MulAssign,
-                        "/=" => AssignOp::DivAssign,
-                        "%=" => AssignOp::ModAssign,
+                        "=" => AssignBinOp::Assign,
+                        "+=" => AssignBinOp::AddAssign,
+                        "-=" => AssignBinOp::SubAssign,
+                        "*=" => AssignBinOp::MulAssign,
+                        "/=" => AssignBinOp::DivAssign,
+                        "%=" => AssignBinOp::ModAssign,
                         _ => unreachable!(),
                     }
                 }
                 Rule::expr => assign.value = Expr::build(pair.into_inner(), env)?,
+                Rule::assign_unary_op => {
+                    assign.op = match pair.as_str() {
+                        "++" => AssignBinOp::AddAssign,
+                        "--" => AssignBinOp::SubAssign,
+                        _ => unreachable!(),
+                    };
+                    assign.value = Expr::Primary(PrimaryExpr::Int(1));
+                }
                 _ => unreachable!(),
             }
         }
