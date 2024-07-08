@@ -1,10 +1,14 @@
-use pest::iterators::Pairs;
+use pest::iterators::Pair;
 
-use crate::{env::Environment, error::AlthreadError, parser::Rule};
+use crate::{
+    env::Environment,
+    error::{AlthreadError, ErrorType},
+    parser::Rule,
+};
 
 use super::{
     datatype::DataType,
-    expr::{Expr, PrimaryExpr},
+    expr::{Expr, ExprKind, PrimaryExpr},
 };
 
 #[derive(Debug)]
@@ -22,17 +26,26 @@ pub struct Assign {
     identifier: String,
     op: AssignBinOp,
     value: Expr,
+    line: usize,
+    column: usize,
 }
 
 impl Assign {
-    pub fn build(pairs: Pairs<Rule>, env: &Environment) -> Result<Self, AlthreadError> {
+    pub fn build(pair: Pair<Rule>, env: &Environment) -> Result<Self, AlthreadError> {
+        let (line, column) = pair.line_col();
         let mut assign = Assign {
             identifier: "".to_string(),
             op: AssignBinOp::Assign,
-            value: Expr::Primary(PrimaryExpr::Null),
+            value: Expr {
+                kind: ExprKind::Primary(PrimaryExpr::Null),
+                line: 0,
+                column: 0,
+            },
+            line,
+            column,
         };
 
-        for pair in pairs {
+        for pair in pair.into_inner() {
             match pair.as_rule() {
                 Rule::IDENTIFIER => assign.identifier = pair.as_str().to_string(),
                 Rule::assign_op => {
@@ -46,35 +59,59 @@ impl Assign {
                         _ => unreachable!(),
                     }
                 }
-                Rule::expr => assign.value = Expr::build(pair.into_inner(), env)?,
+                Rule::expr => assign.value = Expr::build(pair, env)?,
                 Rule::assign_unary_op => {
                     assign.op = match pair.as_str() {
                         "++" => AssignBinOp::AddAssign,
                         "--" => AssignBinOp::SubAssign,
                         _ => unreachable!(),
                     };
-                    assign.value = Expr::Primary(PrimaryExpr::Int(1));
+                    assign.value = Expr {
+                        kind: ExprKind::Primary(PrimaryExpr::Int(1)),
+                        line: pair.as_span().start_pos().line_col().0,
+                        column: pair.as_span().start_pos().line_col().1,
+                    };
                 }
                 _ => unreachable!(),
             }
         }
 
-        let value_type = DataType::from_expr(&assign.value, env)?;
-        let symbol = env.get_symbol(&assign.identifier)?;
+        let value_type = DataType::from_expr(&assign.value.kind, env).map_err(|e| {
+            AlthreadError::error(
+                ErrorType::TypeError,
+                assign.value.line,
+                assign.value.column,
+                e,
+            )
+        })?;
+
+        let symbol = env.get_symbol(&assign.identifier).map_err(|e| {
+            AlthreadError::error(
+                ErrorType::VariableError,
+                assign.value.line,
+                assign.value.column,
+                e,
+            )
+        })?;
 
         if !symbol.mutable {
             return Err(AlthreadError::error(
-                0,
-                0,
-                "Cannot assign to immutable variable".to_string(),
+                ErrorType::VariableError,
+                assign.value.line,
+                assign.value.column,
+                "Cannot change immutable variable value".to_string(),
             ));
         }
 
         if symbol.datatype != value_type {
             return Err(AlthreadError::error(
-                0,
-                0,
-                "Unexpected type in assignment".to_string(),
+                ErrorType::TypeError,
+                assign.line,
+                assign.column,
+                format!(
+                    "Cannot change {} type from {:?} to {:?}",
+                    assign.identifier, symbol.datatype, value_type
+                ),
             ));
         }
 

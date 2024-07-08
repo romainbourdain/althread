@@ -36,14 +36,14 @@ pub fn run_prompt() {
         }
 
         if let Err(e) = run(line) {
-            e.report("".to_string());
+            eprintln!("{:?}", e);
         }
     }
 }
 
 fn run(source: String) -> Result<(), AlthreadError> {
     let pairs = parse(&source).map_err(|e| {
-        e.report("Syntax Error".to_string());
+        e.report(&source);
         e
     })?;
 
@@ -51,10 +51,11 @@ fn run(source: String) -> Result<(), AlthreadError> {
     let mut env = Environment::new(&mut global_table);
 
     let prog = Program::build(pairs, &mut env).map_err(|e| {
-        e.report("Semantic Error".to_string());
+        e.report(&source);
         e
     })?;
 
     println!("{:#?}", prog);
+    // println!("{:#?}", env);
     Ok(())
 }

@@ -1,10 +1,11 @@
 use lazy_static::lazy_static;
-use pest::{
-    iterators::{Pair, Pairs},
-    pratt_parser::PrattParser,
-};
+use pest::{iterators::Pair, pratt_parser::PrattParser};
 
-use crate::{env::Environment, error::AlthreadError, parser::Rule};
+use crate::{
+    env::Environment,
+    error::{AlthreadError, ErrorType},
+    parser::Rule,
+};
 
 use super::datatype::DataType;
 
@@ -32,19 +33,33 @@ lazy_static! {
 }
 
 #[derive(Debug)]
-pub enum Expr {
+pub struct Expr {
+    pub kind: ExprKind,
+    pub line: usize,
+    pub column: usize,
+}
+
+#[derive(Debug)]
+pub enum ExprKind {
     Primary(PrimaryExpr),
     Binary(BinExpr),
     Unary(UnExpr),
 }
 
 impl Expr {
-    pub fn build(pairs: Pairs<Rule>, env: &Environment) -> ExprResult {
+    pub fn new(kind: ExprKind) -> Self {
+        Self {
+            kind,
+            line: 0,
+            column: 0,
+        }
+    }
+    pub fn build(pair: Pair<Rule>, env: &Environment) -> ExprResult {
         PRATT_PARSER
             .map_primary(|pair| PrimaryExpr::build(pair, env))
             .map_infix(|lhs, op, rhs| BinExpr::build(lhs, op, rhs, env))
             .map_prefix(|op, rhs| UnExpr::build(op, rhs, env))
-            .parse(pairs)
+            .parse(pair.into_inner())
     }
 
     pub fn default(datatype: &DataType) -> Self {
@@ -56,7 +71,7 @@ impl Expr {
             DataType::Void => PrimaryExpr::Null,
         };
 
-        Self::Primary(primary)
+        Self::new(ExprKind::Primary(primary))
     }
 }
 
@@ -71,29 +86,32 @@ pub enum PrimaryExpr {
 }
 
 impl PrimaryExpr {
-    pub fn build(pair: Pair<Rule>, env: &Environment) -> Result<Expr, AlthreadError> {
+    pub fn build(pair: Pair<Rule>, env: &Environment) -> ExprResult {
+        let (line, column) = pair.line_col();
         let expr = match pair.as_rule() {
             Rule::NULL => Self::Null,
             Rule::INTEGER => Self::Int(pair.as_str().parse::<i64>().unwrap()),
             Rule::FLOAT => Self::Float(pair.as_str().parse::<f64>().unwrap()),
             Rule::BOOLEAN => Self::Bool(pair.as_str() == "true"),
             Rule::STRING => Self::String(pair.as_str().to_string()),
-            Rule::IDENTIFIER => Self::build_identifier(pair.as_str().to_string(), env)?,
+            Rule::IDENTIFIER => {
+                let identifier = pair.as_str().to_string();
+                let symbol = env
+                    .get_symbol(&identifier)
+                    .map_err(|e| AlthreadError::error(ErrorType::VariableError, line, column, e))?;
+                match &symbol.value {
+                    Some(value) => Ok(value.clone()),
+                    None => Ok(PrimaryExpr::Identifier(identifier)),
+                }?
+            }
             _ => unreachable!("{:?}", pair.as_rule()),
         };
 
-        Ok(Expr::Primary(expr))
-    }
-
-    pub fn build_identifier(
-        identifier: String,
-        env: &Environment,
-    ) -> Result<PrimaryExpr, AlthreadError> {
-        let symbol = env.get_symbol(&identifier)?;
-        match &symbol.value {
-            Some(value) => Ok(value.clone()),
-            None => Ok(PrimaryExpr::Identifier(identifier)),
-        }
+        Ok(Expr {
+            kind: ExprKind::Primary(expr),
+            line: pair.as_span().start_pos().line_col().0,
+            column: pair.as_span().start_pos().line_col().1,
+        })
     }
 }
 
@@ -122,12 +140,8 @@ pub struct BinExpr {
 }
 
 impl BinExpr {
-    fn build(
-        lhs: ExprResult,
-        op: Pair<Rule>,
-        rhs: ExprResult,
-        env: &Environment,
-    ) -> Result<Expr, AlthreadError> {
+    fn build(lhs: ExprResult, op: Pair<Rule>, rhs: ExprResult, env: &Environment) -> ExprResult {
+        let (line, column) = op.line_col();
         let op = match op.as_rule() {
             Rule::add => BinOp::Add,
             Rule::sub => BinOp::Sub,
@@ -147,13 +161,18 @@ impl BinExpr {
         let lhs = lhs?;
         let rhs = rhs?;
 
-        DataType::from_bin_expr(&lhs, &op, &rhs, env)?;
+        DataType::from_bin_expr(&lhs, &op, &rhs, env)
+            .map_err(|e| AlthreadError::error(ErrorType::TypeError, line, column, e))?;
 
-        Ok(Expr::Binary(Self {
-            op,
-            lhs: Box::new(lhs),
-            rhs: Box::new(rhs),
-        }))
+        Ok(Expr {
+            kind: ExprKind::Binary(Self {
+                op,
+                lhs: Box::new(lhs),
+                rhs: Box::new(rhs),
+            }),
+            line,
+            column,
+        })
     }
 }
 
@@ -170,11 +189,8 @@ pub struct UnExpr {
 }
 
 impl UnExpr {
-    pub fn build(
-        op: Pair<Rule>,
-        rhs: ExprResult,
-        env: &Environment,
-    ) -> Result<Expr, AlthreadError> {
+    pub fn build(op: Pair<Rule>, rhs: ExprResult, env: &Environment) -> ExprResult {
+        let (line, column) = op.line_col();
         let op = match op.as_rule() {
             Rule::not => UnOp::Not,
             Rule::sub => UnOp::Neg,
@@ -182,11 +198,16 @@ impl UnExpr {
         };
         let rhs = rhs?;
 
-        DataType::from_un_expr(&op, &rhs, env)?;
+        DataType::from_un_expr(&op, &rhs, env)
+            .map_err(|e| AlthreadError::error(ErrorType::TypeError, line, column, e))?;
 
-        Ok(Expr::Unary(Self {
-            op,
-            rhs: Box::new(rhs),
-        }))
+        Ok(Expr {
+            kind: ExprKind::Unary(Self {
+                op,
+                rhs: Box::new(rhs),
+            }),
+            line,
+            column,
+        })
     }
 }

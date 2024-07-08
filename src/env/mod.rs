@@ -2,7 +2,7 @@ use symbol_table::{Symbol, SymbolTable};
 
 use crate::{
     ast::{datatype::DataType, expr::PrimaryExpr},
-    error::AlthreadError,
+    error::{AlthreadError, ErrorType},
 };
 
 pub mod symbol_table;
@@ -44,6 +44,7 @@ impl<'a> Environment<'a> {
 
         if current_symbol_table.contains_key(&identifier) {
             return Err(AlthreadError::error(
+                ErrorType::VariableError,
                 0,
                 0,
                 format!("Symbol {} already exists in current scope", identifier),
@@ -62,7 +63,7 @@ impl<'a> Environment<'a> {
         Ok(())
     }
 
-    pub fn get_symbol(&self, identifier: &String) -> Result<&Symbol, AlthreadError> {
+    pub fn get_symbol(&self, identifier: &String) -> Result<&Symbol, String> {
         for table in self.symbol_tables.iter().rev() {
             if let Some(symbol) = table.get(identifier) {
                 return Ok(symbol);
@@ -73,10 +74,6 @@ impl<'a> Environment<'a> {
             return Ok(symbol);
         }
 
-        Err(AlthreadError::error(
-            0,
-            0,
-            format!("Symbol {} not found", identifier),
-        ))
+        Err(format!("Symbol {} not found", identifier))
     }
 }

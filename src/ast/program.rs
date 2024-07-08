@@ -2,28 +2,28 @@ use pest::iterators::Pairs;
 
 use crate::{env::Environment, error::AlthreadError, parser::Rule};
 
-use super::block::{parse_block, parse_shared_block, Block};
+use super::block::Block;
 
 #[derive(Debug)]
 pub struct Program {
-    pub main_block: Block,
-    pub shared_block: Block,
-    pub always_block: Block,
+    pub main_block: Option<Block>,
+    pub shared_block: Option<Block>,
+    pub always_block: Option<Block>,
 }
 
 impl Program {
     pub fn build(pairs: Pairs<Rule>, env: &mut Environment) -> Result<Self, AlthreadError> {
-        let mut main_block = Vec::new();
-        let mut shared_block = Vec::new();
-        let always_block = Vec::new();
+        let mut main_block = None;
+        let mut shared_block = None;
+        let always_block = None;
 
         for pair in pairs {
             match pair.as_rule() {
                 Rule::main_block => {
-                    main_block = parse_block(pair.into_inner(), env)?;
+                    main_block = Some(Block::parse_and_push(pair, env)?);
                 }
                 Rule::shared_block => {
-                    shared_block = parse_shared_block(pair.into_inner(), env)?;
+                    shared_block = Some(Block::parse(pair, env)?);
                 }
                 Rule::always_block => {
                     // TODO : implement always block
