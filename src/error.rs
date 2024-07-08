@@ -29,7 +29,6 @@ impl AlthreadError {
     }
 
     pub fn print_err_line(&self, input: &str) {
-        println!("{:?} {input}", self.pos);
         if self.pos.line == 0 {
             return;
         }

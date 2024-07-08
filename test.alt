@@ -7,7 +7,7 @@ main {
     b = 7;
     let c = 3;
     {
-    let d :int = 3;
+    let d :int = "";
     d++;
     }
     const e = true;
