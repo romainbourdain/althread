@@ -60,4 +60,9 @@ impl WhileStmt {
             }
         }
     }
+
+    pub fn eval(&self) -> Result<(), AlthreadError> {
+        // TODO: Implement while statement evaluation
+        unimplemented!();
+    }
 }

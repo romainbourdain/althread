@@ -117,4 +117,9 @@ impl Assign {
 
         Ok(assign)
     }
+
+    pub fn eval(&self) -> Result<(), AlthreadError> {
+        // TODO: Implement assignment evaluation
+        unimplemented!();
+    }
 }

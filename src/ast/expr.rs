@@ -66,15 +66,27 @@ impl Expr {
     }
 
     pub fn default(datatype: &DataType) -> Self {
+        use DataType::*;
+
         let primary = match datatype {
-            DataType::Int => PrimaryExpr::Int(0),
-            DataType::Float => PrimaryExpr::Float(0.0),
-            DataType::Bool => PrimaryExpr::Bool(false),
-            DataType::String => PrimaryExpr::String("".to_string()),
-            DataType::Void => PrimaryExpr::Null,
+            Int => PrimaryExpr::Int(0),
+            Float => PrimaryExpr::Float(0.0),
+            Bool => PrimaryExpr::Bool(false),
+            String => PrimaryExpr::String("".to_string()),
+            Void => PrimaryExpr::Null,
         };
 
         Self::new(ExprKind::Primary(primary))
+    }
+
+    pub fn eval(&self) -> Result<PrimaryExpr, AlthreadError> {
+        use ExprKind::*;
+        match &self.kind {
+            // TODO: Implement Binary and Unary evaluation
+            Primary(expr) => expr.eval(),
+            Binary(_) => unimplemented!(),
+            Unary(_) => unimplemented!(),
+        }
     }
 }
 
@@ -116,6 +128,24 @@ impl PrimaryExpr {
             column: pair.as_span().start_pos().line_col().1,
         })
     }
+
+    pub fn eval(&self) -> Result<PrimaryExpr, AlthreadError> {
+        Ok(self.clone())
+    }
+}
+
+impl fmt::Display for PrimaryExpr {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use PrimaryExpr::*;
+        match self {
+            Null => write!(f, "null"),
+            Int(value) => write!(f, "{}", value),
+            Float(value) => write!(f, "{}", value),
+            Bool(value) => write!(f, "{}", value),
+            String(value) => write!(f, "{}", value),
+            Identifier(value) => write!(f, "{}", value),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -137,20 +167,21 @@ pub enum BinOp {
 
 impl fmt::Display for BinOp {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use BinOp::*;
         let op = match self {
-            BinOp::Add => "+",
-            BinOp::Sub => "-",
-            BinOp::Mul => "*",
-            BinOp::Div => "/",
-            BinOp::Mod => "%",
-            BinOp::Eq => "==",
-            BinOp::Ne => "!=",
-            BinOp::Gt => ">",
-            BinOp::Ge => ">=",
-            BinOp::Lt => "<",
-            BinOp::Le => "<=",
-            BinOp::And => "&&",
-            BinOp::Or => "||",
+            Add => "+",
+            Sub => "-",
+            Mul => "*",
+            Div => "/",
+            Mod => "%",
+            Eq => "==",
+            Ne => "!=",
+            Gt => ">",
+            Ge => ">=",
+            Lt => "<",
+            Le => "<=",
+            And => "&&",
+            Or => "||",
         };
         write!(f, "{}", op)
     }
@@ -208,9 +239,10 @@ pub enum UnOp {
 
 impl fmt::Display for UnOp {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use UnOp::*;
         let op = match self {
-            UnOp::Not => "!",
-            UnOp::Neg => "-",
+            Not => "!",
+            Neg => "-",
         };
         write!(f, "{}", op)
     }

@@ -4,6 +4,7 @@ pub mod datatype;
 pub mod decl;
 pub mod expr;
 pub mod if_stmt;
+pub mod print_stmt;
 pub mod program;
 pub mod stmt;
 pub mod while_stmt;

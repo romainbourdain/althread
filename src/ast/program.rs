@@ -8,7 +8,6 @@ use super::block::Block;
 pub struct Program {
     pub main_block: Option<Block>,
     pub shared_block: Option<Block>,
-    pub always_block: Option<Block>,
     pub line: usize,
     pub column: usize,
 }
@@ -19,7 +18,6 @@ impl Program {
         let mut program = Self {
             main_block: None,
             shared_block: None,
-            always_block: None,
             line,
             column,
         };
@@ -32,15 +30,18 @@ impl Program {
                 Rule::shared_block => {
                     program.shared_block = Some(Block::parse(pair, env)?);
                 }
-                Rule::always_block => {
-                    // TODO : implement always block
-                    unimplemented!();
-                }
                 Rule::EOI => break,
                 rule => unreachable!("{:?}", rule),
             }
         }
 
         Ok(program)
+    }
+
+    pub fn eval(&self) -> Result<(), AlthreadError> {
+        self.shared_block.as_ref().map(|block| block.eval());
+        self.main_block.as_ref().map(|block| block.eval());
+
+        Ok(())
     }
 }

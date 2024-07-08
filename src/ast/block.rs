@@ -37,4 +37,12 @@ impl Block {
         env.pop_table();
         Ok(block)
     }
+
+    pub fn eval(&self) -> Result<(), AlthreadError> {
+        for stmt in &self.stmts {
+            stmt.eval()?;
+        }
+
+        Ok(())
+    }
 }

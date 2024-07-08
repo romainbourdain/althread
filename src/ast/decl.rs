@@ -76,4 +76,9 @@ impl Decl {
 
         Ok(())
     }
+
+    pub fn eval(&self) -> Result<(), AlthreadError> {
+        // TODO: Implement evaluation
+        unimplemented!();
+    }
 }

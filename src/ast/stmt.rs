@@ -3,14 +3,15 @@ use pest::iterators::Pair;
 use crate::{env::Environment, error::AlthreadError, parser::Rule};
 
 use super::{
-    assign::Assign, block::Block, decl::Decl, expr::Expr, if_stmt::IfStmt, while_stmt::WhileStmt,
+    assign::Assign, block::Block, decl::Decl, expr::Expr, if_stmt::IfStmt, print_stmt::PrintStmt,
+    while_stmt::WhileStmt,
 };
 
 #[derive(Debug)]
 pub enum Stmt {
     Expr(Expr),
     Decl(Decl),
-    Print(Expr),
+    Print(PrintStmt),
     Block(Block),
     Assign(Assign),
     IfStmt(IfStmt),
@@ -22,15 +23,28 @@ impl Stmt {
         match pair.as_rule() {
             Rule::decl => Ok(Self::Decl(Decl::build(pair, env)?)),
             Rule::expr => Ok(Self::Expr(Expr::build(pair, env)?)),
-            Rule::print_stmt => Ok(Self::Print(Expr::build(
-                pair.into_inner().next().unwrap(),
-                env,
-            )?)),
+            Rule::print_stmt => Ok(Self::Print(PrintStmt::build(pair, env)?)),
             Rule::block => Ok(Self::Block(Block::parse_and_push(pair, env)?)),
             Rule::assignment => Ok(Self::Assign(Assign::build(pair, env)?)),
             Rule::if_stmt => Ok(Self::IfStmt(IfStmt::build(pair, env)?)),
             Rule::while_stmt => Ok(Self::WhileStmt(WhileStmt::build(pair, env)?)),
             _ => unreachable!(),
         }
+    }
+
+    pub fn eval(&self) -> Result<(), AlthreadError> {
+        use Stmt::*;
+        match self {
+            Expr(expr) => {
+                expr.eval()?;
+            }
+            Decl(decl) => decl.eval()?,
+            Print(print_stmt) => print_stmt.eval()?,
+            Block(block) => block.eval()?,
+            Assign(assign) => assign.eval()?,
+            IfStmt(if_stmt) => if_stmt.eval()?,
+            WhileStmt(while_stmt) => while_stmt.eval()?,
+        };
+        Ok(())
     }
 }

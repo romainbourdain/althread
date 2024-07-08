@@ -1,10 +1,10 @@
 shared {
-    let a: int;
+    // let a: int;
 }
 
 main {
-    let b: int = a+4;
-    print(b);
+    // let b: int = 4;
+    print(4);
       /*  b = 7;
     let c = 3;
     {

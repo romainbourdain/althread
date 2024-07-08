@@ -18,6 +18,7 @@ pub enum ErrorType {
     SyntaxError,
     TypeError,
     VariableError,
+    RuntimeError,
 }
 
 impl fmt::Display for ErrorType {
@@ -26,6 +27,7 @@ impl fmt::Display for ErrorType {
             ErrorType::SyntaxError => write!(f, "Syntax Error"),
             ErrorType::TypeError => write!(f, "Type Error"),
             ErrorType::VariableError => write!(f, "Variable Error"),
+            ErrorType::RuntimeError => write!(f, "Runtime Error"),
         }
     }
 }

@@ -58,4 +58,9 @@ impl IfStmt {
             }
         }
     }
+
+    pub fn eval(&self) -> Result<(), AlthreadError> {
+        // TODO: Implement if statement evaluation
+        unimplemented!();
+    }
 }
