@@ -49,7 +49,8 @@ impl Decl {
             decl.datatype.clone(),
             decl.mutable,
             None,
-        )?;
+        )
+        .map_err(|e| AlthreadError::error(ErrorType::VariableError, decl.line, decl.column, e))?;
 
         Ok(decl)
     }
@@ -68,7 +69,7 @@ impl Decl {
                     ErrorType::TypeError,
                     self.value.line,
                     self.value.column,
-                    format!("Cannot convert {:?} to {:?}", value_type, self.datatype),
+                    format!("Cannot convert {} to {}", value_type, self.datatype),
                 ))
             }
         }

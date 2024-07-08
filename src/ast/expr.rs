@@ -1,3 +1,5 @@
+use core::fmt;
+
 use lazy_static::lazy_static;
 use pest::{iterators::Pair, pratt_parser::PrattParser};
 
@@ -104,7 +106,7 @@ impl PrimaryExpr {
                     None => Ok(PrimaryExpr::Identifier(identifier)),
                 }?
             }
-            _ => unreachable!("{:?}", pair.as_rule()),
+            rule => unreachable!("{:?}", rule),
         };
 
         Ok(Expr {
@@ -132,6 +134,27 @@ pub enum BinOp {
     Or,
 }
 
+impl fmt::Display for BinOp {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let op = match self {
+            BinOp::Add => "+",
+            BinOp::Sub => "-",
+            BinOp::Mul => "*",
+            BinOp::Div => "/",
+            BinOp::Mod => "%",
+            BinOp::Eq => "==",
+            BinOp::Ne => "!=",
+            BinOp::Gt => ">",
+            BinOp::Ge => ">=",
+            BinOp::Lt => "<",
+            BinOp::Le => "<=",
+            BinOp::And => "&&",
+            BinOp::Or => "||",
+        };
+        write!(f, "{}", op)
+    }
+}
+
 #[derive(Debug)]
 pub struct BinExpr {
     pub lhs: Box<Expr>,
@@ -156,7 +179,7 @@ impl BinExpr {
             Rule::le => BinOp::Le,
             Rule::and => BinOp::And,
             Rule::or => BinOp::Or,
-            _ => unreachable!("{:?}", op),
+            rule => unreachable!("{:?}", rule),
         };
         let lhs = lhs?;
         let rhs = rhs?;
@@ -182,6 +205,16 @@ pub enum UnOp {
     Neg,
 }
 
+impl fmt::Display for UnOp {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let op = match self {
+            UnOp::Not => "!",
+            UnOp::Neg => "-",
+        };
+        write!(f, "{}", op)
+    }
+}
+
 #[derive(Debug)]
 pub struct UnExpr {
     pub op: UnOp,
@@ -194,7 +227,7 @@ impl UnExpr {
         let op = match op.as_rule() {
             Rule::not => UnOp::Not,
             Rule::sub => UnOp::Neg,
-            _ => unreachable!("{:?}", op),
+            rule => unreachable!("{:?}", rule),
         };
         let rhs = rhs?;
 

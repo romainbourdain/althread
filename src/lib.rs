@@ -16,7 +16,8 @@ use parser::parse;
 
 pub fn run_file(path: &str) -> io::Result<()> {
     let buf = fs::read_to_string(path)?;
-    if let Err(_) = run(buf) {
+    if let Err(e) = run(&buf) {
+        e.report(&buf);
         exit(1);
     }
     Ok(())
@@ -35,27 +36,19 @@ pub fn run_prompt() {
             break;
         }
 
-        if let Err(e) = run(line) {
-            eprintln!("{:?}", e);
+        if let Err(e) = run(&line) {
+            e.report(&line)
         }
     }
 }
 
-fn run(source: String) -> Result<(), AlthreadError> {
-    let pairs = parse(&source).map_err(|e| {
-        e.report(&source);
-        e
-    })?;
+fn run(source: &str) -> Result<(), AlthreadError> {
+    let pairs = parse(&source).map_err(|e| e)?;
 
     let mut global_table = SymbolTable::new();
     let mut env = Environment::new(&mut global_table);
 
-    let prog = Program::build(pairs, &mut env).map_err(|e| {
-        e.report(&source);
-        e
-    })?;
+    Program::build(pairs, &mut env)?;
 
-    println!("{:#?}", prog);
-    // println!("{:#?}", env);
     Ok(())
 }

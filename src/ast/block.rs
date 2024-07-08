@@ -80,7 +80,7 @@ impl IfBlock {
                     ErrorType::TypeError,
                     condition.line,
                     condition.column,
-                    format!("If condition must be a boolean, found {:?}", datatype),
+                    format!("If condition must be a boolean, found {}", datatype),
                 ));
             }
             Err(e) => {
@@ -134,7 +134,7 @@ impl WhileBlock {
                     ErrorType::TypeError,
                     condition.line,
                     condition.column,
-                    format!("While condition must be a boolean, found {:?}", datatype),
+                    format!("While condition must be a boolean, found {}", datatype),
                 ));
             }
             Err(e) => {

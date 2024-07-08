@@ -1,3 +1,5 @@
+use core::fmt;
+
 use pest::iterators::Pair;
 
 use crate::{env::Environment, error::AlthreadError, parser::Rule};
@@ -57,7 +59,7 @@ impl DataType {
         let rhs_type = Self::from_expr(&rhs.kind, env)?;
         if lhs_type != rhs_type {
             return Err(format!(
-                "Mismatched types: cannot make {:?} operation between {:?} and {:?}",
+                "Cannot make {} operation between {} and {}",
                 op, lhs_type, rhs_type
             ));
         }
@@ -66,7 +68,7 @@ impl DataType {
             BinOp::Add | BinOp::Sub | BinOp::Mul | BinOp::Div | BinOp::Mod => {
                 if (lhs_type != DataType::Int) && (lhs_type != DataType::Float) {
                     return Err(format!(
-                        "Cannot make {:?} operation between {:?} and {:?}",
+                        "Cannot make {} operation between {} and {}",
                         op, lhs_type, rhs_type
                     ));
                 }
@@ -75,7 +77,7 @@ impl DataType {
             BinOp::Eq | BinOp::Ne | BinOp::Gt | BinOp::Ge | BinOp::Lt | BinOp::Le => {
                 if (lhs_type != DataType::Int) && (lhs_type != DataType::Float) {
                     return Err(format!(
-                        "Cannot make {:?} operation between {:?} and {:?}",
+                        "Cannot make {} operation between {} and {}",
                         op, lhs_type, rhs_type
                     ));
                 }
@@ -84,7 +86,7 @@ impl DataType {
             BinOp::And | BinOp::Or => {
                 if lhs_type != DataType::Bool {
                     return Err(format!(
-                        "Cannot make {:?} operation between {:?} and {:?}",
+                        "Cannot make {} operation between {} and {}",
                         op, lhs_type, rhs_type
                     ));
                 }
@@ -99,16 +101,28 @@ impl DataType {
         match op {
             UnOp::Not => {
                 if rhs_type != DataType::Bool {
-                    return Err(format!("Cannot make {:?} operation for {:?}", op, rhs_type));
+                    return Err(format!("Cannot make {} operation for {}", op, rhs_type));
                 }
                 Ok(DataType::Bool)
             }
             UnOp::Neg => {
                 if (rhs_type != DataType::Int) && (rhs_type != DataType::Float) {
-                    return Err(format!("Cannot make {:?} operation for {:?}", op, rhs_type));
+                    return Err(format!("Cannot make {} operation for {}", op, rhs_type));
                 }
                 Ok(rhs_type)
             }
+        }
+    }
+}
+
+impl fmt::Display for DataType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            DataType::Int => write!(f, "int"),
+            DataType::Float => write!(f, "float"),
+            DataType::Bool => write!(f, "bool"),
+            DataType::String => write!(f, "string"),
+            DataType::Void => write!(f, "void"),
         }
     }
 }

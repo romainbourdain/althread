@@ -109,7 +109,7 @@ impl Assign {
                 assign.line,
                 assign.column,
                 format!(
-                    "Cannot change {} type from {:?} to {:?}",
+                    "Cannot change {} type from {} to {}",
                     assign.identifier, symbol.datatype, value_type
                 ),
             ));

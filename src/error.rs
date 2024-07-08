@@ -1,3 +1,5 @@
+use core::fmt;
+
 #[derive(Debug)]
 pub struct Pos {
     pub line: usize,
@@ -15,8 +17,17 @@ pub struct AlthreadError {
 pub enum ErrorType {
     SyntaxError,
     TypeError,
-    RuntimeError,
     VariableError,
+}
+
+impl fmt::Display for ErrorType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            ErrorType::SyntaxError => write!(f, "Syntax Error"),
+            ErrorType::TypeError => write!(f, "Type Error"),
+            ErrorType::VariableError => write!(f, "Variable Error"),
+        }
+    }
 }
 
 impl AlthreadError {
@@ -32,7 +43,11 @@ impl AlthreadError {
         if self.pos.line == 0 {
             return;
         }
-        let line = input.lines().nth(self.pos.line - 1).unwrap().to_string();
+        let line = match input.lines().nth(self.pos.line - 1) {
+            Some(line) => line.to_string(),
+            None => return,
+        };
+
         let line_indent = " ".repeat(self.pos.line.to_string().len());
         eprintln!("{} |", line_indent);
         eprintln!("{} | {}", self.pos.line, line);
@@ -43,6 +58,6 @@ impl AlthreadError {
     pub fn report(&self, input: &str) {
         eprintln!("Error at {}:{}", self.pos.line, self.pos.col);
         self.print_err_line(input);
-        eprintln!("{:?}: {}", self.error_type, self.message);
+        eprintln!("{}: {}", self.error_type, self.message);
     }
 }

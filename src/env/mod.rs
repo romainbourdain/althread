@@ -1,9 +1,6 @@
 use symbol_table::{Symbol, SymbolTable};
 
-use crate::{
-    ast::{datatype::DataType, expr::PrimaryExpr},
-    error::{AlthreadError, ErrorType},
-};
+use crate::ast::{datatype::DataType, expr::PrimaryExpr};
 
 pub mod symbol_table;
 
@@ -22,12 +19,11 @@ impl<'a> Environment<'a> {
     }
 
     pub fn push_table(&mut self) {
-        println!("push scope");
         self.symbol_tables.push(SymbolTable::new());
     }
 
     pub fn pop_table(&mut self) {
-        println!("pop scope: {:?}", self.symbol_tables.pop());
+        self.symbol_tables.pop();
     }
 
     pub fn insert_symbol(
@@ -36,18 +32,16 @@ impl<'a> Environment<'a> {
         datatype: DataType,
         mutable: bool,
         value: Option<PrimaryExpr>,
-    ) -> Result<(), AlthreadError> {
+    ) -> Result<(), String> {
         let current_symbol_table = self
             .symbol_tables
             .last_mut()
             .unwrap_or(&mut self.global_table);
 
         if current_symbol_table.contains_key(&identifier) {
-            return Err(AlthreadError::error(
-                ErrorType::VariableError,
-                0,
-                0,
-                format!("Symbol {} already exists in current scope", identifier),
+            return Err(format!(
+                "Symbol {} already exists in current scope",
+                identifier
             ));
         }
 
@@ -56,9 +50,6 @@ impl<'a> Environment<'a> {
             mutable,
             value,
         };
-
-        println!("inserting symbol: {}", identifier);
-
         current_symbol_table.insert(identifier, symbol);
         Ok(())
     }

@@ -1,18 +1,19 @@
 shared {
-    let a = 7;
+    let a: string;
 }
 
 main {
-    let b: int = a;
-    b = 7;
+    let b: int = a+4
+    
+    *56;
+  /*  b = 7;
     let c = 3;
     {
-    let d :int = "";
+    let d :int;
     d++;
     }
     const e = true;
     let f = "hello world";
-    b=7;
     print(f);
 
     while (c == 3) {
@@ -23,5 +24,5 @@ main {
         c += 3;
     } else {
         c ++;
-    }
+    }*/
 }
