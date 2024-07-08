@@ -48,7 +48,8 @@ fn run(source: &str) -> Result<(), AlthreadError> {
     let mut global_table = SymbolTable::new();
     let mut env = Environment::new(&mut global_table);
 
-    Program::build(pairs, &mut env)?;
+    let ast = Program::build(pairs, &mut env)?;
+    println!("{:#?}", ast);
 
     Ok(())
 }

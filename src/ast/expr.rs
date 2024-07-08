@@ -56,6 +56,7 @@ impl Expr {
             column: 0,
         }
     }
+
     pub fn build(pair: Pair<Rule>, env: &Environment) -> ExprResult {
         PRATT_PARSER
             .map_primary(|pair| PrimaryExpr::build(pair, env))

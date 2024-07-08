@@ -3,10 +3,7 @@ use pest::iterators::Pair;
 use crate::{env::Environment, error::AlthreadError, parser::Rule};
 
 use super::{
-    assign::Assign,
-    block::{Block, IfBlock, WhileBlock},
-    decl::Decl,
-    expr::Expr,
+    assign::Assign, block::Block, decl::Decl, expr::Expr, if_stmt::IfStmt, while_stmt::WhileStmt,
 };
 
 #[derive(Debug)]
@@ -16,8 +13,8 @@ pub enum Stmt {
     Print(Expr),
     Block(Block),
     Assign(Assign),
-    IfStmt(IfBlock),
-    WhileStmt(WhileBlock),
+    IfStmt(IfStmt),
+    WhileStmt(WhileStmt),
 }
 
 impl Stmt {
@@ -31,8 +28,8 @@ impl Stmt {
             )?)),
             Rule::block => Ok(Self::Block(Block::parse_and_push(pair, env)?)),
             Rule::assignment => Ok(Self::Assign(Assign::build(pair, env)?)),
-            Rule::if_stmt => Ok(Self::IfStmt(IfBlock::build(pair, env)?)),
-            Rule::while_stmt => Ok(Self::WhileStmt(WhileBlock::build(pair, env)?)),
+            Rule::if_stmt => Ok(Self::IfStmt(IfStmt::build(pair, env)?)),
+            Rule::while_stmt => Ok(Self::WhileStmt(WhileStmt::build(pair, env)?)),
             _ => unreachable!(),
         }
     }

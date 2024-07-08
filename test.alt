@@ -1,12 +1,11 @@
 shared {
-    let a: string;
+    let a: int;
 }
 
 main {
-    let b: int = a+4
-    
-    *56;
-  /*  b = 7;
+    let b: int = a+4;
+    print(b);
+      /*  b = 7;
     let c = 3;
     {
     let d :int;
