@@ -1,5 +1,3 @@
-use block::Block;
-
 pub mod assign;
 pub mod block;
 pub mod datatype;
@@ -9,6 +7,8 @@ pub mod if_stmt;
 pub mod print_stmt;
 pub mod stmt;
 pub mod while_stmt;
+
+use block::Block;
 
 #[derive(Debug)]
 pub struct Ast {

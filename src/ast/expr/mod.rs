@@ -8,10 +8,7 @@ use pest::{iterators::Pair, pratt_parser::PrattParser};
 use crate::{
     env::Environment,
     error::AlthreadError,
-    nodes::{
-        datatype::DataType,
-        expr::{binary::BinExpr, primary::PrimaryExpr, unary::UnExpr, Expr, ExprKind},
-    },
+    nodes::expr::{binary::BinExpr, primary::PrimaryExpr, unary::UnExpr, Expr},
     parser::Rule,
 };
 
@@ -45,28 +42,5 @@ impl Expr {
             .map_infix(|lhs, op, rhs| BinExpr::build(lhs, op, rhs, env))
             .map_prefix(|op, rhs| UnExpr::build(op, rhs, env))
             .parse(pair.into_inner())
-    }
-
-    pub fn default(datatype: &DataType) -> Self {
-        use DataType::*;
-
-        let primary = match datatype {
-            Int => PrimaryExpr::Int(0),
-            Float => PrimaryExpr::Float(0.0),
-            Bool => PrimaryExpr::Bool(false),
-            String => PrimaryExpr::String("".to_string()),
-            Void => PrimaryExpr::Null,
-        };
-
-        Self::new(ExprKind::Primary(primary))
-    }
-
-    pub fn eval(&self, env: &Environment) -> Result<PrimaryExpr, AlthreadError> {
-        use ExprKind::*;
-        match &self.kind {
-            Primary(expr) => expr.eval(env),
-            Binary(expr) => expr.eval(env),
-            Unary(expr) => expr.eval(env),
-        }
     }
 }

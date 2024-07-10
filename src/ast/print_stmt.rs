@@ -13,10 +13,4 @@ impl PrintStmt {
         let expr = Expr::build(pair.into_inner().next().unwrap(), env)?;
         Ok(Self { expr, line, column })
     }
-
-    pub fn eval(&self, env: &mut Environment) -> Result<(), AlthreadError> {
-        let value = self.expr.eval(env)?;
-        println!("{}", value);
-        Ok(())
-    }
 }

@@ -51,7 +51,7 @@ impl Decl {
         })?;
 
         match (&self.datatype, &value_type) {
-            (_, DataType::Void) => self.value = Expr::default(&self.datatype),
+            (_, DataType::Void) => self.value = Expr::from_datatype(&self.datatype),
             (DataType::Void, _) => self.datatype = value_type,
             _ if (self.datatype == value_type) => {}
             _ => {
@@ -63,18 +63,6 @@ impl Decl {
                 ))
             }
         }
-
-        Ok(())
-    }
-
-    pub fn eval(&self, env: &mut Environment) -> Result<(), AlthreadError> {
-        env.insert_symbol(
-            self.identifier.clone(),
-            self.datatype.clone(),
-            self.mutable,
-            Some(self.value.eval(env)?),
-        )
-        .map_err(|e| AlthreadError::error(ErrorType::VariableError, self.line, self.column, e))?;
 
         Ok(())
     }

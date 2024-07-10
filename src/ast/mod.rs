@@ -42,12 +42,4 @@ impl Ast {
 
         Ok(program)
     }
-
-    pub fn eval(&self, env: &mut Environment) -> Result<(), AlthreadError> {
-        self.shared_block.as_ref().map(|block| block.eval(env));
-        env.push_table();
-        self.main_block.as_ref().map(|block| block.eval(env));
-
-        Ok(())
-    }
 }
