@@ -3,19 +3,9 @@ use pest::iterators::Pair;
 use crate::{
     env::Environment,
     error::{AlthreadError, ErrorType},
+    nodes::{block::Block, datatype::DataType, expr::Expr, if_stmt::IfStmt},
     parser::Rule,
 };
-
-use super::{block::Block, datatype::DataType, expr::Expr};
-
-#[derive(Debug)]
-pub struct IfStmt {
-    pub condition: Expr,
-    pub block: Block,
-    pub else_block: Option<Block>,
-    pub line: usize,
-    pub column: usize,
-}
 
 impl IfStmt {
     pub fn build(pair: Pair<Rule>, env: &mut Environment) -> Result<Self, AlthreadError> {

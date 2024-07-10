@@ -3,47 +3,18 @@ use pest::iterators::Pair;
 use crate::{
     env::Environment,
     error::{AlthreadError, ErrorType},
+    nodes::{
+        assign::{Assign, AssignBinOp},
+        datatype::DataType,
+        expr::{primary::PrimaryExpr, Expr, ExprKind},
+    },
     parser::Rule,
 };
-
-use super::{
-    datatype::DataType,
-    expr::{Expr, ExprKind, PrimaryExpr},
-};
-
-#[derive(Debug)]
-pub enum AssignBinOp {
-    Assign,
-    AddAssign,
-    SubAssign,
-    MulAssign,
-    DivAssign,
-    ModAssign,
-}
-
-#[derive(Debug)]
-pub struct Assign {
-    identifier: String,
-    op: AssignBinOp,
-    value: Expr,
-    line: usize,
-    column: usize,
-}
 
 impl Assign {
     pub fn build(pair: Pair<Rule>, env: &Environment) -> Result<Self, AlthreadError> {
         let (line, column) = pair.line_col();
-        let mut assign = Assign {
-            identifier: "".to_string(),
-            op: AssignBinOp::Assign,
-            value: Expr {
-                kind: ExprKind::Primary(PrimaryExpr::Null),
-                line: 0,
-                column: 0,
-            },
-            line,
-            column,
-        };
+        let mut assign = Self::new(line, column);
 
         for pair in pair.into_inner() {
             match pair.as_rule() {
@@ -116,10 +87,5 @@ impl Assign {
         }
 
         Ok(assign)
-    }
-
-    pub fn eval(&self, env: &mut Environment) -> Result<(), AlthreadError> {
-        // TODO: Implement assignment evaluation
-        unimplemented!();
     }
 }

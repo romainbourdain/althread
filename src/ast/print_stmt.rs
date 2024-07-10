@@ -1,15 +1,11 @@
 use pest::iterators::Pair;
 
-use crate::{env::Environment, error::AlthreadError, parser::Rule};
-
-use super::expr::Expr;
-
-#[derive(Debug)]
-pub struct PrintStmt {
-    pub expr: Expr,
-    pub line: usize,
-    pub column: usize,
-}
+use crate::{
+    env::Environment,
+    error::AlthreadError,
+    nodes::{expr::Expr, print_stmt::PrintStmt},
+    parser::Rule,
+};
 
 impl PrintStmt {
     pub fn build(pair: Pair<Rule>, env: &Environment) -> Result<Self, AlthreadError> {

@@ -1,25 +1,13 @@
 use pest::iterators::Pair;
 
-use crate::{env::Environment, error::AlthreadError, parser::Rule};
-
-use super::stmt::Stmt;
-
-#[derive(Debug)]
-pub struct Block {
-    pub stmts: Vec<Stmt>,
-    pub line: usize,
-    pub column: usize,
-}
+use crate::{
+    env::Environment,
+    error::AlthreadError,
+    nodes::{block::Block, stmt::Stmt},
+    parser::Rule,
+};
 
 impl Block {
-    pub fn new(line: usize, column: usize) -> Self {
-        Self {
-            stmts: Vec::new(),
-            line,
-            column,
-        }
-    }
-
     pub fn parse(pair: Pair<Rule>, env: &mut Environment) -> Result<Self, AlthreadError> {
         let (line, column) = pair.line_col();
         let mut block = Self::new(line, column);

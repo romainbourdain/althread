@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::ast::{datatype::DataType, expr::PrimaryExpr};
+use crate::nodes::{datatype::DataType, expr::primary::PrimaryExpr};
 
 pub type SymbolTable = HashMap<String, Symbol>;
 

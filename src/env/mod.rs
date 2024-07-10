@@ -1,6 +1,6 @@
 use symbol_table::{Symbol, SymbolTable};
 
-use crate::ast::{datatype::DataType, expr::PrimaryExpr};
+use crate::nodes::{datatype::DataType, expr::primary::PrimaryExpr};
 
 pub mod symbol_table;
 

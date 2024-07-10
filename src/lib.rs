@@ -1,7 +1,9 @@
 mod ast;
 mod env;
 mod error;
+mod nodes;
 mod parser;
+mod runtime;
 
 use std::{
     fs,
@@ -9,9 +11,9 @@ use std::{
     process::exit,
 };
 
-use ast::program::Program;
 use env::{symbol_table::SymbolTable, Environment};
 use error::AlthreadError;
+use nodes::Ast;
 use parser::parse;
 
 pub fn run_file(path: &str) -> io::Result<()> {
@@ -48,7 +50,7 @@ fn run(source: &str) -> Result<(), AlthreadError> {
     let mut global_table = SymbolTable::new();
     let mut env = Environment::new(&mut global_table);
 
-    let ast = Program::build(pairs, &mut env)?;
+    let ast = Ast::build(pairs, &mut env)?;
 
     env.clear_global();
 

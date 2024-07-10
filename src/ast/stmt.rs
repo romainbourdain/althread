@@ -1,22 +1,14 @@
 use pest::iterators::Pair;
 
-use crate::{env::Environment, error::AlthreadError, parser::Rule};
-
-use super::{
-    assign::Assign, block::Block, decl::Decl, expr::Expr, if_stmt::IfStmt, print_stmt::PrintStmt,
-    while_stmt::WhileStmt,
+use crate::{
+    env::Environment,
+    error::AlthreadError,
+    nodes::{
+        assign::Assign, block::Block, decl::Decl, expr::Expr, if_stmt::IfStmt,
+        print_stmt::PrintStmt, stmt::Stmt, while_stmt::WhileStmt,
+    },
+    parser::Rule,
 };
-
-#[derive(Debug)]
-pub enum Stmt {
-    Expr(Expr),
-    Decl(Decl),
-    Print(PrintStmt),
-    Block(Block),
-    Assign(Assign),
-    IfStmt(IfStmt),
-    WhileStmt(WhileStmt),
-}
 
 impl Stmt {
     pub fn build(pair: Pair<Rule>, env: &mut Environment) -> Result<Self, AlthreadError> {

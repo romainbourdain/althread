@@ -1,30 +1,18 @@
-use core::fmt;
-
 use pest::iterators::Pair;
 
-use crate::{env::Environment, error::AlthreadError, parser::Rule};
-
-use super::expr::{BinOp, Expr, ExprKind, PrimaryExpr, UnOp};
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum DataType {
-    Int,
-    Float,
-    Bool,
-    String,
-    Void,
-}
+use crate::{
+    env::Environment,
+    error::AlthreadError,
+    nodes::{
+        datatype::DataType,
+        expr::{binary::BinOp, primary::PrimaryExpr, unary::UnOp, Expr, ExprKind},
+    },
+    parser::Rule,
+};
 
 impl DataType {
     pub fn build(pair: Pair<Rule>) -> Result<Self, AlthreadError> {
-        match pair.as_str() {
-            "int" => Ok(Self::Int),
-            "float" => Ok(Self::Float),
-            "bool" => Ok(Self::Bool),
-            "string" => Ok(Self::String),
-            "void" => Ok(Self::Void),
-            _ => unreachable!(),
-        }
+        Self::from_str(pair.as_str())
     }
 
     pub fn from_expr(expr: &ExprKind, env: &Environment) -> Result<Self, String> {
@@ -111,18 +99,6 @@ impl DataType {
                 }
                 Ok(rhs_type)
             }
-        }
-    }
-}
-
-impl fmt::Display for DataType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            DataType::Int => write!(f, "int"),
-            DataType::Float => write!(f, "float"),
-            DataType::Bool => write!(f, "bool"),
-            DataType::String => write!(f, "string"),
-            DataType::Void => write!(f, "void"),
         }
     }
 }
