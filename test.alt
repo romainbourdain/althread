@@ -3,10 +3,9 @@ shared {
 }
 
 main {
-    let b = true;
-    print(!b);
-      /*  b = 7;
-    let c = 3;
+    let b = 3*(4+(-5));
+    print(true || b>-3);
+    /*let c = 3;
     {
     let d :int;
     d++;ç

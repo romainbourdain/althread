@@ -34,6 +34,17 @@ lazy_static! {
     };
 }
 
+macro_rules! match_bin {
+    ([$(($variant:ident, $out:ident)),*], $lhs:expr, $rhs:expr, $op:expr) => {
+        match ($lhs, $rhs) {
+            $(
+                (PrimaryExpr::$variant(a), PrimaryExpr::$variant(b)) => Ok(PrimaryExpr::$out($op(a, b))),
+            )*
+            _ => unreachable!(),
+        }
+    };
+}
+
 #[derive(Debug)]
 pub struct Expr {
     pub kind: ExprKind,
@@ -82,9 +93,8 @@ impl Expr {
     pub fn eval(&self, env: &Environment) -> Result<PrimaryExpr, AlthreadError> {
         use ExprKind::*;
         match &self.kind {
-            // TODO: Implement Binary and Unary evaluation
             Primary(expr) => expr.eval(env),
-            Binary(_) => unimplemented!(),
+            Binary(expr) => expr.eval(env),
             Unary(expr) => expr.eval(env),
         }
     }
@@ -103,6 +113,9 @@ pub enum PrimaryExpr {
 impl PrimaryExpr {
     pub fn build(pair: Pair<Rule>, env: &Environment) -> ExprResult {
         let (line, column) = pair.line_col();
+        if pair.as_rule() == Rule::expr {
+            return Expr::build(pair, env);
+        }
         let expr = match pair.as_rule() {
             Rule::NULL => Self::Null,
             Rule::INTEGER => Self::Int(pair.as_str().parse::<i64>().unwrap()),
@@ -139,12 +152,7 @@ impl PrimaryExpr {
                 if let Some(value) = symbol.value.as_ref() {
                     Ok(value.clone())
                 } else {
-                    Err(AlthreadError::error(
-                        ErrorType::RuntimeError,
-                        0,
-                        0,
-                        format!("symbol has no value"),
-                    ))
+                    unreachable!("symbol has no value");
                 }
             }
             _ => Ok(self.clone()),
@@ -247,6 +255,27 @@ impl BinExpr {
             column,
         })
     }
+
+    pub fn eval(&self, env: &Environment) -> Result<PrimaryExpr, AlthreadError> {
+        let lhs = self.lhs.eval(env)?;
+        let rhs = self.rhs.eval(env)?;
+
+        match self.op {
+            BinOp::Add => match_bin!([(Int, Int), (Float, Float)], lhs, rhs, |a, b| a + b),
+            BinOp::Sub => match_bin!([(Int, Int), (Float, Float)], lhs, rhs, |a, b| a - b),
+            BinOp::Mul => match_bin!([(Int, Int), (Float, Float)], lhs, rhs, |a, b| a * b),
+            BinOp::Div => match_bin!([(Int, Int), (Float, Float)], lhs, rhs, |a, b| a / b),
+            BinOp::Mod => match_bin!([(Int, Int), (Float, Float)], lhs, rhs, |a, b| a % b),
+            BinOp::Eq => match_bin!([(Int, Bool), (Float, Bool)], lhs, rhs, |a, b| a == b),
+            BinOp::Ne => match_bin!([(Int, Bool), (Float, Bool)], lhs, rhs, |a, b| a != b),
+            BinOp::Gt => match_bin!([(Int, Bool), (Float, Bool)], lhs, rhs, |a, b| a > b),
+            BinOp::Ge => match_bin!([(Int, Bool), (Float, Bool)], lhs, rhs, |a, b| a >= b),
+            BinOp::Lt => match_bin!([(Int, Bool), (Float, Bool)], lhs, rhs, |a, b| a < b),
+            BinOp::Le => match_bin!([(Int, Bool), (Float, Bool)], lhs, rhs, |a, b| a <= b),
+            BinOp::Or => match_bin!([(Bool, Bool)], lhs, rhs, |a, b| a || b),
+            BinOp::And => match_bin!([(Bool, Bool)], lhs, rhs, |a, b| a && b),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -296,14 +325,15 @@ impl UnExpr {
     }
 
     pub fn eval(&self, env: &Environment) -> Result<PrimaryExpr, AlthreadError> {
+        let rhs = self.rhs.eval(env)?;
         match self.op {
-            UnOp::Not => match self.rhs.eval(env)? {
-                PrimaryExpr::Bool(expr) => Ok(PrimaryExpr::Bool(!expr)),
+            UnOp::Not => match rhs {
+                PrimaryExpr::Bool(v) => Ok(PrimaryExpr::Bool(!v)),
                 _ => unreachable!(),
             },
-            UnOp::Neg => match self.rhs.eval(env)? {
-                PrimaryExpr::Int(expr) => Ok(PrimaryExpr::Int(-expr)),
-                PrimaryExpr::Float(expr) => Ok(PrimaryExpr::Float(-expr)),
+            UnOp::Neg => match rhs {
+                PrimaryExpr::Int(v) => Ok(PrimaryExpr::Int(-v)),
+                PrimaryExpr::Float(v) => Ok(PrimaryExpr::Float(-v)),
                 _ => unreachable!(),
             },
         }
