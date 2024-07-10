@@ -38,9 +38,9 @@ impl Block {
         Ok(block)
     }
 
-    pub fn eval(&self) -> Result<(), AlthreadError> {
+    pub fn eval(&self, env: &mut Environment) -> Result<(), AlthreadError> {
         for stmt in &self.stmts {
-            stmt.eval()?;
+            stmt.eval(env)?;
         }
 
         Ok(())

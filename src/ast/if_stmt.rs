@@ -59,7 +59,7 @@ impl IfStmt {
         }
     }
 
-    pub fn eval(&self) -> Result<(), AlthreadError> {
+    pub fn eval(&self, env: &mut Environment) -> Result<(), AlthreadError> {
         // TODO: Implement if statement evaluation
         unimplemented!();
     }

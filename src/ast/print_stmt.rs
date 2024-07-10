@@ -18,8 +18,8 @@ impl PrintStmt {
         Ok(Self { expr, line, column })
     }
 
-    pub fn eval(&self) -> Result<(), AlthreadError> {
-        let value = self.expr.eval()?;
+    pub fn eval(&self, env: &mut Environment) -> Result<(), AlthreadError> {
+        let value = self.expr.eval(env)?;
         println!("{}", value);
         Ok(())
     }

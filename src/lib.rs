@@ -49,7 +49,10 @@ fn run(source: &str) -> Result<(), AlthreadError> {
     let mut env = Environment::new(&mut global_table);
 
     let ast = Program::build(pairs, &mut env)?;
-    ast.eval();
+
+    env.clear_global();
+
+    ast.eval(&mut env)?;
 
     Ok(())
 }

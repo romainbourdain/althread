@@ -67,4 +67,8 @@ impl<'a> Environment<'a> {
 
         Err(format!("Symbol {} not found", identifier))
     }
+
+    pub fn clear_global(&mut self) {
+        self.global_table.clear()
+    }
 }

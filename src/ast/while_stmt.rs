@@ -61,7 +61,7 @@ impl WhileStmt {
         }
     }
 
-    pub fn eval(&self) -> Result<(), AlthreadError> {
+    pub fn eval(&self, env: &mut Environment) -> Result<(), AlthreadError> {
         // TODO: Implement while statement evaluation
         unimplemented!();
     }

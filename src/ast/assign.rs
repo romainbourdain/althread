@@ -118,7 +118,7 @@ impl Assign {
         Ok(assign)
     }
 
-    pub fn eval(&self) -> Result<(), AlthreadError> {
+    pub fn eval(&self, env: &mut Environment) -> Result<(), AlthreadError> {
         // TODO: Implement assignment evaluation
         unimplemented!();
     }

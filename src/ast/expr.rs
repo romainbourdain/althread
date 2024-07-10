@@ -30,7 +30,7 @@ lazy_static! {
                 | Op::infix(Rule::div, Assoc::Left)
                 | Op::infix(Rule::modulo, Assoc::Left))
             .op(Op::prefix(Rule::not))
-            .op(Op::prefix(Rule::sub))
+            .op(Op::prefix(Rule::neg))
     };
 }
 
@@ -79,13 +79,13 @@ impl Expr {
         Self::new(ExprKind::Primary(primary))
     }
 
-    pub fn eval(&self) -> Result<PrimaryExpr, AlthreadError> {
+    pub fn eval(&self, env: &Environment) -> Result<PrimaryExpr, AlthreadError> {
         use ExprKind::*;
         match &self.kind {
             // TODO: Implement Binary and Unary evaluation
-            Primary(expr) => expr.eval(),
+            Primary(expr) => expr.eval(env),
             Binary(_) => unimplemented!(),
-            Unary(_) => unimplemented!(),
+            Unary(expr) => expr.eval(env),
         }
     }
 }
@@ -129,8 +129,26 @@ impl PrimaryExpr {
         })
     }
 
-    pub fn eval(&self) -> Result<PrimaryExpr, AlthreadError> {
-        Ok(self.clone())
+    pub fn eval(&self, env: &Environment) -> Result<PrimaryExpr, AlthreadError> {
+        match self {
+            PrimaryExpr::Identifier(ident) => {
+                let symbol = env
+                    .get_symbol(ident)
+                    .map_err(|err| AlthreadError::error(ErrorType::RuntimeError, 0, 0, err))?;
+
+                if let Some(value) = symbol.value.as_ref() {
+                    Ok(value.clone())
+                } else {
+                    Err(AlthreadError::error(
+                        ErrorType::RuntimeError,
+                        0,
+                        0,
+                        format!("symbol has no value"),
+                    ))
+                }
+            }
+            _ => Ok(self.clone()),
+        }
     }
 }
 
@@ -143,7 +161,7 @@ impl fmt::Display for PrimaryExpr {
             Float(value) => write!(f, "{}", value),
             Bool(value) => write!(f, "{}", value),
             String(value) => write!(f, "{}", value),
-            Identifier(value) => write!(f, "{}", value),
+            Identifier(_) => unreachable!(),
         }
     }
 }
@@ -259,7 +277,7 @@ impl UnExpr {
         let (line, column) = op.line_col();
         let op = match op.as_rule() {
             Rule::not => UnOp::Not,
-            Rule::sub => UnOp::Neg,
+            Rule::neg => UnOp::Neg,
             rule => unreachable!("{:?}", rule),
         };
         let rhs = rhs?;
@@ -275,5 +293,19 @@ impl UnExpr {
             line,
             column,
         })
+    }
+
+    pub fn eval(&self, env: &Environment) -> Result<PrimaryExpr, AlthreadError> {
+        match self.op {
+            UnOp::Not => match self.rhs.eval(env)? {
+                PrimaryExpr::Bool(expr) => Ok(PrimaryExpr::Bool(!expr)),
+                _ => unreachable!(),
+            },
+            UnOp::Neg => match self.rhs.eval(env)? {
+                PrimaryExpr::Int(expr) => Ok(PrimaryExpr::Int(-expr)),
+                PrimaryExpr::Float(expr) => Ok(PrimaryExpr::Float(-expr)),
+                _ => unreachable!(),
+            },
+        }
     }
 }
