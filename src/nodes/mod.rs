@@ -17,3 +17,14 @@ pub struct Ast {
     pub line: usize,
     pub column: usize,
 }
+
+impl Ast {
+    pub fn new(line: usize, column: usize) -> Self {
+        Self {
+            main_block: None,
+            shared_block: None,
+            line,
+            column,
+        }
+    }
+}

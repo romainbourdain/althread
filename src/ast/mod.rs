@@ -20,12 +20,7 @@ use crate::{
 impl Ast {
     pub fn build(pairs: Pairs<Rule>, env: &mut Environment) -> Result<Self, AlthreadError> {
         let (line, column) = pairs.clone().next().unwrap().line_col();
-        let mut program = Self {
-            main_block: None,
-            shared_block: None,
-            line,
-            column,
-        };
+        let mut program = Self::new(line, column);
 
         for pair in pairs {
             match pair.as_rule() {

@@ -3,25 +3,14 @@ use pest::iterators::Pair;
 use crate::{
     env::Environment,
     error::{AlthreadError, ErrorType},
-    nodes::{
-        datatype::DataType,
-        decl::Decl,
-        expr::{Expr, ExprKind},
-    },
+    nodes::{datatype::DataType, decl::Decl, expr::Expr},
     parser::Rule,
 };
 
 impl Decl {
     pub fn build(pair: Pair<Rule>, env: &mut Environment) -> Result<Self, AlthreadError> {
         let (line, column) = pair.line_col();
-        let mut decl = Decl {
-            identifier: "".to_string(),
-            value: Expr::new(ExprKind::new()),
-            datatype: DataType::Void,
-            mutable: false,
-            line,
-            column,
-        };
+        let mut decl = Decl::new(line, column);
 
         for pair in pair.into_inner() {
             match pair.as_rule() {

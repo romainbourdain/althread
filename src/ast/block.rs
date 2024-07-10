@@ -25,12 +25,4 @@ impl Block {
         env.pop_table();
         Ok(block)
     }
-
-    pub fn eval(&self, env: &mut Environment) -> Result<(), AlthreadError> {
-        for stmt in &self.stmts {
-            stmt.eval(env)?;
-        }
-
-        Ok(())
-    }
 }
