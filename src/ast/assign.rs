@@ -19,29 +19,17 @@ impl Assign {
         for pair in pair.into_inner() {
             match pair.as_rule() {
                 Rule::IDENTIFIER => assign.identifier = pair.as_str().to_string(),
+                // TODO: implement assign op
                 Rule::assign_op => {
                     assign.op = match pair.as_str() {
                         "=" => AssignBinOp::Assign,
-                        "+=" => AssignBinOp::AddAssign,
-                        "-=" => AssignBinOp::SubAssign,
-                        "*=" => AssignBinOp::MulAssign,
-                        "/=" => AssignBinOp::DivAssign,
-                        "%=" => AssignBinOp::ModAssign,
-                        _ => unreachable!(),
+                        _ => unimplemented!(),
                     }
                 }
                 Rule::expr => assign.value = Expr::build(pair, env)?,
+                // TODO: implement assign unary op
                 Rule::assign_unary_op => {
-                    assign.op = match pair.as_str() {
-                        "++" => AssignBinOp::AddAssign,
-                        "--" => AssignBinOp::SubAssign,
-                        _ => unreachable!(),
-                    };
-                    assign.value = Expr {
-                        kind: ExprKind::Primary(PrimaryExpr::Int(1)),
-                        line: pair.as_span().start_pos().line_col().0,
-                        column: pair.as_span().start_pos().line_col().1,
-                    };
+                    unimplemented!()
                 }
                 _ => unreachable!(),
             }

@@ -3,24 +3,14 @@ shared {
 }
 
 main {
-    let b = 3*(4+(-5));
-    print(true || b>-3);
-    /*let c = 3;
-    {
-    let d :int;
-    d++;ç
-    }
-    const e = true;
-    let f = "hello world";
-    print(f);
-
-    while (c == 3) {
-        let b = 5;
-    }
-
-    if (b == 4) {
-        c += 3;
+    let b = 0;
+    if (b > 10) {
+        b = b + 1;
+        print(b);
     } else {
-        c ++;
-    }*/
+        b = -1;
+        print(b);
+    }
+
+    print(a);
 }

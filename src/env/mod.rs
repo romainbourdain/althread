@@ -71,4 +71,20 @@ impl<'a> Environment<'a> {
     pub fn clear_global(&mut self) {
         self.global_table.clear()
     }
+
+    pub fn update_symbol(&mut self, identifier: &String, value: PrimaryExpr) -> Result<(), String> {
+        for table in self.symbol_tables.iter_mut().rev() {
+            if let Some(symbol) = table.get_mut(identifier) {
+                symbol.value = Some(value);
+                return Ok(());
+            }
+        }
+
+        if let Some(symbol) = self.global_table.get_mut(identifier) {
+            symbol.value = Some(value);
+            return Ok(());
+        }
+
+        Err(format!("Symbol {} not found", identifier))
+    }
 }

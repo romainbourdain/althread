@@ -45,9 +45,3 @@ pub enum ExprKind {
     Binary(BinExpr),
     Unary(UnExpr),
 }
-
-impl ExprKind {
-    pub fn new() -> Self {
-        Self::Primary(PrimaryExpr::Null)
-    }
-}
