@@ -22,11 +22,7 @@ impl Assign {
                 Rule::assign_op => assign.op = AssignOp::build(pair)?,
                 Rule::expr => assign.value = Expr::build(pair, env)?,
                 Rule::assign_unary_op => {
-                    assign.op = match pair.as_str() {
-                        "++" => AssignOp::AddAssign,
-                        "--" => AssignOp::SubAssign,
-                        _ => unimplemented!(),
-                    };
+                    assign.op = AssignOp::build(pair)?;
                     assign.value = Expr::new(ExprKind::Primary(PrimaryExpr::Int(1)));
                 }
                 _ => unreachable!(),
@@ -95,6 +91,8 @@ impl AssignOp {
             "*=" => AssignOp::MulAssign,
             "/=" => AssignOp::DivAssign,
             "%=" => AssignOp::ModAssign,
+            "++" => AssignOp::AddAssign,
+            "--" => AssignOp::SubAssign,
             _ => unimplemented!(),
         })
     }

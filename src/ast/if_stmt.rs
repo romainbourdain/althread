@@ -17,10 +17,9 @@ impl IfStmt {
 
         let condition = Expr::build(condition, env)?;
         let block = Block::parse_and_push(block, env)?;
-        let else_block = match else_block {
-            Some(else_block) => Some(Block::parse_and_push(else_block, env)?),
-            None => None,
-        };
+        let else_block = else_block
+            .map(|block| Block::parse_and_push(block, env))
+            .transpose()?;
 
         match condition.get_datatype(env)? {
             DataType::Bool => Ok(IfStmt {
