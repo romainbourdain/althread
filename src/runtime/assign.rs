@@ -1,16 +1,59 @@
 use crate::{
     env::Environment,
     error::{AlthreadError, ErrorType},
-    nodes::assign::Assign,
+    nodes::{
+        assign::{Assign, AssignOp},
+        expr::primary::PrimaryExpr,
+    },
 };
 
 impl Assign {
     pub fn eval(&self, env: &mut Environment) -> Result<(), AlthreadError> {
-        env.update_symbol(&self.identifier, self.value.eval(env)?)
-            .map_err(|e| {
+        let symbol = env.get_symbol(&self.identifier).map_err(|e| {
+            AlthreadError::error(ErrorType::VariableError, self.line, self.column, e)
+        })?;
+        if let Some(symbol_value) = &symbol.value {
+            let value = match self.op {
+                AssignOp::Assign => self.value.eval(env)?,
+                AssignOp::AddAssign => match (self.value.eval(env)?, symbol_value) {
+                    (PrimaryExpr::Int(value), PrimaryExpr::Int(cur)) => {
+                        PrimaryExpr::Int(cur + value)
+                    }
+                    _ => unreachable!(),
+                },
+                AssignOp::SubAssign => match (self.value.eval(env)?, symbol_value) {
+                    (PrimaryExpr::Int(value), PrimaryExpr::Int(cur)) => {
+                        PrimaryExpr::Int(cur - value)
+                    }
+                    _ => unreachable!(),
+                },
+                AssignOp::MulAssign => match (self.value.eval(env)?, symbol_value) {
+                    (PrimaryExpr::Int(value), PrimaryExpr::Int(cur)) => {
+                        PrimaryExpr::Int(cur * value)
+                    }
+                    _ => unreachable!(),
+                },
+                AssignOp::DivAssign => match (self.value.eval(env)?, symbol_value) {
+                    (PrimaryExpr::Int(value), PrimaryExpr::Int(cur)) => {
+                        PrimaryExpr::Int(cur / value)
+                    }
+                    _ => unreachable!(),
+                },
+                AssignOp::ModAssign => match (self.value.eval(env)?, symbol_value) {
+                    (PrimaryExpr::Int(value), PrimaryExpr::Int(cur)) => {
+                        PrimaryExpr::Int(cur % value)
+                    }
+                    _ => unreachable!(),
+                },
+            };
+
+            env.update_symbol(&self.identifier, value).map_err(|e| {
                 AlthreadError::error(ErrorType::VariableError, self.line, self.column, e)
             })?;
 
-        Ok(())
+            Ok(())
+        } else {
+            unreachable!()
+        }
     }
 }

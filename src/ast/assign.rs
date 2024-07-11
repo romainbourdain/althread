@@ -4,7 +4,7 @@ use crate::{
     env::Environment,
     error::{AlthreadError, ErrorType},
     nodes::{
-        assign::{Assign, AssignBinOp},
+        assign::{Assign, AssignOp},
         datatype::DataType,
         expr::{primary::PrimaryExpr, Expr, ExprKind},
     },
@@ -19,17 +19,25 @@ impl Assign {
         for pair in pair.into_inner() {
             match pair.as_rule() {
                 Rule::IDENTIFIER => assign.identifier = pair.as_str().to_string(),
-                // TODO: implement assign op
                 Rule::assign_op => {
                     assign.op = match pair.as_str() {
-                        "=" => AssignBinOp::Assign,
+                        "=" => AssignOp::Assign,
+                        "+=" => AssignOp::AddAssign,
+                        "-=" => AssignOp::SubAssign,
+                        "*=" => AssignOp::MulAssign,
+                        "/=" => AssignOp::DivAssign,
+                        "%=" => AssignOp::ModAssign,
                         _ => unimplemented!(),
                     }
                 }
                 Rule::expr => assign.value = Expr::build(pair, env)?,
-                // TODO: implement assign unary op
                 Rule::assign_unary_op => {
-                    unimplemented!()
+                    assign.op = match pair.as_str() {
+                        "++" => AssignOp::AddAssign,
+                        "--" => AssignOp::SubAssign,
+                        _ => unimplemented!(),
+                    };
+                    assign.value = Expr::new(ExprKind::Primary(PrimaryExpr::Int(1)));
                 }
                 _ => unreachable!(),
             }
@@ -43,6 +51,23 @@ impl Assign {
                 e,
             )
         })?;
+
+        match (&assign.op, &value_type) {
+            (AssignOp::Assign, _) => {}
+            (AssignOp::AddAssign, DataType::Int) => {}
+            (AssignOp::SubAssign, DataType::Int) => {}
+            (AssignOp::MulAssign, DataType::Int) => {}
+            (AssignOp::DivAssign, DataType::Int) => {}
+            (AssignOp::ModAssign, DataType::Int) => {}
+            (op, datatype) => {
+                return Err(AlthreadError::error(
+                    ErrorType::TypeError,
+                    line,
+                    column,
+                    format!("Unexpected {op} operation with {datatype}"),
+                ))
+            }
+        }
 
         let symbol = env.get_symbol(&assign.identifier).map_err(|e| {
             AlthreadError::error(

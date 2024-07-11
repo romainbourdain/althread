@@ -3,14 +3,8 @@ shared {
 }
 
 main {
-    let b = 0;
-    if (b > 10) {
-        b = b + 1;
-        print(b);
-    } else {
-        b = -1;
-        print(b);
-    }
+    let b = 3;
+    b+= 6*4/3+2;
 
-    print(a);
+    print(b);
 }
