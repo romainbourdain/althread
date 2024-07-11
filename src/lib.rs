@@ -17,9 +17,12 @@ use nodes::Ast;
 use parser::parse;
 
 /// Run code from file
-pub fn run_file(path: &str) -> io::Result<()> {
+pub fn run_file<W>(path: &str, output: &mut W) -> io::Result<()>
+where
+    W: Write,
+{
     let buf = fs::read_to_string(path)?;
-    if let Err(e) = run(&buf) {
+    if let Err(e) = run(&buf, output) {
         e.report(&buf);
         exit(1);
     }
@@ -27,7 +30,10 @@ pub fn run_file(path: &str) -> io::Result<()> {
 }
 
 /// Run code with the client
-pub fn run_prompt() {
+pub fn run_prompt<W>(output: &mut W)
+where
+    W: Write,
+{
     let stdin = io::stdin();
     let mut stdout = io::stdout();
 
@@ -40,13 +46,16 @@ pub fn run_prompt() {
             break;
         }
 
-        if let Err(e) = run(&line) {
+        if let Err(e) = run(&line, output) {
             e.report(&line)
         }
     }
 }
 
-fn run(source: &str) -> Result<(), AlthreadError> {
+fn run<W>(source: &str, output: &mut W) -> Result<(), AlthreadError>
+where
+    W: Write,
+{
     // parse code with pest
     let pairs = parse(&source).map_err(|e| e)?;
 
@@ -59,7 +68,7 @@ fn run(source: &str) -> Result<(), AlthreadError> {
     env.clear_global();
 
     // run ast
-    ast.eval(&mut env)?;
+    ast.eval(&mut env, output)?;
 
     Ok(())
 }

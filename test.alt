@@ -7,4 +7,5 @@ main {
     b+= 6*4/3+2;
 
     print(b);
+    print(b);
 }

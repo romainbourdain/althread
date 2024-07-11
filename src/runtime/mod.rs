@@ -1,3 +1,5 @@
+use std::io::Write;
+
 use crate::{env::Environment, error::AlthreadError, nodes::Ast};
 
 pub mod assign;
@@ -11,10 +13,17 @@ pub mod stmt;
 pub mod while_stmt;
 
 impl Ast {
-    pub fn eval(&self, env: &mut Environment) -> Result<(), AlthreadError> {
-        self.shared_block.as_ref().map(|block| block.eval(env));
+    pub fn eval<W>(&self, env: &mut Environment, output: &mut W) -> Result<(), AlthreadError>
+    where
+        W: Write,
+    {
+        self.shared_block
+            .as_ref()
+            .map(|block| block.eval(env, output));
         env.push_table();
-        self.main_block.as_ref().map(|block| block.eval(env));
+        self.main_block
+            .as_ref()
+            .map(|block| block.eval(env, output));
 
         Ok(())
     }
