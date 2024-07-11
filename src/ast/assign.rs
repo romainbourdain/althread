@@ -19,17 +19,7 @@ impl Assign {
         for pair in pair.into_inner() {
             match pair.as_rule() {
                 Rule::IDENTIFIER => assign.identifier = pair.as_str().to_string(),
-                Rule::assign_op => {
-                    assign.op = match pair.as_str() {
-                        "=" => AssignOp::Assign,
-                        "+=" => AssignOp::AddAssign,
-                        "-=" => AssignOp::SubAssign,
-                        "*=" => AssignOp::MulAssign,
-                        "/=" => AssignOp::DivAssign,
-                        "%=" => AssignOp::ModAssign,
-                        _ => unimplemented!(),
-                    }
-                }
+                Rule::assign_op => assign.op = AssignOp::build(pair)?,
                 Rule::expr => assign.value = Expr::build(pair, env)?,
                 Rule::assign_unary_op => {
                     assign.op = match pair.as_str() {
@@ -43,14 +33,7 @@ impl Assign {
             }
         }
 
-        let value_type = DataType::from_expr(&assign.value.kind, env).map_err(|e| {
-            AlthreadError::error(
-                ErrorType::TypeError,
-                assign.value.line,
-                assign.value.column,
-                e,
-            )
-        })?;
+        let value_type = assign.value.get_datatype(env)?;
 
         match (&assign.op, &value_type) {
             (AssignOp::Assign, _) => {}
@@ -100,5 +83,19 @@ impl Assign {
         }
 
         Ok(assign)
+    }
+}
+
+impl AssignOp {
+    pub fn build(pair: Pair<Rule>) -> Result<Self, AlthreadError> {
+        Ok(match pair.as_str() {
+            "=" => AssignOp::Assign,
+            "+=" => AssignOp::AddAssign,
+            "-=" => AssignOp::SubAssign,
+            "*=" => AssignOp::MulAssign,
+            "/=" => AssignOp::DivAssign,
+            "%=" => AssignOp::ModAssign,
+            _ => unimplemented!(),
+        })
     }
 }

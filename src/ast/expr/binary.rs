@@ -23,7 +23,97 @@ impl BinExpr {
         env: &Environment,
     ) -> ExprResult {
         let (line, column) = op.line_col();
-        let op = match op.as_rule() {
+        let op = BinOp::build(op)?;
+        let expr = Self {
+            op,
+            lhs: Box::new(lhs?),
+            rhs: Box::new(rhs?),
+        };
+
+        expr.get_datatype(env)?;
+
+        Ok(Expr {
+            kind: ExprKind::Binary(expr),
+            line,
+            column,
+        })
+    }
+
+    pub fn get_datatype(&self, env: &Environment) -> Result<DataType, AlthreadError> {
+        let lhs_type = self.lhs.get_datatype(env)?;
+        let rhs_type = self.rhs.get_datatype(env)?;
+        // TODO : implement error with line and col
+        if lhs_type != rhs_type {
+            return Err(AlthreadError::error(
+                ErrorType::TypeError,
+                0,
+                0,
+                format!(
+                    "Cannot make {} operation between {} and {}",
+                    self.op, lhs_type, rhs_type
+                ),
+            ));
+        }
+
+        // TODO : implement with macro
+        match self.op {
+            // +, -, *, / between (float | int) -> (float | int)
+            BinOp::Add | BinOp::Sub | BinOp::Mul | BinOp::Div | BinOp::Mod => {
+                if (lhs_type != DataType::Int) && (lhs_type != DataType::Float) {
+                    // TODO : implement error with line and col
+                    return Err(AlthreadError::error(
+                        ErrorType::TypeError,
+                        0,
+                        0,
+                        format!(
+                            "Cannot make {} operation between {} and {}",
+                            self.op, lhs_type, rhs_type
+                        ),
+                    ));
+                }
+                Ok(lhs_type)
+            }
+
+            // ==, !=, <, <=, >, >= between (float | int) -> bool
+            BinOp::Eq | BinOp::Ne | BinOp::Gt | BinOp::Ge | BinOp::Lt | BinOp::Le => {
+                if (lhs_type != DataType::Int) && (lhs_type != DataType::Float) {
+                    // TODO : implement error with line and col
+                    return Err(AlthreadError::error(
+                        ErrorType::TypeError,
+                        0,
+                        0,
+                        format!(
+                            "Cannot make {} operation between {} and {}",
+                            self.op, lhs_type, rhs_type
+                        ),
+                    ));
+                }
+                Ok(DataType::Bool)
+            }
+
+            // &&, || between bool -> bool
+            BinOp::And | BinOp::Or => {
+                if lhs_type != DataType::Bool {
+                    // TODO : implement error with line and col
+                    return Err(AlthreadError::error(
+                        ErrorType::TypeError,
+                        0,
+                        0,
+                        format!(
+                            "Cannot make {} operation between {} and {}",
+                            self.op, lhs_type, rhs_type
+                        ),
+                    ));
+                }
+                Ok(DataType::Bool)
+            }
+        }
+    }
+}
+
+impl BinOp {
+    pub fn build(pair: Pair<Rule>) -> Result<Self, AlthreadError> {
+        Ok(match pair.as_rule() {
             Rule::add => BinOp::Add,
             Rule::sub => BinOp::Sub,
             Rule::mul => BinOp::Mul,
@@ -38,21 +128,6 @@ impl BinExpr {
             Rule::and => BinOp::And,
             Rule::or => BinOp::Or,
             rule => unreachable!("{:?}", rule),
-        };
-        let lhs = lhs?;
-        let rhs = rhs?;
-
-        DataType::from_bin_expr(&lhs, &op, &rhs, env)
-            .map_err(|e| AlthreadError::error(ErrorType::TypeError, line, column, e))?;
-
-        Ok(Expr {
-            kind: ExprKind::Binary(Self {
-                op,
-                lhs: Box::new(lhs),
-                rhs: Box::new(rhs),
-            }),
-            line,
-            column,
         })
     }
 }

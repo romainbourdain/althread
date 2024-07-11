@@ -22,30 +22,20 @@ impl IfStmt {
             None => None,
         };
 
-        match DataType::from_expr(&condition.kind, env) {
-            Ok(DataType::Bool) => Ok(IfStmt {
+        match condition.get_datatype(env)? {
+            DataType::Bool => Ok(IfStmt {
                 condition,
                 block,
                 else_block,
                 line,
                 column,
             }),
-            Ok(datatype) => {
-                return Err(AlthreadError::error(
-                    ErrorType::TypeError,
-                    condition.line,
-                    condition.column,
-                    format!("If condition must be a boolean, found {}", datatype),
-                ));
-            }
-            Err(e) => {
-                return Err(AlthreadError::error(
-                    ErrorType::TypeError,
-                    condition.line,
-                    condition.column,
-                    e,
-                ))
-            }
+            datatype => Err(AlthreadError::error(
+                ErrorType::TypeError,
+                condition.line,
+                condition.column,
+                format!("If condition must be a boolean, found {}", datatype),
+            )),
         }
     }
 }

@@ -23,18 +23,48 @@ impl UnExpr {
             Rule::neg => UnOp::Neg,
             rule => unreachable!("{:?}", rule),
         };
-        let rhs = rhs?;
+        let expr = Self {
+            op,
+            rhs: Box::new(rhs?),
+        };
 
-        DataType::from_un_expr(&op, &rhs, env)
-            .map_err(|e| AlthreadError::error(ErrorType::TypeError, line, column, e))?;
+        expr.get_datatype(env)?;
 
         Ok(Expr {
-            kind: ExprKind::Unary(Self {
-                op,
-                rhs: Box::new(rhs),
-            }),
+            kind: ExprKind::Unary(expr),
             line,
             column,
         })
+    }
+
+    pub fn get_datatype(&self, env: &Environment) -> Result<DataType, AlthreadError> {
+        let rhs_type = self.rhs.get_datatype(env)?;
+
+        match self.op {
+            UnOp::Not => {
+                if rhs_type != DataType::Bool {
+                    // TODO : implement error with line and col
+                    return Err(AlthreadError::error(
+                        ErrorType::TypeError,
+                        0,
+                        0,
+                        format!("Cannot make {} operation for {}", self.op, rhs_type),
+                    ));
+                }
+                Ok(DataType::Bool)
+            }
+            UnOp::Neg => {
+                if (rhs_type != DataType::Int) && (rhs_type != DataType::Float) {
+                    // TODO : implement error with line and col
+                    return Err(AlthreadError::error(
+                        ErrorType::TypeError,
+                        0,
+                        0,
+                        format!("Cannot make {} operation for {}", self.op, rhs_type),
+                    ));
+                }
+                Ok(rhs_type)
+            }
+        }
     }
 }

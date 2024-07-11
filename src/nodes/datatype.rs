@@ -1,7 +1,5 @@
 use core::fmt;
 
-use crate::error::AlthreadError;
-
 #[derive(Debug, PartialEq, Clone)]
 pub enum DataType {
     Int,
@@ -14,17 +12,6 @@ pub enum DataType {
 impl DataType {
     pub fn new() -> Self {
         Self::Void
-    }
-    pub fn from_str(a: &str) -> Result<Self, AlthreadError> {
-        match a {
-            "int" => Ok(Self::Int),
-            "float" => Ok(Self::Float),
-            "bool" => Ok(Self::Bool),
-            "string" => Ok(Self::String),
-            "void" => Ok(Self::Void),
-            // TODO: Add error handling
-            _ => unimplemented!(),
-        }
     }
 }
 

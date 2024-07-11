@@ -8,7 +8,10 @@ use pest::{iterators::Pair, pratt_parser::PrattParser};
 use crate::{
     env::Environment,
     error::AlthreadError,
-    nodes::expr::{binary::BinExpr, primary::PrimaryExpr, unary::UnExpr, Expr},
+    nodes::{
+        datatype::DataType,
+        expr::{binary::BinExpr, primary::PrimaryExpr, unary::UnExpr, Expr, ExprKind},
+    },
     parser::Rule,
 };
 
@@ -42,5 +45,13 @@ impl Expr {
             .map_infix(|lhs, op, rhs| BinExpr::build(lhs, op, rhs, env))
             .map_prefix(|op, rhs| UnExpr::build(op, rhs, env))
             .parse(pair.into_inner())
+    }
+
+    pub fn get_datatype(&self, env: &Environment) -> Result<DataType, AlthreadError> {
+        match &self.kind {
+            ExprKind::Primary(expr) => expr.get_datatype(env),
+            ExprKind::Binary(expr) => expr.get_datatype(env),
+            ExprKind::Unary(expr) => expr.get_datatype(env),
+        }
     }
 }

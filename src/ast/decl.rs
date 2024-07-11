@@ -22,7 +22,7 @@ impl Decl {
             }
         }
 
-        Self::evaluate_type(&mut decl, env)?;
+        decl.evaluate_type(env)?;
         env.insert_symbol(
             decl.identifier.clone(),
             decl.datatype.clone(),
@@ -34,10 +34,13 @@ impl Decl {
         Ok(decl)
     }
 
+    /// # Compare expr datatype and declared datatype
+    ///
+    /// - Give a value for declarations without value (from datatype)
+    /// - Give a datatype for declaration without datatype (from value)
+    /// - Throw error for incompatible datatype
     fn evaluate_type(&mut self, env: &Environment) -> Result<(), AlthreadError> {
-        let value_type = DataType::from_expr(&self.value.kind, env).map_err(|e| {
-            AlthreadError::error(ErrorType::TypeError, self.value.line, self.value.column, e)
-        })?;
+        let value_type = self.value.get_datatype(env)?;
 
         match (&self.datatype, &value_type) {
             (_, DataType::Void) => self.value = Expr::from_datatype(&self.datatype),

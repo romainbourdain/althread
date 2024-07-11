@@ -16,6 +16,7 @@ use error::AlthreadError;
 use nodes::Ast;
 use parser::parse;
 
+/// Run code from file
 pub fn run_file(path: &str) -> io::Result<()> {
     let buf = fs::read_to_string(path)?;
     if let Err(e) = run(&buf) {
@@ -25,6 +26,7 @@ pub fn run_file(path: &str) -> io::Result<()> {
     Ok(())
 }
 
+/// Run code with the client
 pub fn run_prompt() {
     let stdin = io::stdin();
     let mut stdout = io::stdout();
@@ -45,15 +47,18 @@ pub fn run_prompt() {
 }
 
 fn run(source: &str) -> Result<(), AlthreadError> {
+    // parse code with pest
     let pairs = parse(&source).map_err(|e| e)?;
 
     let mut global_table = SymbolTable::new();
     let mut env = Environment::new(&mut global_table);
 
+    // create ast
     let ast = Ast::build(pairs, &mut env)?;
 
     env.clear_global();
 
+    // run ast
     ast.eval(&mut env)?;
 
     Ok(())
