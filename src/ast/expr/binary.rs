@@ -28,6 +28,8 @@ impl BinExpr {
             op,
             lhs: Box::new(lhs?),
             rhs: Box::new(rhs?),
+            line,
+            column,
         };
 
         expr.get_datatype(env)?;
@@ -46,8 +48,8 @@ impl BinExpr {
         if lhs_type != rhs_type {
             return Err(AlthreadError::error(
                 ErrorType::TypeError,
-                0,
-                0,
+                self.line,
+                self.column,
                 format!(
                     "Cannot make {} operation between {} and {}",
                     self.op, lhs_type, rhs_type
@@ -63,8 +65,8 @@ impl BinExpr {
                     // TODO : implement error with line and col
                     return Err(AlthreadError::error(
                         ErrorType::TypeError,
-                        0,
-                        0,
+                        self.line,
+                        self.column,
                         format!(
                             "Cannot make {} operation between {} and {}",
                             self.op, lhs_type, rhs_type
@@ -80,8 +82,8 @@ impl BinExpr {
                     // TODO : implement error with line and col
                     return Err(AlthreadError::error(
                         ErrorType::TypeError,
-                        0,
-                        0,
+                        self.line,
+                        self.column,
                         format!(
                             "Cannot make {} operation between {} and {}",
                             self.op, lhs_type, rhs_type
@@ -97,8 +99,8 @@ impl BinExpr {
                     // TODO : implement error with line and col
                     return Err(AlthreadError::error(
                         ErrorType::TypeError,
-                        0,
-                        0,
+                        self.line,
+                        self.column,
                         format!(
                             "Cannot make {} operation between {} and {}",
                             self.op, lhs_type, rhs_type

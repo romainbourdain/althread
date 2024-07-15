@@ -24,6 +24,8 @@ impl UnExpr {
             rule => unreachable!("{:?}", rule),
         };
         let expr = Self {
+            line,
+            column,
             op,
             rhs: Box::new(rhs?),
         };
@@ -46,8 +48,8 @@ impl UnExpr {
                     // TODO : implement error with line and col
                     return Err(AlthreadError::error(
                         ErrorType::TypeError,
-                        0,
-                        0,
+                        self.line,
+                        self.column,
                         format!("Cannot make {} operation for {}", self.op, rhs_type),
                     ));
                 }
@@ -58,8 +60,8 @@ impl UnExpr {
                     // TODO : implement error with line and col
                     return Err(AlthreadError::error(
                         ErrorType::TypeError,
-                        0,
-                        0,
+                        self.line,
+                        self.column,
                         format!("Cannot make {} operation for {}", self.op, rhs_type),
                     ));
                 }

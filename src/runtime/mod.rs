@@ -17,13 +17,12 @@ impl Ast {
     where
         W: Write,
     {
-        self.shared_block
-            .as_ref()
-            .map(|block| block.eval(env, output));
-        env.push_table();
-        self.main_block
-            .as_ref()
-            .map(|block| block.eval(env, output));
+        if let Some(block) = self.shared_block.as_ref() {
+            block.eval(env, output)?;
+        }
+        if let Some(block) = self.main_block.as_ref() {
+            block.eval_and_push(env, output)?;
+        }
 
         Ok(())
     }

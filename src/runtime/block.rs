@@ -13,4 +13,18 @@ impl Block {
 
         Ok(())
     }
+
+    pub fn eval_and_push<W>(
+        &self,
+        env: &mut Environment,
+        output: &mut W,
+    ) -> Result<(), AlthreadError>
+    where
+        W: Write,
+    {
+        env.push_table();
+        self.eval(env, output)?;
+        env.pop_table();
+        Ok(())
+    }
 }

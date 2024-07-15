@@ -15,7 +15,7 @@ impl Stmt {
             }
             Decl(decl) => decl.eval(env)?,
             Print(print_stmt) => print_stmt.eval(env, output)?,
-            Block(block) => block.eval(env, output)?,
+            Block(block) => block.eval_and_push(env, output)?,
             IfStmt(if_stmt) => if_stmt.eval(env, output)?,
             WhileStmt(while_stmt) => while_stmt.eval(env, output)?,
         };

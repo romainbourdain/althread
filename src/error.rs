@@ -19,6 +19,7 @@ pub enum ErrorType {
     TypeError,
     VariableError,
     RuntimeError,
+    DivisionByZero,
 }
 
 impl fmt::Display for ErrorType {
@@ -28,6 +29,7 @@ impl fmt::Display for ErrorType {
             ErrorType::TypeError => write!(f, "Type Error"),
             ErrorType::VariableError => write!(f, "Variable Error"),
             ErrorType::RuntimeError => write!(f, "Runtime Error"),
+            ErrorType::DivisionByZero => write!(f, "Division by zero"),
         }
     }
 }

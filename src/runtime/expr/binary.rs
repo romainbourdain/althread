@@ -1,6 +1,6 @@
 use crate::{
     env::Environment,
-    error::AlthreadError,
+    error::{AlthreadError, ErrorType},
     nodes::expr::{
         binary::{BinExpr, BinOp},
         primary::PrimaryExpr,
@@ -27,7 +27,23 @@ impl BinExpr {
             BinOp::Add => match_bin!([(Int, Int), (Float, Float)], lhs, rhs, |a, b| a + b),
             BinOp::Sub => match_bin!([(Int, Int), (Float, Float)], lhs, rhs, |a, b| a - b),
             BinOp::Mul => match_bin!([(Int, Int), (Float, Float)], lhs, rhs, |a, b| a * b),
-            BinOp::Div => match_bin!([(Int, Int), (Float, Float)], lhs, rhs, |a, b| a / b),
+            BinOp::Div => match (&lhs, &rhs) {
+                (PrimaryExpr::Int(_), PrimaryExpr::Int(b)) if b == &0 => Err(AlthreadError::error(
+                    ErrorType::RuntimeError,
+                    self.line,
+                    self.column,
+                    format!("Division by zero"),
+                )),
+                (PrimaryExpr::Float(_), PrimaryExpr::Float(b)) if b == &0.0 => {
+                    Err(AlthreadError::error(
+                        ErrorType::RuntimeError,
+                        self.line,
+                        self.column,
+                        format!("Division by zero"),
+                    ))
+                }
+                _ => match_bin!([(Int, Int), (Float, Float)], lhs, rhs, |a, b| a / b),
+            },
             BinOp::Mod => match_bin!([(Int, Int), (Float, Float)], lhs, rhs, |a, b| a % b),
             BinOp::Eq => match_bin!([(Int, Bool), (Float, Bool)], lhs, rhs, |a, b| a == b),
             BinOp::Ne => match_bin!([(Int, Bool), (Float, Bool)], lhs, rhs, |a, b| a != b),

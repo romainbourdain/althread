@@ -7,6 +7,8 @@ pub struct BinExpr {
     pub lhs: Box<Expr>,
     pub op: BinOp,
     pub rhs: Box<Expr>,
+    pub line: usize,
+    pub column: usize,
 }
 
 #[derive(Debug, Clone)]

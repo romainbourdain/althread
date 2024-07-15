@@ -52,7 +52,7 @@ where
     }
 }
 
-fn run<W>(source: &str, output: &mut W) -> Result<(), AlthreadError>
+pub fn run<W>(source: &str, output: &mut W) -> Result<(), AlthreadError>
 where
     W: Write,
 {

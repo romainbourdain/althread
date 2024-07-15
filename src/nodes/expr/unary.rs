@@ -6,6 +6,8 @@ use super::Expr;
 pub struct UnExpr {
     pub op: UnOp,
     pub rhs: Box<Expr>,
+    pub line: usize,
+    pub column: usize,
 }
 
 #[derive(Debug, Clone)]
