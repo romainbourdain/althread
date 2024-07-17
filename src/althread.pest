@@ -1,13 +1,14 @@
 program = _{ SOI ~ struct_block* ~ EOI }
 
-struct_block = _{ main_block | shared_block | always_block }
-main_block   =  { "main" ~ "{" ~ stmt* ~ "}" }
-shared_block =  { "shared" ~ "{" ~ decl_stmt* ~ "}" }
-always_block =  { "always" ~ "{" ~ expr_stmt* ~ "}" }
+struct_block  = _{ main_block | shared_block | always_block | process_block }
+main_block    =  { "main" ~ "{" ~ stmt* ~ "}" }
+shared_block  =  { "shared" ~ "{" ~ decl_stmt* ~ "}" }
+always_block  =  { "always" ~ "{" ~ expr_stmt* ~ "}" }
+process_block =  { "process" ~ IDENTIFIER ~ "(" ~ ")" ~ block }
 
 block = { "{" ~ stmt* ~ "}" }
 
-stmt = _{ assign_stmt | expr_stmt | print_stmt | if_stmt | while_stmt | block | decl_stmt }
+stmt = _{ assign_stmt | expr_stmt | print_stmt | if_stmt | while_stmt | block | decl_stmt | run_stmt }
 
 decl_stmt    = _{ decl ~ ";" }
 decl         =  { decl_keyword ~ IDENTIFIER ~ (":" ~ DATATYPE)? ~ ("=" ~ expr)? }
@@ -17,6 +18,8 @@ assign_stmt     = _{ assignment ~ ";" }
 assignment      =  { IDENTIFIER ~ assign_op ~ expr | IDENTIFIER ~ assign_unary_op }
 assign_op       =  { "=" | "+=" | "-=" | "*=" | "/=" | "%=" }
 assign_unary_op =  { "++" | "--" }
+
+run_stmt = { "run" ~ IDENTIFIER ~ "(" ~ ")" ~ ";" }
 
 print_stmt = { "print" ~ "(" ~ expr ~ ")" ~ ";" }
 if_stmt    = { "if" ~ "(" ~ expr ~ ")" ~ block ~ ("else" ~ block)? }

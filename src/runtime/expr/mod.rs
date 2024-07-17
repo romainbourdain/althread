@@ -5,7 +5,7 @@ pub mod unary;
 use crate::{
     env::Environment,
     error::AlthreadError,
-    nodes::expr::{primary::PrimaryExpr, Expr, ExprKind},
+    ast::expr::{primary::PrimaryExpr, Expr, ExprKind},
 };
 
 impl Expr {

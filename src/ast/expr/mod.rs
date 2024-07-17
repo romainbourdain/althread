@@ -2,18 +2,15 @@ pub mod binary;
 pub mod primary;
 pub mod unary;
 
+use binary::BinExpr;
 use lazy_static::lazy_static;
 use pest::{iterators::Pair, pratt_parser::PrattParser};
+use primary::PrimaryExpr;
+use unary::UnExpr;
 
-use crate::{
-    env::Environment,
-    error::AlthreadError,
-    nodes::{
-        datatype::DataType,
-        expr::{binary::BinExpr, primary::PrimaryExpr, unary::UnExpr, Expr, ExprKind},
-    },
-    parser::Rule,
-};
+use crate::{env::Environment, error::AlthreadError, parser::Rule};
+
+use super::datatype::DataType;
 
 type ExprResult = Result<Expr, AlthreadError>;
 
@@ -36,6 +33,44 @@ lazy_static! {
             .op(Op::prefix(Rule::not))
             .op(Op::prefix(Rule::neg))
     };
+}
+
+#[derive(Debug)]
+pub struct Expr {
+    pub kind: ExprKind,
+    pub line: usize,
+    pub column: usize,
+}
+
+impl Expr {
+    pub fn new(kind: ExprKind) -> Self {
+        Self {
+            kind,
+            line: 0,
+            column: 0,
+        }
+    }
+
+    pub fn from_datatype(datatype: &DataType) -> Self {
+        use DataType::*;
+
+        let primary = match datatype {
+            Int => PrimaryExpr::Int(0),
+            Float => PrimaryExpr::Float(0.0),
+            Bool => PrimaryExpr::Bool(false),
+            String => PrimaryExpr::String("".to_string()),
+            Void => PrimaryExpr::Null,
+        };
+
+        Self::new(ExprKind::Primary(primary))
+    }
+}
+
+#[derive(Debug)]
+pub enum ExprKind {
+    Primary(PrimaryExpr),
+    Binary(BinExpr),
+    Unary(UnExpr),
 }
 
 impl Expr {

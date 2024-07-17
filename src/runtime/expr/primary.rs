@@ -1,7 +1,7 @@
 use crate::{
     env::Environment,
     error::{AlthreadError, ErrorType},
-    nodes::expr::primary::PrimaryExpr,
+    ast::expr::primary::PrimaryExpr,
 };
 
 impl PrimaryExpr {

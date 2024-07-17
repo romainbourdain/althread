@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use crate::{env::Environment, error::AlthreadError, nodes::stmt::Stmt};
+use crate::{ast::stmt::Stmt, env::Environment, error::AlthreadError};
 
 impl Stmt {
     pub fn eval<W>(&self, env: &mut Environment, output: &mut W) -> Result<(), AlthreadError>
@@ -18,6 +18,7 @@ impl Stmt {
             Block(block) => block.eval_and_push(env, output)?,
             IfStmt(if_stmt) => if_stmt.eval(env, output)?,
             WhileStmt(while_stmt) => while_stmt.eval(env, output)?,
+            Run(run_stmt) => unimplemented!(),
         };
         Ok(())
     }

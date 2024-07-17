@@ -1,7 +1,7 @@
 use crate::{
     env::Environment,
     error::{AlthreadError, ErrorType},
-    nodes::expr::{
+    ast::expr::{
         binary::{BinExpr, BinOp},
         primary::PrimaryExpr,
     },

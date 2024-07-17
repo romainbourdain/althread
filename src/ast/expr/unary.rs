@@ -1,19 +1,26 @@
+use std::fmt;
+
 use pest::iterators::Pair;
 
 use crate::{
+    ast::{
+        datatype::DataType,
+        expr::{Expr, ExprKind},
+    },
     env::Environment,
     error::{AlthreadError, ErrorType},
-    nodes::{
-        datatype::DataType,
-        expr::{
-            unary::{UnExpr, UnOp},
-            Expr, ExprKind,
-        },
-    },
     parser::Rule,
 };
 
 use super::ExprResult;
+
+#[derive(Debug)]
+pub struct UnExpr {
+    pub op: UnOp,
+    pub rhs: Box<Expr>,
+    pub line: usize,
+    pub column: usize,
+}
 
 impl UnExpr {
     pub fn build(op: Pair<Rule>, rhs: ExprResult, env: &Environment) -> ExprResult {
@@ -68,5 +75,22 @@ impl UnExpr {
                 Ok(rhs_type)
             }
         }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum UnOp {
+    Not,
+    Neg,
+}
+
+impl fmt::Display for UnOp {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use UnOp::*;
+        let op = match self {
+            Not => "!",
+            Neg => "-",
+        };
+        write!(f, "{}", op)
     }
 }

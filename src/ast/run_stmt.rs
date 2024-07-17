@@ -1,0 +1,23 @@
+use pest::iterators::Pair;
+
+use crate::{env::Environment, error::AlthreadError, parser::Rule};
+
+#[derive(Debug)]
+pub struct RunStmt {
+    pub identifier: String,
+    pub line: usize,
+    pub column: usize,
+}
+
+impl RunStmt {
+    pub fn parse(pair: Pair<Rule>, env: &Environment) -> Result<Self, AlthreadError> {
+        let (line, column) = pair.line_col();
+        let identifier = pair.into_inner().next().unwrap().as_str().to_string();
+
+        Ok(Self {
+            identifier,
+            line,
+            column,
+        })
+    }
+}

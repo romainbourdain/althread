@@ -5,17 +5,37 @@ pub mod decl;
 pub mod expr;
 pub mod if_stmt;
 pub mod print_stmt;
+pub mod process;
+pub mod run_stmt;
 pub mod stmt;
 pub mod while_stmt;
 
+use block::Block;
 use pest::iterators::Pairs;
+use process::Process;
 
-use crate::{
-    env::Environment,
-    error::AlthreadError,
-    nodes::{block::Block, Ast},
-    parser::Rule,
-};
+use crate::{env::Environment, error::AlthreadError, parser::Rule};
+
+#[derive(Debug)]
+pub struct Ast {
+    pub main_block: Option<Block>,
+    pub shared_block: Option<Block>,
+    pub process_block_list: Vec<Process>,
+    pub line: usize,
+    pub column: usize,
+}
+
+impl Ast {
+    pub fn new(line: usize, column: usize) -> Self {
+        Self {
+            main_block: None,
+            shared_block: None,
+            process_block_list: Vec::new(),
+            line,
+            column,
+        }
+    }
+}
 
 impl Ast {
     pub fn build(pairs: Pairs<Rule>, env: &mut Environment) -> Result<Self, AlthreadError> {
@@ -30,6 +50,7 @@ impl Ast {
                 Rule::shared_block => {
                     program.shared_block = Some(Block::parse(pair, env)?);
                 }
+                Rule::process_block => program.process_block_list.push(Process::parse(pair, env)?),
                 Rule::EOI => break,
                 rule => unreachable!("{:?}", rule),
             }

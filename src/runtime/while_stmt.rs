@@ -3,7 +3,7 @@ use std::io::Write;
 use crate::{
     env::Environment,
     error::{AlthreadError, ErrorType},
-    nodes::{expr::primary::PrimaryExpr, while_stmt::WhileStmt},
+    ast::{expr::primary::PrimaryExpr, while_stmt::WhileStmt},
 };
 
 impl WhileStmt {

@@ -3,9 +3,18 @@ use pest::iterators::Pair;
 use crate::{
     env::Environment,
     error::{AlthreadError, ErrorType},
-    nodes::{block::Block, datatype::DataType, expr::Expr, while_stmt::WhileStmt},
     parser::Rule,
 };
+
+use super::{block::Block, datatype::DataType, expr::Expr};
+
+#[derive(Debug)]
+pub struct WhileStmt {
+    pub condition: Expr,
+    pub block: Block,
+    pub line: usize,
+    pub column: usize,
+}
 
 impl WhileStmt {
     pub fn build(pair: Pair<Rule>, env: &mut Environment) -> Result<Self, AlthreadError> {

@@ -1,10 +1,10 @@
 use crate::{
-    env::Environment,
-    error::{AlthreadError, ErrorType},
-    nodes::{
+    ast::{
         assign::{Assign, AssignOp},
         expr::primary::PrimaryExpr,
     },
+    env::Environment,
+    error::{AlthreadError, ErrorType},
 };
 
 impl Assign {

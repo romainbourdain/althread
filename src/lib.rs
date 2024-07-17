@@ -1,7 +1,6 @@
 mod ast;
 mod env;
 mod error;
-mod nodes;
 mod parser;
 mod runtime;
 
@@ -11,9 +10,9 @@ use std::{
     process::exit,
 };
 
+use ast::Ast;
 use env::{symbol_table::SymbolTable, Environment};
 use error::AlthreadError;
-use nodes::Ast;
 use parser::parse;
 
 /// Run code from file
@@ -64,11 +63,12 @@ where
 
     // create ast
     let ast = Ast::build(pairs, &mut env)?;
+    println!("{:#?}", ast);
 
-    env.clear_global();
+    // env.clear_global();
 
     // run ast
-    ast.eval(&mut env, output)?;
+    // ast.eval(&mut env, output)?;
 
     Ok(())
 }

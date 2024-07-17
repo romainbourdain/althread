@@ -3,7 +3,7 @@ use std::io::Write;
 use crate::{
     env::Environment,
     error::{AlthreadError, ErrorType},
-    nodes::{expr::primary::PrimaryExpr, if_stmt::IfStmt},
+    ast::{expr::primary::PrimaryExpr, if_stmt::IfStmt},
 };
 
 impl IfStmt {

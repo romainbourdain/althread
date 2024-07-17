@@ -1,3 +1,18 @@
+shared {
+    let b = 8;
+}
+
+
+process A() {
+    let a = 7;
+    print(a);
+    print(b);
+}
+
 main {
-    print(3.0/2.0);
+    let a = 5;
+    run A();
+
+    b++;
+    run A();
 }

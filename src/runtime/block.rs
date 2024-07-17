@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use crate::{env::Environment, error::AlthreadError, nodes::block::Block};
+use crate::{ast::block::Block, env::Environment, error::AlthreadError};
 
 impl Block {
     pub fn eval<W>(&self, env: &mut Environment, output: &mut W) -> Result<(), AlthreadError>

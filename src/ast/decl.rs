@@ -3,9 +3,36 @@ use pest::iterators::Pair;
 use crate::{
     env::Environment,
     error::{AlthreadError, ErrorType},
-    nodes::{datatype::DataType, decl::Decl, expr::Expr},
     parser::Rule,
 };
+
+use super::{
+    datatype::DataType,
+    expr::{primary::PrimaryExpr, Expr, ExprKind},
+};
+
+#[derive(Debug)]
+pub struct Decl {
+    pub identifier: String,
+    pub value: Expr,
+    pub datatype: DataType,
+    pub mutable: bool,
+    pub line: usize,
+    pub column: usize,
+}
+
+impl Decl {
+    pub fn new(line: usize, column: usize) -> Self {
+        Self {
+            identifier: "".to_string(),
+            value: Expr::new(ExprKind::Primary(PrimaryExpr::Null)),
+            datatype: DataType::new(),
+            mutable: false,
+            line,
+            column,
+        }
+    }
+}
 
 impl Decl {
     pub fn build(pair: Pair<Rule>, env: &mut Environment) -> Result<Self, AlthreadError> {

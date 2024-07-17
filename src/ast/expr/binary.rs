@@ -1,19 +1,24 @@
+use std::fmt;
+
 use pest::iterators::Pair;
 
 use crate::{
+    ast::datatype::DataType,
     env::Environment,
     error::{AlthreadError, ErrorType},
-    nodes::{
-        datatype::DataType,
-        expr::{
-            binary::{BinExpr, BinOp},
-            Expr, ExprKind,
-        },
-    },
     parser::Rule,
 };
 
-use super::ExprResult;
+use super::{Expr, ExprKind, ExprResult};
+
+#[derive(Debug)]
+pub struct BinExpr {
+    pub lhs: Box<Expr>,
+    pub op: BinOp,
+    pub rhs: Box<Expr>,
+    pub line: usize,
+    pub column: usize,
+}
 
 impl BinExpr {
     pub fn build(
@@ -131,5 +136,44 @@ impl BinOp {
             Rule::or => BinOp::Or,
             rule => unreachable!("{:?}", rule),
         })
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum BinOp {
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Mod,
+    Eq,
+    Ne,
+    Gt,
+    Ge,
+    Lt,
+    Le,
+    And,
+    Or,
+}
+
+impl fmt::Display for BinOp {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use BinOp::*;
+        let op = match self {
+            Add => "+",
+            Sub => "-",
+            Mul => "*",
+            Div => "/",
+            Mod => "%",
+            Eq => "==",
+            Ne => "!=",
+            Gt => ">",
+            Ge => ">=",
+            Lt => "<",
+            Le => "<=",
+            And => "&&",
+            Or => "||",
+        };
+        write!(f, "{}", op)
     }
 }
