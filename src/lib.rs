@@ -2,7 +2,7 @@ mod ast;
 mod env;
 mod error;
 mod parser;
-mod runtime;
+// mod runtime;
 
 use std::{
     fs,
@@ -65,7 +65,7 @@ where
     let ast = Ast::build(pairs, &mut env)?;
     println!("{:#?}", ast);
 
-    // env.clear_global();
+    env.clear_global();
 
     // run ast
     // ast.eval(&mut env, output)?;

@@ -14,6 +14,8 @@ impl RunStmt {
         let (line, column) = pair.line_col();
         let identifier = pair.into_inner().next().unwrap().as_str().to_string();
 
+        // TODO : vérifier que le process existe
+
         Ok(Self {
             identifier,
             line,
