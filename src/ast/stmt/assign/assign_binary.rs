@@ -3,7 +3,7 @@ use pest::iterators::Pair;
 use crate::{
     ast::{
         expr::{primary::PrimaryExpr, Expr, ExprKind},
-        token::{binary_assign_op::BinaryAssignOp, datatype::DataType},
+        token::{assign_binary_op::AssignBinaryOp, datatype::DataType},
     },
     env::Environment,
     error::{AlthreadError, ErrorType},
@@ -13,7 +13,7 @@ use crate::{
 #[derive(Debug)]
 pub struct AssignBinary {
     pub left: String,
-    pub op: BinaryAssignOp,
+    pub op: AssignBinaryOp,
     pub right: Expr,
     pub line: usize,
     pub column: usize,
@@ -23,7 +23,7 @@ impl AssignBinary {
     pub fn new(line: usize, column: usize) -> Self {
         Self {
             left: "".to_string(),
-            op: BinaryAssignOp::Assign,
+            op: AssignBinaryOp::Assign,
             right: Expr::new(ExprKind::Primary(PrimaryExpr::Null)),
             line,
             column,
@@ -39,10 +39,10 @@ impl AssignBinary {
         for pair in pair.into_inner() {
             match pair.as_rule() {
                 Rule::IDENTIFIER => assign.left = pair.as_str().to_string(),
-                Rule::assign_op => assign.op = BinaryAssignOp::from_pair(pair)?,
+                Rule::assign_op => assign.op = AssignBinaryOp::from_pair(pair)?,
                 Rule::expr => assign.right = Expr::from_pair(pair, env)?,
                 Rule::assign_unary_op => {
-                    assign.op = BinaryAssignOp::from_pair(pair)?;
+                    assign.op = AssignBinaryOp::from_pair(pair)?;
                     assign.right = Expr::new(ExprKind::Primary(PrimaryExpr::Int(1)));
                 }
                 _ => unreachable!(),
@@ -52,12 +52,12 @@ impl AssignBinary {
         let value_type = assign.right.get_datatype(env)?;
 
         match (&assign.op, &value_type) {
-            (BinaryAssignOp::Assign, _) => {}
-            (BinaryAssignOp::AddAssign, DataType::Int) => {}
-            (BinaryAssignOp::SubAssign, DataType::Int) => {}
-            (BinaryAssignOp::MulAssign, DataType::Int) => {}
-            (BinaryAssignOp::DivAssign, DataType::Int) => {}
-            (BinaryAssignOp::ModAssign, DataType::Int) => {}
+            (AssignBinaryOp::Assign, _) => {}
+            (AssignBinaryOp::AddAssign, DataType::Int) => {}
+            (AssignBinaryOp::SubAssign, DataType::Int) => {}
+            (AssignBinaryOp::MulAssign, DataType::Int) => {}
+            (AssignBinaryOp::DivAssign, DataType::Int) => {}
+            (AssignBinaryOp::ModAssign, DataType::Int) => {}
             (op, datatype) => {
                 return Err(AlthreadError::error(
                     ErrorType::TypeError,
@@ -107,32 +107,32 @@ impl AssignBinary {
         })?;
         if let Some(symbol_value) = &symbol.value {
             let value = match self.op {
-                BinaryAssignOp::Assign => self.right.eval(env)?,
-                BinaryAssignOp::AddAssign => match (self.right.eval(env)?, symbol_value) {
+                AssignBinaryOp::Assign => self.right.eval(env)?,
+                AssignBinaryOp::AddAssign => match (self.right.eval(env)?, symbol_value) {
                     (PrimaryExpr::Int(value), PrimaryExpr::Int(cur)) => {
                         PrimaryExpr::Int(cur + value)
                     }
                     _ => unreachable!(),
                 },
-                BinaryAssignOp::SubAssign => match (self.right.eval(env)?, symbol_value) {
+                AssignBinaryOp::SubAssign => match (self.right.eval(env)?, symbol_value) {
                     (PrimaryExpr::Int(value), PrimaryExpr::Int(cur)) => {
                         PrimaryExpr::Int(cur - value)
                     }
                     _ => unreachable!(),
                 },
-                BinaryAssignOp::MulAssign => match (self.right.eval(env)?, symbol_value) {
+                AssignBinaryOp::MulAssign => match (self.right.eval(env)?, symbol_value) {
                     (PrimaryExpr::Int(value), PrimaryExpr::Int(cur)) => {
                         PrimaryExpr::Int(cur * value)
                     }
                     _ => unreachable!(),
                 },
-                BinaryAssignOp::DivAssign => match (self.right.eval(env)?, symbol_value) {
+                AssignBinaryOp::DivAssign => match (self.right.eval(env)?, symbol_value) {
                     (PrimaryExpr::Int(value), PrimaryExpr::Int(cur)) => {
                         PrimaryExpr::Int(cur / value)
                     }
                     _ => unreachable!(),
                 },
-                BinaryAssignOp::ModAssign => match (self.right.eval(env)?, symbol_value) {
+                AssignBinaryOp::ModAssign => match (self.right.eval(env)?, symbol_value) {
                     (PrimaryExpr::Int(value), PrimaryExpr::Int(cur)) => {
                         PrimaryExpr::Int(cur % value)
                     }
