@@ -21,7 +21,7 @@ pub struct UnExpr {
 }
 
 impl UnExpr {
-    pub fn build(op: Pair<Rule>, rhs: ExprResult, env: &Environment) -> ExprResult {
+    pub fn from_pair(op: Pair<Rule>, rhs: ExprResult, env: &Environment) -> ExprResult {
         let (line, column) = op.line_col();
         let op = match op.as_rule() {
             Rule::not => UnOp::Not,

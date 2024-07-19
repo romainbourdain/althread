@@ -17,9 +17,9 @@ pub struct PrintStmt {
 }
 
 impl PrintStmt {
-    pub fn build(pair: Pair<Rule>, env: &Environment) -> Result<Self, AlthreadError> {
+    pub fn from_pair(pair: Pair<Rule>, env: &Environment) -> Result<Self, AlthreadError> {
         let (line, column) = pair.line_col();
-        let expr = Expr::build(pair.into_inner().next().unwrap(), env)?;
+        let expr = Expr::from_pair(pair.into_inner().next().unwrap(), env)?;
         Ok(Self { expr, line, column })
     }
 

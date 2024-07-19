@@ -32,7 +32,7 @@ impl fmt::Display for DataType {
 }
 
 impl DataType {
-    pub fn build(pair: Pair<Rule>) -> Result<Self, AlthreadError> {
+    pub fn from_pair(pair: Pair<Rule>) -> Result<Self, AlthreadError> {
         Self::from_str(pair.as_str())
     }
 

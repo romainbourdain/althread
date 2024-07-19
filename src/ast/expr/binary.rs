@@ -30,14 +30,14 @@ macro_rules! match_bin {
 }
 
 impl BinExpr {
-    pub fn build(
+    pub fn from_pair(
         lhs: ExprResult,
         op: Pair<Rule>,
         rhs: ExprResult,
         env: &Environment,
     ) -> ExprResult {
         let (line, column) = op.line_col();
-        let op = BinOp::build(op)?;
+        let op = BinOp::from_pair(op)?;
         let expr = Self {
             op,
             lhs: Box::new(lhs?),

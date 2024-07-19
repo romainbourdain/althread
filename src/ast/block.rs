@@ -29,7 +29,7 @@ impl Block {
         let mut block = Self::new(line, column);
 
         for pair in pair.into_inner() {
-            block.stmts.push(Stmt::build(pair, env)?);
+            block.stmts.push(Stmt::from_pair(pair, env)?);
         }
 
         Ok(block)

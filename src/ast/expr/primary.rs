@@ -36,10 +36,10 @@ impl fmt::Display for PrimaryExpr {
 }
 
 impl PrimaryExpr {
-    pub fn build(pair: Pair<Rule>, env: &Environment) -> ExprResult {
+    pub fn from_pair(pair: Pair<Rule>, env: &Environment) -> ExprResult {
         // parenthesis priority
         if pair.as_rule() == Rule::expr {
-            return Expr::build(pair, env);
+            return Expr::from_pair(pair, env);
         }
 
         let expr = match pair.as_rule() {

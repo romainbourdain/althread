@@ -10,7 +10,7 @@ pub struct RunStmt {
 }
 
 impl RunStmt {
-    pub fn parse(pair: Pair<Rule>, env: &Environment) -> Result<Self, AlthreadError> {
+    pub fn from_pair(pair: Pair<Rule>, env: &Environment) -> Result<Self, AlthreadError> {
         let (line, column) = pair.line_col();
         let identifier = pair.into_inner().next().unwrap().as_str().to_string();
 

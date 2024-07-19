@@ -44,7 +44,7 @@ impl fmt::Display for BinOp {
 }
 
 impl BinOp {
-    pub fn build(pair: Pair<Rule>) -> Result<Self, AlthreadError> {
+    pub fn from_pair(pair: Pair<Rule>) -> Result<Self, AlthreadError> {
         Ok(match pair.as_rule() {
             Rule::add => BinOp::Add,
             Rule::sub => BinOp::Sub,

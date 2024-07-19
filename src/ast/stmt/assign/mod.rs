@@ -14,11 +14,11 @@ pub enum Assign {
 }
 
 impl Assign {
-    pub fn build(pair: Pair<Rule>, env: &Environment) -> Result<Self, AlthreadError> {
+    pub fn from_pair(pair: Pair<Rule>, env: &Environment) -> Result<Self, AlthreadError> {
         let pair = pair.into_inner().next().unwrap();
         Ok(match pair.as_rule() {
-            Rule::assign_unary => Self::Unary(AssignUnary::build(pair, env)?),
-            Rule::assign_binary => Self::Binary(AssignBinary::build(pair, env)?),
+            Rule::assign_unary => Self::Unary(AssignUnary::from_pair(pair, env)?),
+            Rule::assign_binary => Self::Binary(AssignBinary::from_pair(pair, env)?),
             _ => unreachable!(),
         })
     }

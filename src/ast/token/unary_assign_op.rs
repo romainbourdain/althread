@@ -22,7 +22,7 @@ impl fmt::Display for UnaryAssignOp {
 }
 
 impl UnaryAssignOp {
-    pub fn build(pair: Pair<Rule>) -> Result<Self, AlthreadError> {
+    pub fn from_pair(pair: Pair<Rule>) -> Result<Self, AlthreadError> {
         Ok(match pair.as_str() {
             "++" => UnaryAssignOp::Increment,
             "--" => UnaryAssignOp::Decrement,

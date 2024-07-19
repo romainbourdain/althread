@@ -34,16 +34,16 @@ impl Decl {
 }
 
 impl Decl {
-    pub fn build(pair: Pair<Rule>, env: &mut Environment) -> Result<Self, AlthreadError> {
+    pub fn from_pair(pair: Pair<Rule>, env: &mut Environment) -> Result<Self, AlthreadError> {
         let (line, column) = pair.line_col();
         let mut decl = Decl::new(line, column);
 
         for pair in pair.into_inner() {
             match pair.as_rule() {
                 Rule::IDENTIFIER => decl.identifier = pair.as_str().to_string(),
-                Rule::DATATYPE => decl.datatype = DataType::build(pair)?,
+                Rule::DATATYPE => decl.datatype = DataType::from_pair(pair)?,
                 Rule::decl_keyword => decl.mutable = pair.as_str() == "let",
-                Rule::expr => decl.value = Expr::build(pair, env)?,
+                Rule::expr => decl.value = Expr::from_pair(pair, env)?,
                 _ => unreachable!(),
             }
         }

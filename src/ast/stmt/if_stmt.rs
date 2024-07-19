@@ -23,14 +23,14 @@ pub struct IfStmt {
 }
 
 impl IfStmt {
-    pub fn build(pair: Pair<Rule>, env: &mut Environment) -> Result<Self, AlthreadError> {
+    pub fn from_pair(pair: Pair<Rule>, env: &mut Environment) -> Result<Self, AlthreadError> {
         let (line, column) = pair.line_col();
         let mut pairs = pair.into_inner();
         let condition = pairs.next().unwrap();
         let block = pairs.next().unwrap();
         let else_block = pairs.next();
 
-        let condition = Expr::build(condition, env)?;
+        let condition = Expr::from_pair(condition, env)?;
         let block = Block::parse_and_push(block, env)?;
         let else_block = else_block
             .map(|block| Block::parse_and_push(block, env))

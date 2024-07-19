@@ -32,17 +32,17 @@ impl AssignBinary {
 }
 
 impl AssignBinary {
-    pub fn build(pair: Pair<Rule>, env: &Environment) -> Result<Self, AlthreadError> {
+    pub fn from_pair(pair: Pair<Rule>, env: &Environment) -> Result<Self, AlthreadError> {
         let (line, column) = pair.line_col();
         let mut assign = Self::new(line, column);
 
         for pair in pair.into_inner() {
             match pair.as_rule() {
                 Rule::IDENTIFIER => assign.left = pair.as_str().to_string(),
-                Rule::assign_op => assign.op = BinaryAssignOp::build(pair)?,
-                Rule::expr => assign.right = Expr::build(pair, env)?,
+                Rule::assign_op => assign.op = BinaryAssignOp::from_pair(pair)?,
+                Rule::expr => assign.right = Expr::from_pair(pair, env)?,
                 Rule::assign_unary_op => {
-                    assign.op = BinaryAssignOp::build(pair)?;
+                    assign.op = BinaryAssignOp::from_pair(pair)?;
                     assign.right = Expr::new(ExprKind::Primary(PrimaryExpr::Int(1)));
                 }
                 _ => unreachable!(),

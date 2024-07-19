@@ -74,11 +74,11 @@ pub enum ExprKind {
 }
 
 impl Expr {
-    pub fn build(pair: Pair<Rule>, env: &Environment) -> ExprResult {
+    pub fn from_pair(pair: Pair<Rule>, env: &Environment) -> ExprResult {
         PRATT_PARSER
-            .map_primary(|pair| PrimaryExpr::build(pair, env))
-            .map_infix(|lhs, op, rhs| BinExpr::build(lhs, op, rhs, env))
-            .map_prefix(|op, rhs| UnExpr::build(op, rhs, env))
+            .map_primary(|pair| PrimaryExpr::from_pair(pair, env))
+            .map_infix(|lhs, op, rhs| BinExpr::from_pair(lhs, op, rhs, env))
+            .map_prefix(|op, rhs| UnExpr::from_pair(op, rhs, env))
             .parse(pair.into_inner())
     }
 

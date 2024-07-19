@@ -25,14 +25,14 @@ impl AssignUnary {
         }
     }
 
-    pub fn build(pair: Pair<Rule>, env: &Environment) -> Result<Self, AlthreadError> {
+    pub fn from_pair(pair: Pair<Rule>, env: &Environment) -> Result<Self, AlthreadError> {
         let (line, column) = pair.line_col();
         let mut assign = Self::new(line, column);
 
         for pair in pair.into_inner() {
             match pair.as_rule() {
                 Rule::IDENTIFIER => assign.left = pair.as_str().to_string(),
-                Rule::assign_unary_op => assign.op = UnaryAssignOp::build(pair)?,
+                Rule::assign_unary_op => assign.op = UnaryAssignOp::from_pair(pair)?,
                 _ => unreachable!(),
             }
         }

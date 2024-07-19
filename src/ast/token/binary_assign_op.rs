@@ -30,7 +30,7 @@ impl fmt::Display for BinaryAssignOp {
 }
 
 impl BinaryAssignOp {
-    pub fn build(pair: Pair<Rule>) -> Result<Self, AlthreadError> {
+    pub fn from_pair(pair: Pair<Rule>) -> Result<Self, AlthreadError> {
         Ok(match pair.as_str() {
             "=" => BinaryAssignOp::Assign,
             "+=" => BinaryAssignOp::AddAssign,
