@@ -89,4 +89,12 @@ impl Expr {
             ExprKind::Unary(expr) => expr.get_datatype(env),
         }
     }
+
+    pub fn eval(&self, env: &Environment) -> Result<PrimaryExpr, AlthreadError> {
+        match &self.kind {
+            ExprKind::Primary(expr) => expr.eval(env),
+            ExprKind::Unary(expr) => expr.eval(env),
+            ExprKind::Binary(expr) => expr.eval(env),
+        }
+    }
 }

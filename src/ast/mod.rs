@@ -4,6 +4,8 @@ pub mod process;
 pub mod stmt;
 pub mod token;
 
+use std::io::Write;
+
 use block::Block;
 use pest::iterators::Pairs;
 use process::Process;
@@ -51,5 +53,19 @@ impl Ast {
         }
 
         Ok(program)
+    }
+
+    pub fn eval<W>(&self, env: &mut Environment, output: &mut W) -> Result<(), AlthreadError>
+    where
+        W: Write,
+    {
+        if let Some(block) = self.shared_block.as_ref() {
+            block.eval(env, output)?;
+        }
+        if let Some(block) = self.main_block.as_ref() {
+            block.eval_and_push(env, output)?;
+        }
+
+        Ok(())
     }
 }

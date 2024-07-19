@@ -5,6 +5,8 @@ pub mod print_stmt;
 pub mod run_stmt;
 pub mod while_stmt;
 
+use std::io::Write;
+
 use assign::Assign;
 use decl::Decl;
 use if_stmt::IfStmt;
@@ -42,5 +44,25 @@ impl Stmt {
             Rule::run_stmt => Ok(Self::Run(RunStmt::parse(pair, env)?)),
             _ => unreachable!(),
         }
+    }
+
+    pub fn eval<W>(&self, env: &mut Environment, output: &mut W) -> Result<(), AlthreadError>
+    where
+        W: Write,
+    {
+        use Stmt::*;
+        match self {
+            Assign(assign) => assign.eval(env)?,
+            Expr(expr) => {
+                expr.eval(env)?;
+            }
+            Decl(decl) => decl.eval(env)?,
+            Print(print_stmt) => print_stmt.eval(env, output)?,
+            Block(block) => block.eval_and_push(env, output)?,
+            IfStmt(if_stmt) => if_stmt.eval(env, output)?,
+            WhileStmt(while_stmt) => while_stmt.eval(env, output)?,
+            Run(_) => unimplemented!(),
+        };
+        Ok(())
     }
 }

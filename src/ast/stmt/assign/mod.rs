@@ -22,4 +22,11 @@ impl Assign {
             _ => unreachable!(),
         })
     }
+
+    pub fn eval(&self, env: &mut Environment) -> Result<(), AlthreadError> {
+        match self {
+            Assign::Binary(binary) => binary.eval(env),
+            Assign::Unary(unary) => unary.eval(env),
+        }
+    }
 }

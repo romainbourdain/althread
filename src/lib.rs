@@ -2,7 +2,6 @@ mod ast;
 mod env;
 mod error;
 mod parser;
-mod runtime;
 
 use std::{
     fs,
