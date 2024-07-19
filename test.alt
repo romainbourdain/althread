@@ -11,8 +11,8 @@ process A() {
 
 main {
     let a = 5;
-    run A();
+   // run A();
 
     b++;
-    run A();
+   // run A();
 }

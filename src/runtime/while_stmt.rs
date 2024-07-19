@@ -1,9 +1,9 @@
 use std::io::Write;
 
 use crate::{
+    ast::{expr::primary::PrimaryExpr, stmt::while_stmt::WhileStmt},
     env::Environment,
     error::{AlthreadError, ErrorType},
-    ast::{expr::primary::PrimaryExpr, while_stmt::WhileStmt},
 };
 
 impl WhileStmt {

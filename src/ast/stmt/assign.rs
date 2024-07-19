@@ -1,16 +1,13 @@
-use std::fmt;
-
 use pest::iterators::Pair;
 
 use crate::{
+    ast::{
+        expr::{primary::PrimaryExpr, Expr, ExprKind},
+        token::{assign_op::AssignOp, datatype::DataType},
+    },
     env::Environment,
     error::{AlthreadError, ErrorType},
     parser::Rule,
-};
-
-use super::{
-    datatype::DataType,
-    expr::{primary::PrimaryExpr, Expr, ExprKind},
 };
 
 #[derive(Debug)]
@@ -102,46 +99,5 @@ impl Assign {
         }
 
         Ok(assign)
-    }
-}
-
-impl AssignOp {
-    pub fn build(pair: Pair<Rule>) -> Result<Self, AlthreadError> {
-        Ok(match pair.as_str() {
-            "=" => AssignOp::Assign,
-            "+=" => AssignOp::AddAssign,
-            "-=" => AssignOp::SubAssign,
-            "*=" => AssignOp::MulAssign,
-            "/=" => AssignOp::DivAssign,
-            "%=" => AssignOp::ModAssign,
-            "++" => AssignOp::AddAssign,
-            "--" => AssignOp::SubAssign,
-            _ => unimplemented!(),
-        })
-    }
-}
-
-#[derive(Debug, PartialEq)]
-pub enum AssignOp {
-    Assign,
-    AddAssign,
-    SubAssign,
-    MulAssign,
-    DivAssign,
-    ModAssign,
-}
-
-impl fmt::Display for AssignOp {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use AssignOp::*;
-        let op = match self {
-            Assign => "=",
-            AddAssign => "+=",
-            SubAssign => "-=",
-            MulAssign => "*=",
-            DivAssign => "/=",
-            ModAssign => "%=",
-        };
-        write!(f, "{}", op)
     }
 }

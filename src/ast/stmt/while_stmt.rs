@@ -1,12 +1,11 @@
 use pest::iterators::Pair;
 
 use crate::{
+    ast::{block::Block, expr::Expr, token::datatype::DataType},
     env::Environment,
     error::{AlthreadError, ErrorType},
     parser::Rule,
 };
-
-use super::{block::Block, datatype::DataType, expr::Expr};
 
 #[derive(Debug)]
 pub struct WhileStmt {

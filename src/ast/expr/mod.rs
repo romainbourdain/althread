@@ -10,7 +10,7 @@ use unary::UnExpr;
 
 use crate::{env::Environment, error::AlthreadError, parser::Rule};
 
-use super::datatype::DataType;
+use super::token::datatype::DataType;
 
 type ExprResult = Result<Expr, AlthreadError>;
 

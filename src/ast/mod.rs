@@ -1,14 +1,8 @@
-pub mod assign;
 pub mod block;
-pub mod datatype;
-pub mod decl;
 pub mod expr;
-pub mod if_stmt;
-pub mod print_stmt;
 pub mod process;
-pub mod run_stmt;
 pub mod stmt;
-pub mod while_stmt;
+pub mod token;
 
 use block::Block;
 use pest::iterators::Pairs;

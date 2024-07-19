@@ -1,8 +1,6 @@
 use pest::iterators::Pair;
 
-use crate::{env::Environment, error::AlthreadError, parser::Rule};
-
-use super::expr::Expr;
+use crate::{ast::expr::Expr, env::Environment, error::AlthreadError, parser::Rule};
 
 #[derive(Debug)]
 pub struct PrintStmt {

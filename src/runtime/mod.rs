@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use crate::{env::Environment, error::AlthreadError, ast::Ast};
+use crate::{ast::Ast, env::Environment, error::AlthreadError};
 
 pub mod assign;
 pub mod block;

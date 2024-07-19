@@ -1,11 +1,21 @@
+pub mod assign;
+pub mod decl;
+pub mod if_stmt;
+pub mod print_stmt;
+pub mod run_stmt;
+pub mod while_stmt;
+
+use assign::Assign;
+use decl::Decl;
+use if_stmt::IfStmt;
 use pest::iterators::Pair;
+use print_stmt::PrintStmt;
+use run_stmt::RunStmt;
+use while_stmt::WhileStmt;
 
 use crate::{env::Environment, error::AlthreadError, parser::Rule};
 
-use super::{
-    assign::Assign, block::Block, decl::Decl, expr::Expr, if_stmt::IfStmt, print_stmt::PrintStmt,
-    run_stmt::RunStmt, while_stmt::WhileStmt,
-};
+use super::{block::Block, expr::Expr};
 
 #[derive(Debug)]
 pub enum Stmt {

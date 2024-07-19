@@ -1,8 +1,5 @@
 use crate::{
-    ast::{
-        assign::{Assign, AssignOp},
-        expr::primary::PrimaryExpr,
-    },
+    ast::{expr::primary::PrimaryExpr, stmt::assign::Assign, token::assign_op::AssignOp},
     env::Environment,
     error::{AlthreadError, ErrorType},
 };

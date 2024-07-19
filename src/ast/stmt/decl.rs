@@ -1,14 +1,13 @@
 use pest::iterators::Pair;
 
 use crate::{
+    ast::{
+        expr::{primary::PrimaryExpr, Expr, ExprKind},
+        token::datatype::DataType,
+    },
     env::Environment,
     error::{AlthreadError, ErrorType},
     parser::Rule,
-};
-
-use super::{
-    datatype::DataType,
-    expr::{primary::PrimaryExpr, Expr, ExprKind},
 };
 
 #[derive(Debug)]

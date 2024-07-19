@@ -3,7 +3,7 @@ use std::fmt;
 use pest::iterators::Pair;
 
 use crate::{
-    ast::datatype::DataType,
+    ast::token::datatype::DataType,
     env::Environment,
     error::{AlthreadError, ErrorType},
     parser::Rule,

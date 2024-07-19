@@ -1,7 +1,7 @@
 use crate::{
+    ast::stmt::decl::Decl,
     env::Environment,
     error::{AlthreadError, ErrorType},
-    ast::decl::Decl,
 };
 
 impl Decl {

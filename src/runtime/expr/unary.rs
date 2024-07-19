@@ -1,10 +1,10 @@
 use crate::{
+    ast::{
+        expr::{primary::PrimaryExpr, unary::UnExpr},
+        token::unary_op::UnOp,
+    },
     env::Environment,
     error::AlthreadError,
-    ast::expr::{
-        primary::PrimaryExpr,
-        unary::{UnExpr, UnOp},
-    },
 };
 
 impl UnExpr {

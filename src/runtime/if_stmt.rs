@@ -1,9 +1,9 @@
 use std::io::Write;
 
 use crate::{
+    ast::{expr::primary::PrimaryExpr, stmt::if_stmt::IfStmt},
     env::Environment,
     error::{AlthreadError, ErrorType},
-    ast::{expr::primary::PrimaryExpr, if_stmt::IfStmt},
 };
 
 impl IfStmt {

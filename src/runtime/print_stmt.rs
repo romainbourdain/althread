@@ -1,7 +1,7 @@
 use std::io::Write;
 
 use crate::{
-    ast::print_stmt::PrintStmt,
+    ast::stmt::print_stmt::PrintStmt,
     env::Environment,
     error::{AlthreadError, ErrorType},
 };

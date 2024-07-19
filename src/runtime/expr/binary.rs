@@ -1,10 +1,10 @@
 use crate::{
+    ast::{
+        expr::{binary::BinExpr, primary::PrimaryExpr},
+        token::binary_op::BinOp,
+    },
     env::Environment,
     error::{AlthreadError, ErrorType},
-    ast::expr::{
-        binary::{BinExpr, BinOp},
-        primary::PrimaryExpr,
-    },
 };
 
 macro_rules! match_bin {
