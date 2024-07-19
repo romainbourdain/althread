@@ -1,5 +1,3 @@
-use std::fmt;
-
 use pest::iterators::Pair;
 
 use crate::{

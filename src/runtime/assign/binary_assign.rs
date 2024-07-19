@@ -1,42 +1,45 @@
 use crate::{
-    ast::{expr::primary::PrimaryExpr, stmt::assign::Assign, token::assign_op::AssignOp},
+    ast::{
+        expr::primary::PrimaryExpr, stmt::assign::assign_binary::AssignBinary,
+        token::binary_assign_op::BinaryAssignOp,
+    },
     env::Environment,
     error::{AlthreadError, ErrorType},
 };
 
-impl Assign {
+impl AssignBinary {
     pub fn eval(&self, env: &mut Environment) -> Result<(), AlthreadError> {
-        let symbol = env.get_symbol(&self.identifier).map_err(|e| {
+        let symbol = env.get_symbol(&self.left).map_err(|e| {
             AlthreadError::error(ErrorType::VariableError, self.line, self.column, e)
         })?;
         if let Some(symbol_value) = &symbol.value {
             let value = match self.op {
-                AssignOp::Assign => self.value.eval(env)?,
-                AssignOp::AddAssign => match (self.value.eval(env)?, symbol_value) {
+                BinaryAssignOp::Assign => self.right.eval(env)?,
+                BinaryAssignOp::AddAssign => match (self.right.eval(env)?, symbol_value) {
                     (PrimaryExpr::Int(value), PrimaryExpr::Int(cur)) => {
                         PrimaryExpr::Int(cur + value)
                     }
                     _ => unreachable!(),
                 },
-                AssignOp::SubAssign => match (self.value.eval(env)?, symbol_value) {
+                BinaryAssignOp::SubAssign => match (self.right.eval(env)?, symbol_value) {
                     (PrimaryExpr::Int(value), PrimaryExpr::Int(cur)) => {
                         PrimaryExpr::Int(cur - value)
                     }
                     _ => unreachable!(),
                 },
-                AssignOp::MulAssign => match (self.value.eval(env)?, symbol_value) {
+                BinaryAssignOp::MulAssign => match (self.right.eval(env)?, symbol_value) {
                     (PrimaryExpr::Int(value), PrimaryExpr::Int(cur)) => {
                         PrimaryExpr::Int(cur * value)
                     }
                     _ => unreachable!(),
                 },
-                AssignOp::DivAssign => match (self.value.eval(env)?, symbol_value) {
+                BinaryAssignOp::DivAssign => match (self.right.eval(env)?, symbol_value) {
                     (PrimaryExpr::Int(value), PrimaryExpr::Int(cur)) => {
                         PrimaryExpr::Int(cur / value)
                     }
                     _ => unreachable!(),
                 },
-                AssignOp::ModAssign => match (self.value.eval(env)?, symbol_value) {
+                BinaryAssignOp::ModAssign => match (self.right.eval(env)?, symbol_value) {
                     (PrimaryExpr::Int(value), PrimaryExpr::Int(cur)) => {
                         PrimaryExpr::Int(cur % value)
                     }
@@ -44,7 +47,7 @@ impl Assign {
                 },
             };
 
-            env.update_symbol(&self.identifier, value).map_err(|e| {
+            env.update_symbol(&self.left, value).map_err(|e| {
                 AlthreadError::error(ErrorType::VariableError, self.line, self.column, e)
             })?;
 

@@ -13,6 +13,7 @@ main {
     let a = 5;
    // run A();
 
-    b++;
+    b--;
+    print(b);
    // run A();
 }

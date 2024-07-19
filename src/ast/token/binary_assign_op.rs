@@ -5,7 +5,7 @@ use pest::iterators::Pair;
 use crate::{error::AlthreadError, parser::Rule};
 
 #[derive(Debug, PartialEq)]
-pub enum AssignOp {
+pub enum BinaryAssignOp {
     Assign,
     AddAssign,
     SubAssign,
@@ -14,9 +14,9 @@ pub enum AssignOp {
     ModAssign,
 }
 
-impl fmt::Display for AssignOp {
+impl fmt::Display for BinaryAssignOp {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use AssignOp::*;
+        use BinaryAssignOp::*;
         let op = match self {
             Assign => "=",
             AddAssign => "+=",
@@ -29,17 +29,15 @@ impl fmt::Display for AssignOp {
     }
 }
 
-impl AssignOp {
+impl BinaryAssignOp {
     pub fn build(pair: Pair<Rule>) -> Result<Self, AlthreadError> {
         Ok(match pair.as_str() {
-            "=" => AssignOp::Assign,
-            "+=" => AssignOp::AddAssign,
-            "-=" => AssignOp::SubAssign,
-            "*=" => AssignOp::MulAssign,
-            "/=" => AssignOp::DivAssign,
-            "%=" => AssignOp::ModAssign,
-            "++" => AssignOp::AddAssign,
-            "--" => AssignOp::SubAssign,
+            "=" => BinaryAssignOp::Assign,
+            "+=" => BinaryAssignOp::AddAssign,
+            "-=" => BinaryAssignOp::SubAssign,
+            "*=" => BinaryAssignOp::MulAssign,
+            "/=" => BinaryAssignOp::DivAssign,
+            "%=" => BinaryAssignOp::ModAssign,
             _ => unimplemented!(),
         })
     }

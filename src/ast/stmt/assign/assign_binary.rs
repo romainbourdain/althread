@@ -3,7 +3,7 @@ use pest::iterators::Pair;
 use crate::{
     ast::{
         expr::{primary::PrimaryExpr, Expr, ExprKind},
-        token::{assign_op::AssignOp, datatype::DataType},
+        token::{binary_assign_op::BinaryAssignOp, datatype::DataType},
     },
     env::Environment,
     error::{AlthreadError, ErrorType},
@@ -11,53 +11,53 @@ use crate::{
 };
 
 #[derive(Debug)]
-pub struct Assign {
-    pub identifier: String,
-    pub op: AssignOp,
-    pub value: Expr,
+pub struct AssignBinary {
+    pub left: String,
+    pub op: BinaryAssignOp,
+    pub right: Expr,
     pub line: usize,
     pub column: usize,
 }
 
-impl Assign {
+impl AssignBinary {
     pub fn new(line: usize, column: usize) -> Self {
         Self {
-            identifier: "".to_string(),
-            op: AssignOp::Assign,
-            value: Expr::new(ExprKind::Primary(PrimaryExpr::Null)),
+            left: "".to_string(),
+            op: BinaryAssignOp::Assign,
+            right: Expr::new(ExprKind::Primary(PrimaryExpr::Null)),
             line,
             column,
         }
     }
 }
 
-impl Assign {
+impl AssignBinary {
     pub fn build(pair: Pair<Rule>, env: &Environment) -> Result<Self, AlthreadError> {
         let (line, column) = pair.line_col();
         let mut assign = Self::new(line, column);
 
         for pair in pair.into_inner() {
             match pair.as_rule() {
-                Rule::IDENTIFIER => assign.identifier = pair.as_str().to_string(),
-                Rule::assign_op => assign.op = AssignOp::build(pair)?,
-                Rule::expr => assign.value = Expr::build(pair, env)?,
+                Rule::IDENTIFIER => assign.left = pair.as_str().to_string(),
+                Rule::assign_op => assign.op = BinaryAssignOp::build(pair)?,
+                Rule::expr => assign.right = Expr::build(pair, env)?,
                 Rule::assign_unary_op => {
-                    assign.op = AssignOp::build(pair)?;
-                    assign.value = Expr::new(ExprKind::Primary(PrimaryExpr::Int(1)));
+                    assign.op = BinaryAssignOp::build(pair)?;
+                    assign.right = Expr::new(ExprKind::Primary(PrimaryExpr::Int(1)));
                 }
                 _ => unreachable!(),
             }
         }
 
-        let value_type = assign.value.get_datatype(env)?;
+        let value_type = assign.right.get_datatype(env)?;
 
         match (&assign.op, &value_type) {
-            (AssignOp::Assign, _) => {}
-            (AssignOp::AddAssign, DataType::Int) => {}
-            (AssignOp::SubAssign, DataType::Int) => {}
-            (AssignOp::MulAssign, DataType::Int) => {}
-            (AssignOp::DivAssign, DataType::Int) => {}
-            (AssignOp::ModAssign, DataType::Int) => {}
+            (BinaryAssignOp::Assign, _) => {}
+            (BinaryAssignOp::AddAssign, DataType::Int) => {}
+            (BinaryAssignOp::SubAssign, DataType::Int) => {}
+            (BinaryAssignOp::MulAssign, DataType::Int) => {}
+            (BinaryAssignOp::DivAssign, DataType::Int) => {}
+            (BinaryAssignOp::ModAssign, DataType::Int) => {}
             (op, datatype) => {
                 return Err(AlthreadError::error(
                     ErrorType::TypeError,
@@ -68,11 +68,11 @@ impl Assign {
             }
         }
 
-        let symbol = env.get_symbol(&assign.identifier).map_err(|e| {
+        let symbol = env.get_symbol(&assign.left).map_err(|e| {
             AlthreadError::error(
                 ErrorType::VariableError,
-                assign.value.line,
-                assign.value.column,
+                assign.right.line,
+                assign.right.column,
                 e,
             )
         })?;
@@ -80,8 +80,8 @@ impl Assign {
         if !symbol.mutable {
             return Err(AlthreadError::error(
                 ErrorType::VariableError,
-                assign.value.line,
-                assign.value.column,
+                assign.right.line,
+                assign.right.column,
                 "Cannot change immutable variable value".to_string(),
             ));
         }
@@ -93,7 +93,7 @@ impl Assign {
                 assign.column,
                 format!(
                     "Cannot change {} type from {} to {}",
-                    assign.identifier, symbol.datatype, value_type
+                    assign.left, symbol.datatype, value_type
                 ),
             ));
         }
