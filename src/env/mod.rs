@@ -1,6 +1,12 @@
 use symbol_table::{Symbol, SymbolTable};
 
-use crate::ast::{expr::primary::PrimaryExpr, token::datatype::DataType};
+use crate::{
+    ast::{
+        expr::primary::PrimaryExpr,
+        token::{datatype::DataType, identifier::Identifier},
+    },
+    error::{AlthreadError, ErrorType},
+};
 
 pub mod symbol_table;
 
@@ -54,37 +60,46 @@ impl<'a> Environment<'a> {
         Ok(())
     }
 
-    pub fn get_symbol(&self, identifier: &String) -> Result<&Symbol, String> {
+    pub fn get_symbol(&self, identifier: &Identifier) -> Result<&Symbol, AlthreadError> {
         for table in self.symbol_tables.iter().rev() {
-            if let Some(symbol) = table.get(identifier) {
+            if let Some(symbol) = table.get(identifier.value.as_str()) {
                 return Ok(symbol);
             }
         }
 
-        if let Some(symbol) = self.global_table.get(identifier) {
+        if let Some(symbol) = self.global_table.get(identifier.value.as_str()) {
             return Ok(symbol);
         }
 
-        Err(format!("Symbol {} not found", identifier))
+        Err(AlthreadError::error(
+            ErrorType::VariableError,
+            identifier.line,
+            identifier.column,
+            format!("Symbol {} not found", identifier.value.as_str()),
+        ))
     }
 
     pub fn clear_global(&mut self) {
         self.global_table.clear()
     }
 
-    pub fn update_symbol(&mut self, identifier: &String, value: PrimaryExpr) -> Result<(), String> {
+    pub fn update_symbol(
+        &mut self,
+        identifier: &Identifier,
+        value: PrimaryExpr,
+    ) -> Result<(), String> {
         for table in self.symbol_tables.iter_mut().rev() {
-            if let Some(symbol) = table.get_mut(identifier) {
+            if let Some(symbol) = table.get_mut(identifier.value.as_str()) {
                 symbol.value = Some(value);
                 return Ok(());
             }
         }
 
-        if let Some(symbol) = self.global_table.get_mut(identifier) {
+        if let Some(symbol) = self.global_table.get_mut(identifier.value.as_str()) {
             symbol.value = Some(value);
             return Ok(());
         }
 
-        Err(format!("Symbol {} not found", identifier))
+        Err(format!("Symbol {} not found", identifier.value.as_str()))
     }
 }

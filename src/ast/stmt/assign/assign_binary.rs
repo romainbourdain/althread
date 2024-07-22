@@ -3,7 +3,7 @@ use pest::iterators::Pair;
 use crate::{
     ast::{
         expr::{primary::PrimaryExpr, Expr, ExprKind},
-        token::{assign_binary_op::AssignBinaryOp, datatype::DataType},
+        token::{assign_binary_op::AssignBinaryOp, datatype::DataType, identifier::Identifier},
     },
     env::Environment,
     error::{AlthreadError, ErrorType},
@@ -12,7 +12,7 @@ use crate::{
 
 #[derive(Debug)]
 pub struct AssignBinary {
-    pub left: String,
+    pub left: Identifier,
     pub op: AssignBinaryOp,
     pub right: Expr,
     pub line: usize,
@@ -22,7 +22,7 @@ pub struct AssignBinary {
 impl AssignBinary {
     pub fn new(line: usize, column: usize) -> Self {
         Self {
-            left: "".to_string(),
+            left: Identifier::new(0, 0),
             op: AssignBinaryOp::Assign,
             right: Expr::new(ExprKind::Primary(PrimaryExpr::Null)),
             line,
@@ -38,13 +38,9 @@ impl AssignBinary {
 
         for pair in pair.into_inner() {
             match pair.as_rule() {
-                Rule::IDENTIFIER => assign.left = pair.as_str().to_string(),
+                Rule::IDENTIFIER => assign.left = Identifier::from_pair(pair),
                 Rule::assign_op => assign.op = AssignBinaryOp::from_pair(pair)?,
                 Rule::expr => assign.right = Expr::from_pair(pair, env)?,
-                Rule::assign_unary_op => {
-                    assign.op = AssignBinaryOp::from_pair(pair)?;
-                    assign.right = Expr::new(ExprKind::Primary(PrimaryExpr::Int(1)));
-                }
                 _ => unreachable!(),
             }
         }
@@ -68,14 +64,7 @@ impl AssignBinary {
             }
         }
 
-        let symbol = env.get_symbol(&assign.left).map_err(|e| {
-            AlthreadError::error(
-                ErrorType::VariableError,
-                assign.right.line,
-                assign.right.column,
-                e,
-            )
-        })?;
+        let symbol = env.get_symbol(&assign.left)?;
 
         if !symbol.mutable {
             return Err(AlthreadError::error(
@@ -102,9 +91,7 @@ impl AssignBinary {
     }
 
     pub fn eval(&self, env: &mut Environment) -> Result<(), AlthreadError> {
-        let symbol = env.get_symbol(&self.left).map_err(|e| {
-            AlthreadError::error(ErrorType::VariableError, self.line, self.column, e)
-        })?;
+        let symbol = env.get_symbol(&self.left)?;
         if let Some(symbol_value) = &symbol.value {
             let value = match self.op {
                 AssignBinaryOp::Assign => self.right.eval(env)?,

@@ -3,9 +3,9 @@ use std::fmt;
 use pest::iterators::Pair;
 
 use crate::{
-    ast::token::datatype::DataType,
+    ast::token::{datatype::DataType, identifier::Identifier},
     env::Environment,
-    error::{AlthreadError, ErrorType},
+    error::AlthreadError,
     parser::Rule,
 };
 
@@ -18,7 +18,7 @@ pub enum PrimaryExpr {
     Float(f64),
     Bool(bool),
     String(String),
-    Identifier(String),
+    Identifier(Identifier),
 }
 
 impl fmt::Display for PrimaryExpr {
@@ -42,20 +42,22 @@ impl PrimaryExpr {
             return Expr::from_pair(pair, env);
         }
 
+        let (line, column) = pair.line_col();
+
         let expr = match pair.as_rule() {
             Rule::NULL => Self::Null,
             Rule::INTEGER => Self::Int(pair.as_str().parse::<i64>().unwrap()),
             Rule::FLOAT => Self::Float(pair.as_str().parse::<f64>().unwrap()),
             Rule::BOOLEAN => Self::Bool(pair.as_str() == "true"),
             Rule::STRING => Self::String(pair.as_str().to_string()),
-            Rule::IDENTIFIER => Self::Identifier(pair.as_str().to_string()),
+            Rule::IDENTIFIER => Self::Identifier(Identifier::from_pair(pair)),
             rule => unreachable!("{:?}", rule),
         };
 
         Ok(Expr {
             kind: ExprKind::Primary(expr),
-            line: pair.as_span().start_pos().line_col().0,
-            column: pair.as_span().start_pos().line_col().1,
+            line,
+            column,
         })
     }
 
@@ -67,10 +69,7 @@ impl PrimaryExpr {
             PrimaryExpr::String(_) => Ok(DataType::String),
             PrimaryExpr::Null => Ok(DataType::Void),
             PrimaryExpr::Identifier(ident) => {
-                // TODO : implement error with line and col
-                let symbol = env
-                    .get_symbol(ident)
-                    .map_err(|e| AlthreadError::error(ErrorType::TypeError, 0, 0, e))?;
+                let symbol = env.get_symbol(ident)?;
                 Ok(symbol.datatype.clone())
             }
         }
@@ -79,9 +78,7 @@ impl PrimaryExpr {
     pub fn eval(&self, env: &Environment) -> Result<PrimaryExpr, AlthreadError> {
         match self {
             PrimaryExpr::Identifier(ident) => {
-                let symbol = env
-                    .get_symbol(ident)
-                    .map_err(|err| AlthreadError::error(ErrorType::RuntimeError, 0, 0, err))?;
+                let symbol = env.get_symbol(&ident)?;
 
                 if let Some(value) = symbol.value.as_ref() {
                     Ok(value.clone())
