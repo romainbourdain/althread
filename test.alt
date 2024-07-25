@@ -1,8 +1,3 @@
 main {
-    let a: int = 3;
-    let b: int;
-    let c;
-    let d;
-    a++;
-    b++;
+    print(-7-(+3));
 }

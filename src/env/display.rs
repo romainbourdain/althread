@@ -1,6 +1,6 @@
 use std::fmt;
 
-use super::{Environment, Symbol, SymbolValue};
+use super::{Environment, Symbol};
 
 impl<'a> fmt::Display for Environment<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -40,22 +40,6 @@ impl fmt::Display for Symbol {
             match &self.value {
                 Some(value) => value.to_string(),
                 None => "None".to_string(),
-            }
-        )
-    }
-}
-
-impl fmt::Display for SymbolValue {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match self {
-                SymbolValue::Null => "Null".to_string(),
-                SymbolValue::Bool(b) => b.to_string(),
-                SymbolValue::Int(i) => i.to_string(),
-                SymbolValue::Float(fl) => fl.to_string(),
-                SymbolValue::String(s) => s.clone(),
             }
         )
     }

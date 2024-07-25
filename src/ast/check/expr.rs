@@ -35,6 +35,7 @@ fn check_primary(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<Data
             let symbol = env.get_symbol(&pair)?;
             symbol.datatype.clone()
         }
+        Rule::expr => check_expr(pair, env)?,
         _ => return Err(no_rule!(pair)),
     })
 }
@@ -54,9 +55,10 @@ fn check_unary<'a>(mut pairs: Pairs<'a, Rule>, env: &mut Environment) -> Althrea
             };
 
             match pair.as_str() {
-                "-" if !data_type.is_numeric() => Err(error_message(pair.as_str(), data_type)),
-                "!" if data_type != DataType::Bool => Err(error_message(pair.as_str(), data_type)),
-                _ => Ok(data_type),
+                "+" if data_type.is_numeric() => Ok(data_type),
+                "-" if data_type.is_numeric() => Ok(data_type),
+                "!" if data_type == DataType::Bool => Ok(data_type),
+                _ => Err(error_message(pair.as_str(), data_type)),
             }
         }
         Rule::primary => Ok(check_expr(pair, env)?),
@@ -78,12 +80,6 @@ fn check_binary<'a>(mut pairs: Pairs<'a, Rule>, env: &mut Environment) -> Althre
     if let Some(op) = pairs.next() {
         let right_type = check_binary(pairs, env)?;
         match op.as_str() {
-            "+" | "-" | "*" | "/" | "%" if !left_type.is_numeric() => {
-                Err(error_message(op, left_type))
-            }
-            "<" | ">" | "<=" | ">=" if !left_type.is_numeric() => Err(error_message(op, left_type)),
-            "&&" | "||" if left_type != DataType::Bool => Err(error_message(op, left_type)),
-            "==" | "!=" | "<" | ">" | "<=" | ">=" => Ok(DataType::Bool),
             _ if right_type != left_type => Err(AlthreadError::new(
                 ErrorType::TypeError,
                 op.line_col().0,
@@ -95,6 +91,12 @@ fn check_binary<'a>(mut pairs: Pairs<'a, Rule>, env: &mut Environment) -> Althre
                     right_type
                 ),
             )),
+            "+" | "-" | "*" | "/" | "%" if !left_type.is_numeric() => {
+                Err(error_message(op, left_type))
+            }
+            "<" | ">" | "<=" | ">=" if !left_type.is_numeric() => Err(error_message(op, left_type)),
+            "&&" | "||" if left_type != DataType::Bool => Err(error_message(op, left_type)),
+            "==" | "!=" | "<" | ">" | "<=" | ">=" => Ok(DataType::Bool),
             _ => Ok(left_type),
         }
     } else {

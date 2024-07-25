@@ -40,14 +40,21 @@ where
 
     // check ast
     {
+        println!("Checking AST...");
         let mut global_table = SymbolTable::new();
         let mut env = Environment::new(&mut global_table);
 
         ast.check(&mut env)?;
     }
 
-    // // run ast
-    // ast.eval(&mut env, output)?;
+    // run ast
+    {
+        println!("Running AST...");
+        let mut global_table = SymbolTable::new();
+        let mut env = Environment::new(&mut global_table);
+
+        ast.eval(&mut env)?;
+    }
 
     Ok(())
 }

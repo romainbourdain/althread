@@ -57,7 +57,7 @@ equality    = { comparison ~ (equality_op ~ comparison)* }
 equality_op = { "==" | "!=" }
 
 comparison    = { term ~ (comparison_op ~ term)* }
-comparison_op = { "<" | "<=" | ">" | ">=" }
+comparison_op = { "<=" | ">=" | "<" | ">" }
 
 term    = { factor ~ (term_op ~ factor)* }
 term_op = { "+" | "-" }
@@ -68,7 +68,7 @@ factor_op = { "*" | "/" | "%" }
 unary    = { unary_op* ~ primary }
 unary_op = { "+" | "-" | "!" }
 
-primary = { BOOLEAN | INTEGER | FLOAT | STRING | NULL | IDENTIFIER | "(" ~ expr ~ ")" }
+primary = { BOOLEAN | FLOAT | INTEGER | STRING | NULL | IDENTIFIER | "(" ~ expr ~ ")" }
 
 /// # Calls
 run_stmt   = { "run" ~ IDENTIFIER ~ "(" ~ ")" ~ ";" }

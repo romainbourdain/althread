@@ -1,10 +1,12 @@
 pub mod datatype;
 pub mod display;
 pub mod symbol_table;
+pub mod value;
 
 use std::collections::HashMap;
 
 use datatype::DataType;
+use value::Value;
 
 #[derive(Debug)]
 pub struct Environment<'a> {
@@ -18,14 +20,5 @@ pub type SymbolTable = HashMap<String, Symbol>;
 pub struct Symbol {
     pub datatype: DataType,
     pub mutable: bool,
-    pub value: Option<SymbolValue>,
-}
-
-#[derive(Debug)]
-pub enum SymbolValue {
-    Null,
-    Bool(bool),
-    Int(i64),
-    Float(f64),
-    String(String),
+    pub value: Option<Value>,
 }

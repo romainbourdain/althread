@@ -5,7 +5,7 @@ use crate::{
     parser::Rule,
 };
 
-use super::{datatype::DataType, Environment, Symbol, SymbolTable, SymbolValue};
+use super::{datatype::DataType, value::Value, Environment, Symbol, SymbolTable};
 
 impl<'a> Environment<'a> {
     pub fn new(global_table: &'a mut SymbolTable) -> Self {
@@ -28,7 +28,7 @@ impl<'a> Environment<'a> {
         identifier: &Pair<Rule>,
         datatype: DataType,
         mutable: bool,
-        value: Option<SymbolValue>,
+        value: Option<Value>,
     ) -> AlthreadResult<()> {
         let (line, column) = identifier.line_col();
         let identifier = identifier.as_str().to_string();
@@ -74,7 +74,7 @@ impl<'a> Environment<'a> {
         ))
     }
 
-    pub fn update_symbol(&mut self, identifier: &String, value: SymbolValue) -> Result<(), String> {
+    pub fn update_symbol(&mut self, identifier: &String, value: Value) -> Result<(), String> {
         for table in self.symbol_tables.iter_mut().rev() {
             if let Some(symbol) = table.get_mut(identifier.as_str()) {
                 symbol.value = Some(value);

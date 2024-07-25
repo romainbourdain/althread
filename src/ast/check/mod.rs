@@ -17,29 +17,28 @@ impl<'a> Ast<'a> {
     pub fn check(&self, env: &mut Environment) -> AlthreadResult<()> {
         for (_, pairs) in &self.process_bricks {
             env.push_table();
-            Self::check_pair(pairs.clone(), env)?;
-            println!("{}", env);
+            check_pairs(pairs.clone(), env)?;
             env.pop_table();
         }
         Ok(())
     }
+}
 
-    fn check_pair(pairs: Pairs<'a, Rule>, env: &mut Environment) -> AlthreadResult<()> {
-        for pair in pairs {
-            match pair.as_rule() {
-                Rule::expr => {
-                    check_expr(pair, env)?;
-                }
-                Rule::print_stmt => check_call(pair, env)?,
-                Rule::decl => check_decl(pair, env)?,
-                Rule::assignment => check_assign(pair, env)?,
-                Rule::run_stmt | Rule::if_stmt | Rule::while_stmt | Rule::scope => {
-                    unimplemented!()
-                }
-                _ => return Err(no_rule!(pair)),
+fn check_pairs<'a>(pairs: Pairs<'a, Rule>, env: &mut Environment) -> AlthreadResult<()> {
+    for pair in pairs {
+        match pair.as_rule() {
+            Rule::expr => {
+                check_expr(pair, env)?;
             }
+            Rule::print_stmt => check_call(pair, env)?,
+            Rule::decl => check_decl(pair, env)?,
+            Rule::assignment => check_assign(pair, env)?,
+            Rule::run_stmt | Rule::if_stmt | Rule::while_stmt | Rule::scope => {
+                unimplemented!()
+            }
+            _ => return Err(no_rule!(pair)),
         }
-
-        Ok(())
     }
+
+    Ok(())
 }
