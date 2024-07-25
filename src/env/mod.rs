@@ -1,12 +1,6 @@
-use symbol_table::{Symbol, SymbolTable};
+use symbol_table::{DataType, Symbol, SymbolTable, SymbolValue};
 
-use crate::{
-    ast::{
-        expr::primary::PrimaryExpr,
-        token::{datatype::DataType, identifier::Identifier},
-    },
-    error::{AlthreadError, ErrorType},
-};
+use crate::error::{AlthreadError, ErrorType};
 
 pub mod symbol_table;
 
@@ -37,7 +31,7 @@ impl<'a> Environment<'a> {
         identifier: String,
         datatype: DataType,
         mutable: bool,
-        value: Option<PrimaryExpr>,
+        value: Option<SymbolValue>,
     ) -> Result<(), String> {
         let current_symbol_table = self
             .symbol_tables
@@ -60,22 +54,22 @@ impl<'a> Environment<'a> {
         Ok(())
     }
 
-    pub fn get_symbol(&self, identifier: &Identifier) -> Result<&Symbol, AlthreadError> {
+    pub fn get_symbol(&self, identifier: &String) -> Result<&Symbol, AlthreadError> {
         for table in self.symbol_tables.iter().rev() {
-            if let Some(symbol) = table.get(identifier.value.as_str()) {
+            if let Some(symbol) = table.get(identifier.as_str()) {
                 return Ok(symbol);
             }
         }
 
-        if let Some(symbol) = self.global_table.get(identifier.value.as_str()) {
+        if let Some(symbol) = self.global_table.get(identifier.as_str()) {
             return Ok(symbol);
         }
 
         Err(AlthreadError::error(
             ErrorType::VariableError,
-            identifier.line,
-            identifier.column,
-            format!("Symbol {} not found", identifier.value.as_str()),
+            0,
+            0,
+            format!("Symbol {} not found", identifier.as_str()),
         ))
     }
 
@@ -83,23 +77,19 @@ impl<'a> Environment<'a> {
         self.global_table.clear()
     }
 
-    pub fn update_symbol(
-        &mut self,
-        identifier: &Identifier,
-        value: PrimaryExpr,
-    ) -> Result<(), String> {
+    pub fn update_symbol(&mut self, identifier: &String, value: SymbolValue) -> Result<(), String> {
         for table in self.symbol_tables.iter_mut().rev() {
-            if let Some(symbol) = table.get_mut(identifier.value.as_str()) {
+            if let Some(symbol) = table.get_mut(identifier.as_str()) {
                 symbol.value = Some(value);
                 return Ok(());
             }
         }
 
-        if let Some(symbol) = self.global_table.get_mut(identifier.value.as_str()) {
+        if let Some(symbol) = self.global_table.get_mut(identifier.as_str()) {
             symbol.value = Some(value);
             return Ok(());
         }
 
-        Err(format!("Symbol {} not found", identifier.value.as_str()))
+        Err(format!("Symbol {} not found", identifier.as_str()))
     }
 }

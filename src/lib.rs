@@ -57,16 +57,20 @@ where
     // parse code with pest
     let pairs = parse(&source).map_err(|e| e)?;
 
-    let mut global_table = SymbolTable::new();
-    let mut env = Environment::new(&mut global_table);
-
     // create ast
-    let ast = Ast::build(pairs, &mut env)?;
+    let ast = Ast::build(pairs)?;
+    println!("{}", ast);
 
-    env.clear_global();
+    // check ast
+    {
+        let mut global_table = SymbolTable::new();
+        let mut env = Environment::new(&mut global_table);
 
-    // run ast
-    ast.eval(&mut env, output)?;
+        ast.check(&mut env)?;
+    }
+
+    // // run ast
+    // ast.eval(&mut env, output)?;
 
     Ok(())
 }

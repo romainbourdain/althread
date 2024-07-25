@@ -1,65 +1,98 @@
-program = _{ SOI ~ struct_block* ~ EOI }
+/// # Althread
+/// This file contains the grammar for the althread language.
 
-struct_block  = _{ main_block | shared_block | always_block | process_block }
-main_block    =  { "main" ~ "{" ~ stmt* ~ "}" }
-shared_block  =  { "shared" ~ "{" ~ decl_stmt* ~ "}" }
-always_block  =  { "always" ~ "{" ~ expr_stmt* ~ "}" }
-process_block =  { "process" ~ IDENTIFIER ~ "(" ~ ")" ~ block }
+program = _{ SOI ~ bricks* ~ EOI }
 
-block = { "{" ~ stmt* ~ "}" }
+/// # Bricks
+/// Bricks are the main building blocks of the program.
+/// They are the main, shared, always, and process blocks.
+///
+/// - The main block is the entry point of the program.
+/// - The shared block is used to declare global variables.
+/// - The always block is used check condition at each atomic step.
+/// - The process block is used to run code in parallel.
+bricks        = _{ main_brick | global_brick | cond_brick | process_brick }
+main_brick    =  { "main" ~ "{" ~ stmt* ~ "}" }
+global_brick  =  { "shared" ~ "{" ~ decl_stmt* ~ "}" }
+cond_brick    =  { "always" ~ "{" ~ expr_stmt* ~ "}" }
+process_brick =  { "process" ~ IDENTIFIER ~ "(" ~ ")" ~ "{" ~ stmt* ~ "}" }
 
-stmt = _{ assign_stmt | expr_stmt | print_stmt | if_stmt | while_stmt | block | decl_stmt | run_stmt }
+stmt = _{ assign_stmt | decl_stmt | expr_stmt | print_stmt | run_stmt | if_stmt | while_stmt | scope }
 
+/// # Assignments
+/// Assignments are used to assign values to variables.
+/// There are two types of assignments: unary and binary.
+///
+/// - Unary assignments are used to increment or decrement the value of a variable (e.g. a++).
+/// - Binary assignments are used to assign the result of an expression to a variable (e.g. a = b + c).
+assign_stmt = _{ assignment ~ ";" }
+assignment  = _{ assign_unary | assign_binary }
+
+assign_unary    = { IDENTIFIER ~ assign_unary_op }
+assign_unary_op = { "++" | "--" }
+
+assign_binary    = { IDENTIFIER ~ assign_binary_op ~ expr }
+assign_binary_op = { "=" | "+=" | "-=" | "*=" | "/=" | "%=" }
+
+/// # Declarations
+/// Declarations are used to declare variables.
+/// There are two types of declarations: let and const.
 decl_stmt    = _{ decl ~ ";" }
 decl         =  { decl_keyword ~ IDENTIFIER ~ (":" ~ DATATYPE)? ~ ("=" ~ expr)? }
 decl_keyword =  { "let" | "const" }
 
-assign_stmt     = _{ assignment ~ ";" }
-assignment      =  { assign_unary | assign_binary }
-assign_unary    =  { IDENTIFIER ~ assign_unary_op }
-assign_unary_op =  { "++" | "--" }
-assign_binary   =  { IDENTIFIER ~ assign_op ~ expr }
-assign_op       =  { "=" | "+=" | "-=" | "*=" | "/=" | "%=" }
-
-run_stmt = { "run" ~ IDENTIFIER ~ "(" ~ ")" ~ ";" }
-
-print_stmt = { "print" ~ "(" ~ expr ~ ")" ~ ";" }
-if_stmt    = { "if" ~ "(" ~ expr ~ ")" ~ block ~ ("else" ~ block)? }
-while_stmt = { "while" ~ "(" ~ expr ~ ")" ~ block }
-
+/// # Expressions
+/// Expressions are used to evaluate values.
+/// The expressions in althread language follow the arithmetic precedence rules.
 expr_stmt = _{ expr ~ ";" }
-expr      =  { prefix? ~ primary ~ (infix ~ prefix? ~ primary)* }
-infix     = _{ add | sub | mul | div | modulo | eq | ne | lt | le | gt | ge | and | or }
-prefix    = _{ neg | not }
-add       =  { "+" }
-sub       =  { "-" }
-mul       =  { "*" }
-div       =  { "/" }
-modulo    =  { "%" }
-eq        =  { "==" }
-ne        =  { "!=" }
-lt        =  { "<" }
-le        =  { "<=" }
-gt        =  { ">" }
-ge        =  { ">=" }
-and       =  { "&&" }
-or        =  { "||" }
-neg       =  { "-" }
-not       =  { "!" }
+expr      =  { logical_or }
 
-primary = _{ BOOLEAN | FLOAT | INTEGER | STRING | IDENTIFIER | NULL | "(" ~ expr ~ ")" }
+logical_or = { logical_and ~ (or_op ~ logical_and)* }
+or_op      = { "||" }
 
-DATATYPE = { "bool" | "int" | "float" | "void" | "string" }
+logical_and = { equality ~ (and_op ~ equality)* }
+and_op      = { "&&" }
 
-INTEGER    = @{ ASCII_DIGIT+ }
-FLOAT      = @{ ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT* }
-STRING     = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
-IDENTIFIER = @{ !(RESERVED_IDENTIFIER ~ !IDENTIFIER_CHAR) ~ ASCII_ALPHA ~ IDENTIFIER_CHAR* }
-BOOLEAN    = @{ "true" | "false" }
-NULL       = @{ "null" }
+equality    = { comparison ~ (equality_op ~ comparison)* }
+equality_op = { "==" | "!=" }
 
+comparison    = { term ~ (comparison_op ~ term)* }
+comparison_op = { "<" | "<=" | ">" | ">=" }
+
+term    = { factor ~ (term_op ~ factor)* }
+term_op = { "+" | "-" }
+
+factor    = { unary ~ (factor_op ~ unary)* }
+factor_op = { "*" | "/" | "%" }
+
+unary    = { unary_op* ~ primary }
+unary_op = { "+" | "-" | "!" }
+
+primary = { BOOLEAN | INTEGER | FLOAT | STRING | NULL | IDENTIFIER | "(" ~ expr ~ ")" }
+
+/// # Functions
+run_stmt   = { "run" ~ IDENTIFIER ~ "(" ~ ")" ~ ";" }
+print_stmt = { "print" ~ "(" ~ expr ~ ")" ~ ";" }
+
+/// # Control Flow
+scope      = { "{" ~ stmt* ~ "}" }
+if_stmt    = { "if" ~ "(" ~ expr ~ ")" ~ scope ~ ("else" ~ scope)? }
+while_stmt = { "while" ~ "(" ~ expr ~ ")" ~ scope }
+
+/// # Lexical Structure
+/// The lexical structure of the althread language.
+/// The language supports the following datatypes: bool, int, float, void, and string.
+DATATYPE = { "bool" | "int" | "float" | "string" | "void" }
+
+BOOLEAN = @{ "true" | "false" }
+INTEGER = @{ ASCII_DIGIT+ }
+FLOAT   = @{ ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT* }
+STRING  = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
+NULL    = @{ "null" }
+
+IDENTIFIER          = @{ !(RESERVED_IDENTIFIER ~ !IDENTIFIER_CHAR) ~ ASCII_ALPHA ~ IDENTIFIER_CHAR* }
 IDENTIFIER_CHAR     = _{ ASCII_ALPHANUMERIC | "_" }
-RESERVED_IDENTIFIER =  { "let" | "const" | "print" | "true" | "false" | "null" | "main" | "shared" | "always" }
+RESERVED_IDENTIFIER =  { "let" | "const" | "print" | "true" | "false" | "null" | "main" | "shared" | "always" | "process" | "if" | "else" | "while" | "run" }
 
 WHITESPACE = _{ " " | "\t" | NEWLINE }
 NEWLINE    = _{ "\n" | "\r" | "\r\n" }

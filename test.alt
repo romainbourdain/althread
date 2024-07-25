@@ -1,19 +1,6 @@
-shared {
-    let b = 8;
-}
-
-
-process A() {
-    let a = 7;
-    print(a);
-    print(b);
-}
-
 main {
-    let a = 5;
-   // run A();
-
-    b--;
-    print(b);
-   // run A();
+    !true;
+    true==false;
+    true+true;
+    3+4+5;
 }

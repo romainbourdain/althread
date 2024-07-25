@@ -13,6 +13,8 @@ pub struct AlthreadError {
     error_type: ErrorType,
 }
 
+pub type AlthreadResult<T> = Result<T, AlthreadError>;
+
 #[derive(Debug)]
 pub enum ErrorType {
     SyntaxError,
