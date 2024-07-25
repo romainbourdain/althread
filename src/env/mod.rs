@@ -65,7 +65,7 @@ impl<'a> Environment<'a> {
             return Ok(symbol);
         }
 
-        Err(AlthreadError::error(
+        Err(AlthreadError::new(
             ErrorType::VariableError,
             0,
             0,

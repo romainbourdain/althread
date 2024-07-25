@@ -15,6 +15,18 @@ pub struct AlthreadError {
 
 pub type AlthreadResult<T> = Result<T, AlthreadError>;
 
+#[macro_export]
+macro_rules! no_rule {
+    ($pair:expr) => {
+        $crate::error::AlthreadError::new(
+            $crate::error::ErrorType::SyntaxError,
+            $pair.line_col().0,
+            $pair.line_col().1,
+            format!("Unexpected rule: {:?}", $pair.as_rule()),
+        )
+    };
+}
+
 #[derive(Debug)]
 pub enum ErrorType {
     SyntaxError,
@@ -37,7 +49,7 @@ impl fmt::Display for ErrorType {
 }
 
 impl AlthreadError {
-    pub fn error(error_type: ErrorType, line: usize, col: usize, message: String) -> Self {
+    pub fn new(error_type: ErrorType, line: usize, col: usize, message: String) -> Self {
         Self {
             pos: Pos { line, col },
             message,
@@ -45,7 +57,13 @@ impl AlthreadError {
         }
     }
 
-    pub fn print_err_line(&self, input: &str) {
+    pub fn report(&self, input: &str) {
+        eprintln!("Error at {}:{}", self.pos.line, self.pos.col);
+        self.print_err_line(input);
+        eprintln!("{}: {}", self.error_type, self.message);
+    }
+
+    fn print_err_line(&self, input: &str) {
         if self.pos.line == 0 {
             return;
         }
@@ -59,11 +77,5 @@ impl AlthreadError {
         eprintln!("{} | {}", self.pos.line, line);
         eprintln!("{} |{}^---", line_indent, " ".repeat(self.pos.col));
         eprintln!("{} |", line_indent);
-    }
-
-    pub fn report(&self, input: &str) {
-        eprintln!("Error at {}:{}", self.pos.line, self.pos.col);
-        self.print_err_line(input);
-        eprintln!("{}: {}", self.error_type, self.message);
     }
 }

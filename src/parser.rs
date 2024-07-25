@@ -22,6 +22,6 @@ pub fn parse(source: &str) -> Result<Pairs<Rule>, AlthreadError> {
             }
             ErrorVariant::CustomError { message } => message,
         };
-        AlthreadError::error(ErrorType::SyntaxError, line, col, error_message)
+        AlthreadError::new(ErrorType::SyntaxError, line, col, error_message)
     })
 }

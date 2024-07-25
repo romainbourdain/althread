@@ -2,10 +2,7 @@ use std::collections::HashMap;
 
 use pest::iterators::Pairs;
 
-use crate::{
-    error::{AlthreadError, ErrorType},
-    parser::Rule,
-};
+use crate::{error::AlthreadError, no_rule, parser::Rule};
 
 use super::Ast;
 
@@ -18,42 +15,26 @@ impl<'a> Ast<'a> {
         }
     }
 
-    // La méthode `build` prend des `Pairs` avec une durée de vie `'a`
     pub fn build(pairs: Pairs<'a, Rule>) -> Result<Self, AlthreadError> {
         let mut ast = Self::new();
 
         for pair in pairs {
             let rule = pair.as_rule();
-            let mut inner_pairs = pair.into_inner(); // `inner_pairs` emprunte la durée de vie de `pair`
             match rule {
                 Rule::main_brick => {
-                    // Insertion avec une durée de vie explicite
-                    ast.process_bricks.insert("main".to_string(), inner_pairs);
+                    ast.process_bricks
+                        .insert("main".to_string(), pair.into_inner());
                 }
                 Rule::process_brick => {
-                    if let Some(name_pair) = inner_pairs.next() {
-                        ast.process_bricks
-                            .insert(name_pair.as_str().to_string(), inner_pairs);
-                    } else {
-                        return Err(AlthreadError::error(
-                            ErrorType::SyntaxError,
-                            0,
-                            0,
-                            format!("process_brick name missing"),
-                        ));
-                    }
+                    let mut pairs = pair.into_inner();
+                    let name_pair = pairs.next().unwrap();
+                    ast.process_bricks
+                        .insert(name_pair.as_str().to_string(), pairs);
                 }
-                Rule::cond_brick => ast.condition_bricks.push(inner_pairs),
-                Rule::global_brick => ast.global_bricks.push(inner_pairs),
+                Rule::cond_brick => ast.condition_bricks.push(pair.into_inner()),
+                Rule::global_brick => ast.global_bricks.push(pair.into_inner()),
                 Rule::EOI => (),
-                _ => {
-                    return Err(AlthreadError::error(
-                        ErrorType::SyntaxError,
-                        0,
-                        0,
-                        format!("Unexpected rule: {:?}", rule),
-                    ))
-                }
+                _ => return Err(no_rule!(pair)),
             }
         }
 
