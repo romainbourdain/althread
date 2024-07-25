@@ -1,6 +1,6 @@
 main {
-    !true;
-    true==false;
-    3+4+a;
-    print(3);
+    let a: int = 3;
+    let a: int;
+    let a = 3;
+    let a;
 }

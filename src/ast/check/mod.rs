@@ -1,7 +1,9 @@
 pub mod call;
+pub mod decl;
 pub mod expr;
 
 use call::check_call;
+use decl::check_decl;
 use expr::check_expr;
 use pest::iterators::Pairs;
 
@@ -24,8 +26,8 @@ impl<'a> Ast<'a> {
                     check_expr(pair)?;
                 }
                 Rule::print_stmt => check_call(pair)?,
-                Rule::decl
-                | Rule::assignment
+                Rule::decl => check_decl(pair)?,
+                Rule::assignment
                 | Rule::run_stmt
                 | Rule::if_stmt
                 | Rule::while_stmt
