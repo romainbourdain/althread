@@ -32,6 +32,16 @@ impl DataType {
         }
     }
 
+    pub fn as_str(&self) -> &str {
+        match self {
+            DataType::Void => "void",
+            DataType::Bool => "bool",
+            DataType::Int => "int",
+            DataType::Float => "float",
+            DataType::String => "string",
+        }
+    }
+
     pub fn is_numeric(&self) -> bool {
         matches!(self, DataType::Int | DataType::Float)
     }
@@ -39,16 +49,6 @@ impl DataType {
 
 impl fmt::Display for DataType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match self {
-                DataType::Void => "void",
-                DataType::Bool => "bool",
-                DataType::Int => "int",
-                DataType::Float => "float",
-                DataType::String => "string",
-            }
-        )
+        write!(f, "{}", self.as_str())
     }
 }

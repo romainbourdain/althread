@@ -32,7 +32,7 @@ fn check_primary(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<Data
         Rule::FLOAT => DataType::Float,
         Rule::STRING => DataType::String,
         Rule::IDENTIFIER => {
-            let symbol = env.get_symbol(pair)?;
+            let symbol = env.get_symbol(&pair)?;
             symbol.datatype.clone()
         }
         _ => return Err(no_rule!(pair)),

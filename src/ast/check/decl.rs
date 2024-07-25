@@ -25,7 +25,7 @@ pub fn check_decl(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<()>
 
     let datatype = check_decl_type(datatype, expr, env)?;
 
-    env.insert_symbol(identifier, datatype, mutable, None)?;
+    env.insert_symbol(&identifier, datatype, mutable, None)?;
 
     Ok(())
 }

@@ -35,7 +35,7 @@ impl fmt::Display for Symbol {
         write!(
             f,
             "{:<10} | {:<8} | {:<10}",
-            self.datatype,
+            self.datatype.as_str(),
             self.mutable,
             match &self.value {
                 Some(value) => value.to_string(),

@@ -1,7 +1,9 @@
+pub mod assign;
 pub mod call;
 pub mod decl;
 pub mod expr;
 
+use assign::check_assign;
 use call::check_call;
 use decl::check_decl;
 use expr::check_expr;
@@ -30,11 +32,8 @@ impl<'a> Ast<'a> {
                 }
                 Rule::print_stmt => check_call(pair, env)?,
                 Rule::decl => check_decl(pair, env)?,
-                Rule::assignment
-                | Rule::run_stmt
-                | Rule::if_stmt
-                | Rule::while_stmt
-                | Rule::scope => {
+                Rule::assignment => check_assign(pair, env)?,
+                Rule::run_stmt | Rule::if_stmt | Rule::while_stmt | Rule::scope => {
                     unimplemented!()
                 }
                 _ => return Err(no_rule!(pair)),

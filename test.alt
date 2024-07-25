@@ -3,4 +3,6 @@ main {
     let b: int;
     let c;
     let d;
+    a++;
+    b++;
 }
