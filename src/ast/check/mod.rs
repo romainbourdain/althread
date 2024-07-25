@@ -1,7 +1,7 @@
-pub mod decl;
+pub mod call;
 pub mod expr;
 
-use decl::check_decl;
+use call::check_call;
 use expr::check_expr;
 use pest::iterators::Pairs;
 
@@ -20,9 +20,17 @@ impl<'a> Ast<'a> {
     fn check_pair(pairs: Pairs<'a, Rule>, env: &mut Environment) -> AlthreadResult<()> {
         for pair in pairs {
             match pair.as_rule() {
-                Rule::decl => check_decl(pair, env)?,
                 Rule::expr => {
                     check_expr(pair)?;
+                }
+                Rule::print_stmt => check_call(pair)?,
+                Rule::decl
+                | Rule::assignment
+                | Rule::run_stmt
+                | Rule::if_stmt
+                | Rule::while_stmt
+                | Rule::scope => {
+                    unimplemented!()
                 }
                 _ => return Err(no_rule!(pair)),
             }

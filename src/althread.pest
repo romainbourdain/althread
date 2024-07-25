@@ -26,7 +26,7 @@ stmt = _{ assign_stmt | decl_stmt | expr_stmt | print_stmt | run_stmt | if_stmt 
 /// - Unary assignments are used to increment or decrement the value of a variable (e.g. a++).
 /// - Binary assignments are used to assign the result of an expression to a variable (e.g. a = b + c).
 assign_stmt = _{ assignment ~ ";" }
-assignment  = _{ assign_unary | assign_binary }
+assignment  =  { assign_unary | assign_binary }
 
 assign_unary    = { IDENTIFIER ~ assign_unary_op }
 assign_unary_op = { "++" | "--" }
@@ -70,7 +70,7 @@ unary_op = { "+" | "-" | "!" }
 
 primary = { BOOLEAN | INTEGER | FLOAT | STRING | NULL | IDENTIFIER | "(" ~ expr ~ ")" }
 
-/// # Functions
+/// # Calls
 run_stmt   = { "run" ~ IDENTIFIER ~ "(" ~ ")" ~ ";" }
 print_stmt = { "print" ~ "(" ~ expr ~ ")" ~ ";" }
 
