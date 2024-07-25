@@ -1,6 +1,6 @@
 main {
     let a: int = 3;
-    let a: int;
-    let a = 3;
-    let a;
+    let b: int;
+    let c = 3;
+    const d;
 }

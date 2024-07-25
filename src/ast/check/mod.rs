@@ -14,7 +14,10 @@ use super::Ast;
 impl<'a> Ast<'a> {
     pub fn check(&self, env: &mut Environment) -> AlthreadResult<()> {
         for (_, pairs) in &self.process_bricks {
+            env.push_table();
             Self::check_pair(pairs.clone(), env)?;
+            println!("{:#?}", env);
+            env.pop_table();
         }
         Ok(())
     }
@@ -26,7 +29,7 @@ impl<'a> Ast<'a> {
                     check_expr(pair)?;
                 }
                 Rule::print_stmt => check_call(pair)?,
-                Rule::decl => check_decl(pair)?,
+                Rule::decl => check_decl(pair, env)?,
                 Rule::assignment
                 | Rule::run_stmt
                 | Rule::if_stmt

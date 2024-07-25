@@ -1,6 +1,10 @@
+use pest::iterators::Pair;
 use symbol_table::{DataType, Symbol, SymbolTable, SymbolValue};
 
-use crate::error::{AlthreadError, ErrorType};
+use crate::{
+    error::{AlthreadError, AlthreadResult, ErrorType},
+    parser::Rule,
+};
 
 pub mod symbol_table;
 
@@ -28,20 +32,24 @@ impl<'a> Environment<'a> {
 
     pub fn insert_symbol(
         &mut self,
-        identifier: String,
+        identifier: Pair<Rule>,
         datatype: DataType,
         mutable: bool,
         value: Option<SymbolValue>,
-    ) -> Result<(), String> {
+    ) -> AlthreadResult<()> {
+        let (line, column) = identifier.line_col();
+        let identifier = identifier.as_str().to_string();
         let current_symbol_table = self
             .symbol_tables
             .last_mut()
             .unwrap_or(&mut self.global_table);
 
         if current_symbol_table.contains_key(&identifier) {
-            return Err(format!(
-                "Symbol {} already exists in current scope",
-                identifier
+            return Err(AlthreadError::new(
+                ErrorType::VariableError,
+                line,
+                column,
+                format!("Symbol {} already exists in current scope", identifier),
             ));
         }
 
@@ -71,10 +79,6 @@ impl<'a> Environment<'a> {
             0,
             format!("Symbol {} not found", identifier.as_str()),
         ))
-    }
-
-    pub fn clear_global(&mut self) {
-        self.global_table.clear()
     }
 
     pub fn update_symbol(&mut self, identifier: &String, value: SymbolValue) -> Result<(), String> {

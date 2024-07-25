@@ -1,7 +1,7 @@
 use pest::iterators::Pair;
 
 use crate::{
-    env::symbol_table::DataType,
+    env::{symbol_table::DataType, Environment},
     error::{AlthreadError, AlthreadResult, ErrorType},
     no_rule,
     parser::Rule,
@@ -9,10 +9,10 @@ use crate::{
 
 use super::expr::check_expr;
 
-pub fn check_decl(pair: Pair<Rule>) -> AlthreadResult<()> {
+pub fn check_decl(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<()> {
     let mut pairs = pair.into_inner();
-    let decl_keyword = pairs.next().unwrap();
-    let ident = pairs.next().unwrap();
+    let mutable = pairs.next().unwrap().as_str() == "let";
+    let identifier = pairs.next().unwrap();
     let mut datatype = None;
     let mut expr = None;
     for pair in pairs {
@@ -24,6 +24,8 @@ pub fn check_decl(pair: Pair<Rule>) -> AlthreadResult<()> {
     }
 
     let datatype = check_decl_type(datatype, expr)?;
+
+    env.insert_symbol(identifier, datatype, mutable, None)?;
 
     Ok(())
 }
