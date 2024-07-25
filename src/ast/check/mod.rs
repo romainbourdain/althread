@@ -16,7 +16,7 @@ impl<'a> Ast<'a> {
         for (_, pairs) in &self.process_bricks {
             env.push_table();
             Self::check_pair(pairs.clone(), env)?;
-            println!("{:#?}", env);
+            println!("{}", env);
             env.pop_table();
         }
         Ok(())

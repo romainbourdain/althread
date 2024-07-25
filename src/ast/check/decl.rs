@@ -1,7 +1,7 @@
 use pest::iterators::Pair;
 
 use crate::{
-    env::{symbol_table::DataType, Environment},
+    env::{datatype::DataType, Environment},
     error::{AlthreadError, AlthreadResult, ErrorType},
     no_rule,
     parser::Rule,

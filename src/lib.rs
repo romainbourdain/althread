@@ -10,7 +10,7 @@ use std::{
 };
 
 use ast::Ast;
-use env::{symbol_table::SymbolTable, Environment};
+use env::{Environment, SymbolTable};
 use error::AlthreadError;
 use parser::parse;
 
