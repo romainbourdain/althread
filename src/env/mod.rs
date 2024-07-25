@@ -62,7 +62,7 @@ impl<'a> Environment<'a> {
         Ok(())
     }
 
-    pub fn get_symbol(&self, identifier: &String) -> Result<&Symbol, AlthreadError> {
+    pub fn get_symbol(&self, identifier: Pair<Rule>) -> AlthreadResult<&Symbol> {
         for table in self.symbol_tables.iter().rev() {
             if let Some(symbol) = table.get(identifier.as_str()) {
                 return Ok(symbol);

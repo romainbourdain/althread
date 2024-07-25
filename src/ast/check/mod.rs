@@ -26,9 +26,9 @@ impl<'a> Ast<'a> {
         for pair in pairs {
             match pair.as_rule() {
                 Rule::expr => {
-                    check_expr(pair)?;
+                    check_expr(pair, env)?;
                 }
-                Rule::print_stmt => check_call(pair)?,
+                Rule::print_stmt => check_call(pair, env)?,
                 Rule::decl => check_decl(pair, env)?,
                 Rule::assignment
                 | Rule::run_stmt

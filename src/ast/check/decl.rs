@@ -23,7 +23,7 @@ pub fn check_decl(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<()>
         }
     }
 
-    let datatype = check_decl_type(datatype, expr)?;
+    let datatype = check_decl_type(datatype, expr, env)?;
 
     env.insert_symbol(identifier, datatype, mutable, None)?;
 
@@ -33,10 +33,11 @@ pub fn check_decl(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<()>
 fn check_decl_type<'a>(
     datatype: Option<DataType>,
     expr: Option<Pair<'a, Rule>>,
+    env: &mut Environment,
 ) -> AlthreadResult<DataType> {
     if let Some(expr) = expr {
         let (line, column) = expr.line_col();
-        let expr_type = check_expr(expr)?;
+        let expr_type = check_expr(expr, env)?;
         if let Some(datatype) = datatype {
             if datatype != expr_type {
                 return Err(AlthreadError::new(
