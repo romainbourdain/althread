@@ -34,6 +34,7 @@ pub enum ErrorType {
     VariableError,
     RuntimeError,
     DivisionByZero,
+    ArithmeticError,
 }
 
 impl fmt::Display for ErrorType {
@@ -44,6 +45,7 @@ impl fmt::Display for ErrorType {
             ErrorType::VariableError => write!(f, "Variable Error"),
             ErrorType::RuntimeError => write!(f, "Runtime Error"),
             ErrorType::DivisionByZero => write!(f, "Division by zero"),
+            ErrorType::ArithmeticError => write!(f, "Arithmetic Error"),
         }
     }
 }
