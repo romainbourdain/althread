@@ -51,7 +51,7 @@ fn eval_assign_binary(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult
     let current_value = env.get_symbol(&identifier)?.value.clone();
 
     let value = match op.as_str() {
-        "=" => Ok(current_value),
+        "=" => Ok(expr),
         "+=" => current_value.add(&expr),
         "-=" => current_value.sub(&expr),
         "*=" => current_value.mul(&expr),

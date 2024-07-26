@@ -45,27 +45,26 @@ fn eval_primary(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<Value
 }
 
 fn eval_unary<'a>(mut pairs: Pairs<'a, Rule>, env: &mut Environment) -> AlthreadResult<Value> {
-    let pair = pairs.next().unwrap();
-    match pair.as_rule() {
-        Rule::unary_op => {
-            let val = eval_unary(pairs, env)?;
-            Ok(match pair.as_str() {
-                "+" => Ok(val),
-                "-" => val.neg(),
-                "!" => val.not(),
-                _ => return Err(no_rule!(pair)),
-            }
-            .map_err(|e| {
-                AlthreadError::new(
-                    ErrorType::ArithmeticError,
-                    pair.line_col().0,
-                    pair.line_col().1,
-                    e.to_string(),
-                )
-            })?)
+    let pair: Pair<'a, Rule> = pairs.next().unwrap();
+    if let Some(val) = pairs.next() {
+        let val = eval_expr(val, env)?;
+        let op = pair;
+        Ok(match op.as_str() {
+            "+" => Ok(val),
+            "-" => val.neg(),
+            "!" => val.not(),
+            _ => return Err(no_rule!(op)),
         }
-        Rule::primary => Ok(eval_expr(pair, env)?),
-        _ => Err(no_rule!(pair)),
+        .map_err(|e| {
+            AlthreadError::new(
+                ErrorType::ArithmeticError,
+                op.line_col().0,
+                op.line_col().1,
+                e.to_string(),
+            )
+        })?)
+    } else {
+        Ok(eval_expr(pair, env)?)
     }
 }
 

@@ -65,7 +65,7 @@ term_op = { "+" | "-" }
 factor    = { unary ~ (factor_op ~ unary)* }
 factor_op = { "*" | "/" | "%" }
 
-unary    = { unary_op* ~ primary }
+unary    = { unary_op? ~ primary }
 unary_op = { "+" | "-" | "!" }
 
 primary = { BOOLEAN | FLOAT | INTEGER | STRING | NULL | IDENTIFIER | "(" ~ expr ~ ")" }
