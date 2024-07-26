@@ -12,13 +12,13 @@ pub enum Value {
 }
 
 impl Value {
-    pub fn get_type(&self) -> DataType {
-        match self {
-            Value::Null => DataType::Void,
-            Value::Bool(_) => DataType::Bool,
-            Value::Int(_) => DataType::Int,
-            Value::Float(_) => DataType::Float,
-            Value::String(_) => DataType::String,
+    pub fn from_datatype(datatype: &DataType) -> Self {
+        match datatype {
+            DataType::Void => Value::Null,
+            DataType::Bool => Value::Bool(false),
+            DataType::Int => Value::Int(0),
+            DataType::Float => Value::Float(0.0),
+            DataType::String => Value::String("".to_string()),
         }
     }
 
@@ -45,7 +45,11 @@ impl Value {
             (Value::Int(i), Value::Int(j)) => Ok(Value::Int(i + j)),
             (Value::Float(i), Value::Float(j)) => Ok(Value::Float(i + j)),
             (Value::String(i), Value::String(j)) => Ok(Value::String(format!("{}{}", i, j))),
-            (i, j) => Err(format!("Cannot add {} and {}", i.get_type(), j.get_type())),
+            (i, j) => Err(format!(
+                "Cannot add {} and {}",
+                DataType::from_value(i),
+                DataType::from_value(j)
+            )),
         }
     }
 
@@ -55,8 +59,8 @@ impl Value {
             (Value::Float(i), Value::Float(j)) => Ok(Value::Float(i - j)),
             (i, j) => Err(format!(
                 "Cannot subtract {} and {}",
-                i.get_type(),
-                j.get_type()
+                DataType::from_value(i),
+                DataType::from_value(j)
             )),
         }
     }
@@ -67,8 +71,8 @@ impl Value {
             (Value::Float(i), Value::Float(j)) => Ok(Value::Float(i * j)),
             (i, j) => Err(format!(
                 "Cannot multiply {} and {}",
-                i.get_type(),
-                j.get_type()
+                DataType::from_value(i),
+                DataType::from_value(j)
             )),
         }
     }
@@ -80,8 +84,8 @@ impl Value {
             (Value::Float(i), Value::Float(j)) if *j != 0.0 => Ok(Value::Float(i / j)),
             (i, j) => Err(format!(
                 "Cannot divide {} and {}",
-                i.get_type(),
-                j.get_type()
+                DataType::from_value(i),
+                DataType::from_value(j)
             )),
         }
     }
@@ -93,8 +97,8 @@ impl Value {
             (Value::Float(i), Value::Float(j)) if *j != 0.0 => Ok(Value::Float(i % j)),
             (i, j) => Err(format!(
                 "No modulo between {} and {}",
-                i.get_type(),
-                j.get_type()
+                DataType::from_value(i),
+                DataType::from_value(j)
             )),
         }
     }
@@ -107,8 +111,8 @@ impl Value {
             (Value::Bool(i), Value::Bool(j)) => Ok(Value::Bool(i == j)),
             (i, j) => Err(format!(
                 "Cannot compare {} and {}",
-                i.get_type(),
-                j.get_type()
+                DataType::from_value(i),
+                DataType::from_value(j)
             )),
         }
     }
@@ -121,8 +125,8 @@ impl Value {
             (Value::Bool(i), Value::Bool(j)) => Ok(Value::Bool(i != j)),
             (i, j) => Err(format!(
                 "Cannot compare {} and {}",
-                i.get_type(),
-                j.get_type()
+                DataType::from_value(i),
+                DataType::from_value(j)
             )),
         }
     }
@@ -133,8 +137,8 @@ impl Value {
             (Value::Float(i), Value::Float(j)) => Ok(Value::Bool(i > j)),
             (i, j) => Err(format!(
                 "Cannot compare {} and {}",
-                i.get_type(),
-                j.get_type()
+                DataType::from_value(i),
+                DataType::from_value(j)
             )),
         }
     }
@@ -145,8 +149,8 @@ impl Value {
             (Value::Float(i), Value::Float(j)) => Ok(Value::Bool(i >= j)),
             (i, j) => Err(format!(
                 "Cannot compare {} and {}",
-                i.get_type(),
-                j.get_type()
+                DataType::from_value(i),
+                DataType::from_value(j)
             )),
         }
     }
@@ -157,8 +161,8 @@ impl Value {
             (Value::Float(i), Value::Float(j)) => Ok(Value::Bool(i < j)),
             (i, j) => Err(format!(
                 "Cannot compare {} and {}",
-                i.get_type(),
-                j.get_type()
+                DataType::from_value(i),
+                DataType::from_value(j)
             )),
         }
     }
@@ -169,8 +173,8 @@ impl Value {
             (Value::Float(i), Value::Float(j)) => Ok(Value::Bool(i <= j)),
             (i, j) => Err(format!(
                 "Cannot compare {} and {}",
-                i.get_type(),
-                j.get_type()
+                DataType::from_value(i),
+                DataType::from_value(j)
             )),
         }
     }
@@ -180,8 +184,8 @@ impl Value {
             (Value::Bool(i), Value::Bool(j)) => Ok(Value::Bool(*i && *j)),
             (i, j) => Err(format!(
                 "Cannot perform logical AND between {} and {}",
-                i.get_type(),
-                j.get_type()
+                DataType::from_value(i),
+                DataType::from_value(j)
             )),
         }
     }
@@ -191,8 +195,8 @@ impl Value {
             (Value::Bool(i), Value::Bool(j)) => Ok(Value::Bool(*i || *j)),
             (i, j) => Err(format!(
                 "Cannot perform logical OR between {} and {}",
-                i.get_type(),
-                j.get_type()
+                DataType::from_value(i),
+                DataType::from_value(j)
             )),
         }
     }

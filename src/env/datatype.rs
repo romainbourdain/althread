@@ -1,5 +1,7 @@
 use std::fmt;
 
+use super::value::Value;
+
 #[derive(Debug, PartialEq, Clone)]
 pub enum DataType {
     Void,
@@ -17,6 +19,16 @@ impl DataType {
             "float" => Self::Float,
             "string" => Self::String,
             _ => Self::Void,
+        }
+    }
+
+    pub fn from_value(val: &Value) -> Self {
+        match val {
+            Value::Null => Self::Void,
+            Value::Bool(_) => Self::Bool,
+            Value::Int(_) => Self::Int,
+            Value::Float(_) => Self::Float,
+            Value::String(_) => Self::String,
         }
     }
 

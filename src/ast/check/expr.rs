@@ -45,21 +45,24 @@ fn check_unary<'a>(mut pairs: Pairs<'a, Rule>, env: &mut Environment) -> Althrea
     match pair.as_rule() {
         Rule::unary_op => {
             let data_type = check_unary(pairs, env)?;
-            let error_message = |op: &str, data_type: DataType| {
-                AlthreadError::new(
-                    ErrorType::TypeError,
-                    pair.line_col().0,
-                    pair.line_col().1,
-                    format!("Wrong type for {} unary operator: {}", op, data_type),
-                )
-            };
 
             match pair.as_str() {
                 "+" if data_type.is_numeric() => Ok(data_type),
                 "-" if data_type.is_numeric() => Ok(data_type),
                 "!" if data_type == DataType::Bool => Ok(data_type),
-                _ => Err(error_message(pair.as_str(), data_type)),
+                op => Err(format!(
+                    "Wrong type for {} unary operator: {}",
+                    op, data_type
+                )),
             }
+            .map_err(|e| {
+                AlthreadError::new(
+                    ErrorType::TypeError,
+                    pair.line_col().0,
+                    pair.line_col().1,
+                    e,
+                )
+            })
         }
         Rule::primary => Ok(check_expr(pair, env)?),
         _ => Err(no_rule!(pair)),
@@ -67,38 +70,29 @@ fn check_unary<'a>(mut pairs: Pairs<'a, Rule>, env: &mut Environment) -> Althrea
 }
 
 fn check_binary<'a>(mut pairs: Pairs<'a, Rule>, env: &mut Environment) -> AlthreadResult<DataType> {
-    let error_message = |op: Pair<Rule>, data_type: DataType| {
-        AlthreadError::new(
-            ErrorType::TypeError,
-            op.line_col().0,
-            op.line_col().1,
-            format!("Wrong type for {} operator: {}", op.as_str(), data_type),
-        )
-    };
-
     let left_type = check_expr(pairs.next().unwrap(), env)?;
     if let Some(op) = pairs.next() {
+        let (line, col) = op.line_col();
+        let op = op.as_str();
         let right_type = check_binary(pairs, env)?;
-        match op.as_str() {
-            _ if right_type != left_type => Err(AlthreadError::new(
-                ErrorType::TypeError,
-                op.line_col().0,
-                op.line_col().1,
-                format!(
-                    "{} operation between {} and {} is not allowed",
-                    op.as_str(),
-                    left_type,
-                    right_type
-                ),
+        match op {
+            _ if right_type != left_type => Err(format!(
+                "{} operation between {} and {} is not allowed",
+                op, left_type, right_type
             )),
             "+" | "-" | "*" | "/" | "%" if !left_type.is_numeric() => {
-                Err(error_message(op, left_type))
+                Err(format!("Wrong type for {} operator: {}", op, left_type))
             }
-            "<" | ">" | "<=" | ">=" if !left_type.is_numeric() => Err(error_message(op, left_type)),
-            "&&" | "||" if left_type != DataType::Bool => Err(error_message(op, left_type)),
+            "<" | ">" | "<=" | ">=" if !left_type.is_numeric() => {
+                Err(format!("Wrong type for {} operator: {}", op, left_type))
+            }
+            "&&" | "||" if left_type != DataType::Bool => {
+                Err(format!("Wrong type for {} operator: {}", op, left_type))
+            }
             "==" | "!=" | "<" | ">" | "<=" | ">=" => Ok(DataType::Bool),
             _ => Ok(left_type),
         }
+        .map_err(|e| AlthreadError::new(ErrorType::TypeError, line, col, e))
     } else {
         Ok(left_type)
     }
