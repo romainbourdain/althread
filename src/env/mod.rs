@@ -20,5 +20,5 @@ pub type SymbolTable = HashMap<String, Symbol>;
 pub struct Symbol {
     pub datatype: DataType,
     pub mutable: bool,
-    pub value: Option<Value>,
+    pub value: Value,
 }

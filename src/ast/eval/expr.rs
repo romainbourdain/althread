@@ -37,7 +37,7 @@ fn eval_primary(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<Value
         Rule::STRING => Value::String(val.to_string()),
         Rule::IDENTIFIER => {
             let symbol = env.get_symbol(&pair)?;
-            symbol.value.clone().unwrap()
+            symbol.value.clone()
         }
         Rule::expr => eval_expr(pair, env)?,
         _ => return Err(no_rule!(pair)),

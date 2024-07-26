@@ -25,9 +25,9 @@ impl<'a> Environment<'a> {
 
     pub fn insert_symbol(
         &mut self,
-        identifier: &Pair<Rule>,
-        datatype: DataType,
         mutable: bool,
+        identifier: &Pair<Rule>,
+        datatype: Option<DataType>,
         value: Option<Value>,
     ) -> AlthreadResult<()> {
         let (line, column) = identifier.line_col();
@@ -43,6 +43,31 @@ impl<'a> Environment<'a> {
                 line,
                 column,
                 format!("Symbol {} already exists in current scope", identifier),
+            ));
+        }
+
+        let (datatype, value) = match (datatype, value) {
+            (Some(datatype), Some(value)) => (datatype, value),
+            (Some(datatype), None) => {
+                let value = Value::from_datatype(&datatype);
+                (datatype, value)
+            }
+            (None, Some(value)) => {
+                let datatype = DataType::from_value(&value);
+                (datatype, value)
+            }
+            (None, None) => (DataType::Void, Value::Null),
+        };
+        let value_type = DataType::from_value(&value);
+        if datatype != value_type {
+            return Err(AlthreadError::new(
+                ErrorType::TypeError,
+                line,
+                column,
+                format!(
+                    "Wrong type for variable: expected {:?}, found {:?}",
+                    datatype, value_type
+                ),
             ));
         }
 
@@ -77,13 +102,13 @@ impl<'a> Environment<'a> {
     pub fn update_symbol(&mut self, identifier: &String, value: Value) -> Result<(), String> {
         for table in self.symbol_tables.iter_mut().rev() {
             if let Some(symbol) = table.get_mut(identifier.as_str()) {
-                symbol.value = Some(value);
+                symbol.value = value;
                 return Ok(());
             }
         }
 
         if let Some(symbol) = self.global_table.get_mut(identifier.as_str()) {
-            symbol.value = Some(value);
+            symbol.value = value;
             return Ok(());
         }
 
