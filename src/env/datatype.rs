@@ -41,10 +41,6 @@ impl DataType {
             DataType::String => "string",
         }
     }
-
-    pub fn is_numeric(&self) -> bool {
-        matches!(self, DataType::Int | DataType::Float)
-    }
 }
 
 impl fmt::Display for DataType {

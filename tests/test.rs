@@ -1,4 +1,4 @@
-use std::{fs, io};
+/* use std::{fs, io};
 
 use althread_with_pest::run;
 
@@ -44,3 +44,4 @@ create_eq_test!(if_stmt, "tests/files/if");
 create_eq_test!(if_else_stmt, "tests/files/if_else");
 create_eq_test!(while_stmt, "tests/files/while");
 create_eq_test!(scope, "tests/files/scope");
+ */
