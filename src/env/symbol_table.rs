@@ -46,37 +46,11 @@ impl<'a> Environment<'a> {
             ));
         }
 
-        let (datatype, value) = match (datatype, value) {
-            (Some(datatype), Some(value)) => (datatype, value),
-            (Some(datatype), None) => {
-                let value = Value::from_datatype(&datatype);
-                (datatype, value)
-            }
-            (None, Some(value)) => {
-                let datatype = DataType::from_value(&value);
-                (datatype, value)
-            }
-            (None, None) => (DataType::Void, Value::Null),
-        };
-        let value_type = DataType::from_value(&value);
-        if datatype != value_type {
-            return Err(AlthreadError::new(
-                ErrorType::TypeError,
-                line,
-                column,
-                format!(
-                    "Wrong type for variable: expected {:?}, found {:?}",
-                    datatype, value_type
-                ),
-            ));
-        }
+        let symbol = Symbol::new(mutable, datatype, value)
+            .map_err(|e| AlthreadError::new(ErrorType::VariableError, line, column, e))?;
 
-        let symbol = Symbol {
-            datatype,
-            mutable,
-            value,
-        };
         current_symbol_table.insert(identifier, symbol);
+
         Ok(())
     }
 
@@ -99,19 +73,38 @@ impl<'a> Environment<'a> {
         ))
     }
 
-    pub fn update_symbol(&mut self, identifier: &String, value: Value) -> Result<(), String> {
+    pub fn update_symbol(&mut self, identifier: &Pair<Rule>, value: Value) -> AlthreadResult<()> {
         for table in self.symbol_tables.iter_mut().rev() {
             if let Some(symbol) = table.get_mut(identifier.as_str()) {
-                symbol.value = value;
+                symbol.update(value).map_err(|e| {
+                    AlthreadError::new(
+                        ErrorType::VariableError,
+                        identifier.line_col().0,
+                        identifier.line_col().1,
+                        e,
+                    )
+                })?;
                 return Ok(());
             }
         }
 
         if let Some(symbol) = self.global_table.get_mut(identifier.as_str()) {
-            symbol.value = value;
+            symbol.update(value).map_err(|e| {
+                AlthreadError::new(
+                    ErrorType::VariableError,
+                    identifier.line_col().0,
+                    identifier.line_col().1,
+                    e,
+                )
+            })?;
             return Ok(());
         }
 
-        Err(format!("Symbol {} not found", identifier.as_str()))
+        Err(AlthreadError::new(
+            ErrorType::VariableError,
+            0,
+            0,
+            format!("Symbol {} not found", identifier.as_str()),
+        ))
     }
 }

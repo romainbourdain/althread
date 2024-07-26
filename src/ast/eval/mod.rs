@@ -1,7 +1,9 @@
+pub mod assign;
 pub mod call;
 pub mod decl;
 pub mod expr;
 
+use assign::eval_assign;
 use call::eval_call;
 use decl::eval_decl;
 use expr::eval_expr;
@@ -31,7 +33,8 @@ fn eval_pairs<'a>(pairs: Pairs<'a, Rule>, env: &mut Environment) -> AlthreadResu
             }
             Rule::print_stmt => eval_call(pair, env)?,
             Rule::decl => eval_decl(pair, env)?,
-            Rule::assignment | Rule::run_stmt | Rule::if_stmt | Rule::while_stmt | Rule::scope => {
+            Rule::assignment => eval_assign(pair, env)?,
+            Rule::run_stmt | Rule::if_stmt | Rule::while_stmt | Rule::scope => {
                 unimplemented!()
             }
             _ => return Err(no_rule!(pair)),

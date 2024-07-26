@@ -1,13 +1,12 @@
 use pest::iterators::Pair;
 
 use crate::{
+    ast::eval::expr::eval_expr,
     env::{datatype::DataType, Environment},
     error::AlthreadResult,
     no_rule,
     parser::Rule,
 };
-
-use super::expr::eval_expr;
 
 pub fn eval_decl(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<()> {
     let mut pairs = pair.into_inner();

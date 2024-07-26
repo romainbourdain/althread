@@ -1,10 +1,4 @@
 main {
-    let a;
-    let b: float;
-    let c: float = 3.123456789;
-    let d = "coucou";
+    let a = 3.0/1;
     print(a);
-    print(b);
-    print(c);
-    print(d);
 }

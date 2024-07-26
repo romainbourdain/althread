@@ -82,7 +82,7 @@ fn eval_binary<'a>(
             "-" => left_value.sub(&right_value),
             "*" => left_value.mul(&right_value),
             "/" => left_value.div(&right_value),
-            "%" => left_value.modulo(&right_value),
+            "%" => left_value.rem(&right_value),
             "==" => left_value.eq(&right_value),
             "!=" => left_value.ne(&right_value),
             "<" => left_value.lt(&right_value),

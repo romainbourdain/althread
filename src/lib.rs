@@ -5,7 +5,7 @@ mod parser;
 
 use std::{
     fs,
-    io::{self, Write},
+    io::{self},
     process::exit,
 };
 
@@ -15,22 +15,16 @@ use error::AlthreadError;
 use parser::parse;
 
 /// Run code from file
-pub fn run_file<W>(path: &str, output: &mut W) -> io::Result<()>
-where
-    W: Write,
-{
+pub fn run_file(path: &str) -> io::Result<()> {
     let buf = fs::read_to_string(path)?;
-    if let Err(e) = run(&buf, output) {
+    if let Err(e) = run(&buf) {
         e.report(&buf);
         exit(1);
     }
     Ok(())
 }
 
-pub fn run<W>(source: &str, output: &mut W) -> Result<(), AlthreadError>
-where
-    W: Write,
-{
+pub fn run(source: &str) -> Result<(), AlthreadError> {
     // parse code with pest
     let pairs = parse(&source).map_err(|e| e)?;
 

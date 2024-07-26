@@ -1,17 +1,14 @@
-pub mod assign;
 pub mod call;
-pub mod decl;
-pub mod expr;
 
-use assign::check_assign;
 use call::check_call;
-use decl::check_decl;
-use expr::check_expr;
 use pest::iterators::Pairs;
 
 use crate::{env::Environment, error::AlthreadResult, no_rule, parser::Rule};
 
-use super::Ast;
+use super::{
+    eval::{assign::eval_assign, decl::eval_decl, expr::eval_expr},
+    Ast,
+};
 
 impl<'a> Ast<'a> {
     pub fn check(&self, env: &mut Environment) -> AlthreadResult<()> {
@@ -28,11 +25,11 @@ fn check_pairs<'a>(pairs: Pairs<'a, Rule>, env: &mut Environment) -> AlthreadRes
     for pair in pairs {
         match pair.as_rule() {
             Rule::expr => {
-                check_expr(pair, env)?;
+                eval_expr(pair, env)?;
             }
             Rule::print_stmt => check_call(pair, env)?,
-            Rule::decl => check_decl(pair, env)?,
-            Rule::assignment => check_assign(pair, env)?,
+            Rule::decl => eval_decl(pair, env)?,
+            Rule::assignment => eval_assign(pair, env)?,
             Rule::run_stmt | Rule::if_stmt | Rule::while_stmt | Rule::scope => {
                 unimplemented!()
             }

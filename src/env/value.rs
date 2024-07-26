@@ -24,11 +24,17 @@ impl Value {
 
     pub fn as_str(&self) -> String {
         match self {
-            Value::Null => "null".to_string(),
-            Value::Bool(b) => b.to_string(),
-            Value::Int(i) => i.to_string(),
-            Value::Float(fl) => fl.to_string(),
-            Value::String(s) => s.clone(),
+            Value::Null => format!("null"),
+            Value::Bool(b) => format!("{}", b),
+            Value::Int(i) => format!("{}", i),
+            Value::Float(fl) => {
+                if fl.fract() == 0.0 {
+                    format!("{:.1}", fl)
+                } else {
+                    format!("{}", fl)
+                }
+            }
+            Value::String(s) => format!("{}", s),
         }
     }
 
@@ -37,6 +43,22 @@ impl Value {
             Value::Null | Value::Int(0) | Value::Float(0.0) => true,
             Value::String(s) if s.is_empty() => true,
             _ => false,
+        }
+    }
+
+    pub fn increment(&self) -> Result<Self, String> {
+        match self {
+            Value::Int(i) => Ok(Value::Int(i + 1)),
+            Value::Float(f) => Ok(Value::Float(f + 1.0)),
+            _ => Err("Cannot increment non-numeric value".to_string()),
+        }
+    }
+
+    pub fn decrement(&self) -> Result<Self, String> {
+        match self {
+            Value::Int(i) => Ok(Value::Int(i - 1)),
+            Value::Float(f) => Ok(Value::Float(f - 1.0)),
+            _ => Err("Cannot decrement non-numeric value".to_string()),
         }
     }
 
@@ -90,7 +112,7 @@ impl Value {
         }
     }
 
-    pub fn modulo(&self, other: &Value) -> Result<Self, String> {
+    pub fn rem(&self, other: &Value) -> Result<Self, String> {
         match (self, other) {
             (i, j) if j.is_null() => Err(format!("Cannot divide {} by {}", i, j)),
             (Value::Int(i), Value::Int(j)) if *j != 0 => Ok(Value::Int(i % j)),
@@ -219,18 +241,6 @@ impl Value {
 
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Value::Null => write!(f, "null"),
-            Value::Bool(b) => write!(f, "{}", b),
-            Value::Int(i) => write!(f, "{}", i),
-            Value::Float(fl) => {
-                if fl.fract() == 0.0 {
-                    write!(f, "{:.1}", fl)
-                } else {
-                    write!(f, "{}", fl)
-                }
-            }
-            Value::String(s) => write!(f, "{}", s),
-        }
+        write!(f, "{}", self.as_str())
     }
 }
