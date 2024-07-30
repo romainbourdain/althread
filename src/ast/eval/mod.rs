@@ -9,7 +9,9 @@ use decl::eval_decl;
 use expr::eval_expr;
 use pest::iterators::Pairs;
 
-use crate::{args::Config, env::Environment, error::AlthreadResult, no_rule, parser::Rule};
+use crate::{
+    args::Config, debug::Debug, env::Environment, error::AlthreadResult, no_rule, parser::Rule,
+};
 
 use super::Ast;
 
@@ -26,27 +28,40 @@ impl<'a> Ast<'a> {
 }
 
 fn eval_pairs<'a>(
-    pairs: Pairs<'a, Rule>,
+    mut pairs: Pairs<'a, Rule>,
     env: &mut Environment,
     config: &Config,
 ) -> AlthreadResult<()> {
-    for pair in pairs {
-        if config.debug {
-            println!("{:?}", pair.as_str());
-        }
-        match pair.as_rule() {
-            Rule::expr => {
-                eval_expr(pair, env)?;
-            }
-            Rule::print_stmt => eval_call(pair, env)?,
-            Rule::decl => eval_decl(pair, env)?,
-            Rule::assignment => eval_assign(pair, env)?,
-            Rule::run_stmt | Rule::if_stmt | Rule::while_stmt | Rule::scope => {
-                unimplemented!()
-            }
-            _ => return Err(no_rule!(pair)),
-        }
+    loop {
+        if !consume_pair(&mut pairs, env, config)? {
+            break;
+        };
     }
 
     Ok(())
+}
+
+fn consume_pair(
+    pairs: &mut Pairs<Rule>,
+    env: &mut Environment,
+    config: &Config,
+) -> AlthreadResult<bool> {
+    match pairs.next() {
+        None => Ok(false),
+        Some(pair) => {
+            match pair.as_rule() {
+                Rule::expr => {
+                    eval_expr(pair, env)?;
+                }
+                Rule::print_stmt => eval_call(pair, env)?,
+                Rule::decl => eval_decl(pair, env)?,
+                Rule::assignment => eval_assign(pair, env)?,
+                Rule::scope | Rule::run_stmt | Rule::while_stmt | Rule::if_stmt => {
+                    unimplemented!()
+                }
+                _ => return Err(no_rule!(pair)),
+            }
+            Ok(true)
+        }
+    }
 }
