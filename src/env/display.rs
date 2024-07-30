@@ -5,7 +5,6 @@ use super::{Environment, Symbol};
 impl<'a> fmt::Display for Environment<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // Display the global table
-        writeln!(f, "-------------------- Environment --------------------\n")?;
         writeln!(f, "Global:\n+------+------------+----------+------------+")?;
         writeln!(f, "| Name |  Datatype  | Mutable  | Value      |")?;
         writeln!(f, "+------+------------+----------+------------+")?;
@@ -15,9 +14,8 @@ impl<'a> fmt::Display for Environment<'a> {
         writeln!(f, "+------+------------+----------+------------+")?;
 
         // Display each symbol table
-        writeln!(f, "\nSymbol_tables:")?;
         for (index, table) in self.symbol_tables.iter().enumerate() {
-            writeln!(f, "Table {}:", index)?;
+            writeln!(f, "\nTable {}:", index)?;
             writeln!(f, "+------+------------+----------+------------+")?;
             writeln!(f, "| Name |  Datatype  | Mutable  | Value      |")?;
             writeln!(f, "+------+------------+----------+------------+")?;

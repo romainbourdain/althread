@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use pest::iterators::Pair;
 
 use crate::{
@@ -5,7 +7,9 @@ use crate::{
     parser::Rule,
 };
 
-use super::{datatype::DataType, value::Value, Environment, Symbol, SymbolTable};
+use super::{datatype::DataType, value::Value, Environment, Symbol};
+
+pub type SymbolTable = HashMap<String, Symbol>;
 
 impl<'a> Environment<'a> {
     pub fn new(global_table: &'a mut SymbolTable) -> Self {

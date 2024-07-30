@@ -1,15 +1,20 @@
-use std::{env::args, process::exit};
+use std::{fs, process::exit};
 
-use althread_with_pest::run_file;
-
+use althread_with_pest::{
+    args::{cmd, Config},
+    run,
+};
 fn main() {
-    let args: Vec<String> = args().collect();
+    // Parse args and check input file
+    let matches = cmd().get_matches();
+    let config = Config::from_args(&matches);
 
-    match args.len() {
-        2 => run_file(&args[1]).expect("Could not run file"),
-        _ => {
-            eprintln!("Usage: {} <script.alt>", args[0]);
-            exit(1);
-        }
+    // Read file
+    let buf = fs::read_to_string(&config.input).expect("Cannot read file");
+
+    // Run code
+    if let Err(e) = run(&buf) {
+        e.report(&buf);
+        exit(1);
     }
 }

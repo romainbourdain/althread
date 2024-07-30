@@ -1,4 +1,6 @@
+pub mod args;
 mod ast;
+mod debug;
 mod env;
 mod error;
 mod parser;
@@ -9,14 +11,16 @@ use std::{
     process::exit,
 };
 
+use args::Config;
 use ast::Ast;
-use env::{Environment, SymbolTable};
+use env::{symbol_table::SymbolTable, Environment};
 use error::AlthreadError;
 use parser::parse;
 
 /// Run code from file
-pub fn run_file(path: &str) -> io::Result<()> {
-    let buf = fs::read_to_string(path)?;
+pub fn run_file(config: &Config) -> io::Result<()> {
+    let buf = fs::read_to_string(&config.input)?;
+
     if let Err(e) = run(&buf) {
         e.report(&buf);
         exit(1);
@@ -30,11 +34,11 @@ pub fn run(source: &str) -> Result<(), AlthreadError> {
 
     // create ast
     let ast = Ast::build(pairs)?;
-    println!("{}", ast);
+    // println!("{}", ast);
 
     // check ast
     {
-        println!("Checking AST...");
+        // println!("Checking AST...");
         let mut global_table = SymbolTable::new();
         let mut env = Environment::new(&mut global_table);
 
@@ -43,7 +47,7 @@ pub fn run(source: &str) -> Result<(), AlthreadError> {
 
     // run ast
     {
-        println!("Running AST...");
+        // println!("Running AST...");
         let mut global_table = SymbolTable::new();
         let mut env = Environment::new(&mut global_table);
 
