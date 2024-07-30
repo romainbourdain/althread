@@ -4,6 +4,7 @@ use althread_with_pest::{
     args::{cmd, Config},
     run,
 };
+
 fn main() {
     // Parse args and check input file
     let matches = cmd().get_matches();
