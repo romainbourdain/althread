@@ -14,7 +14,7 @@ fn main() {
     let buf = fs::read_to_string(&config.input).expect("Cannot read file");
 
     // Run code
-    if let Err(e) = run(&buf) {
+    if let Err(e) = run(&buf, &config) {
         e.report(&buf);
         exit(1);
     }

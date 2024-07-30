@@ -16,7 +16,7 @@ impl Config {
     /// Convert clap matches to Config
     pub fn from_args(matches: &ArgMatches) -> Self {
         Self {
-            debug: matches.contains_id("debug"),
+            debug: matches.get_flag("debug"),
             input: matches
                 .get_one::<PathBuf>("input")
                 .expect("<Input> is required")

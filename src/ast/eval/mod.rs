@@ -9,16 +9,15 @@ use decl::eval_decl;
 use expr::eval_expr;
 use pest::iterators::Pairs;
 
-use crate::{debug::Debug, env::Environment, error::AlthreadResult, no_rule, parser::Rule};
+use crate::{args::Config, env::Environment, error::AlthreadResult, no_rule, parser::Rule};
 
 use super::Ast;
 
 impl<'a> Ast<'a> {
-    pub fn eval(&self, env: &mut Environment) -> AlthreadResult<()> {
-        let mut debug = Debug::new();
+    pub fn eval(&self, env: &mut Environment, config: &Config) -> AlthreadResult<()> {
         for (_, pairs) in &self.process_bricks {
             env.push_table();
-            eval_pairs(pairs.clone(), env, &mut debug)?;
+            eval_pairs(pairs.clone(), env, config)?;
             env.pop_table();
         }
 
@@ -29,11 +28,12 @@ impl<'a> Ast<'a> {
 fn eval_pairs<'a>(
     pairs: Pairs<'a, Rule>,
     env: &mut Environment,
-    debug: &mut Debug,
+    config: &Config,
 ) -> AlthreadResult<()> {
     for pair in pairs {
-        debug.push(pair.as_str().to_string());
-
+        if config.debug {
+            println!("{:?}", pair.as_str());
+        }
         match pair.as_rule() {
             Rule::expr => {
                 eval_expr(pair, env)?;
@@ -46,8 +46,6 @@ fn eval_pairs<'a>(
             }
             _ => return Err(no_rule!(pair)),
         }
-
-        debug.prompt_user(env);
     }
 
     Ok(())
