@@ -3,3 +3,15 @@ main {
     a = 2.0;
     print(a);
 }
+
+shared {
+    let a = 8;
+}
+
+process A() {
+    let b = 9;
+}
+
+always {
+    a == 8;
+}

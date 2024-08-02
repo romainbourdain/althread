@@ -9,9 +9,7 @@ use decl::eval_decl;
 use expr::eval_expr;
 use pest::iterators::Pairs;
 
-use crate::{
-    args::Config, debug::Debug, env::Environment, error::AlthreadResult, no_rule, parser::Rule,
-};
+use crate::{args::Config, env::Environment, error::AlthreadResult, no_rule, parser::Rule};
 
 use super::Ast;
 
