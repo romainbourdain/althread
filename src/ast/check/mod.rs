@@ -1,41 +1,67 @@
+pub mod assign;
 pub mod call;
+pub mod decl;
+pub mod expr;
 
+use assign::check_assign;
 use call::check_call;
-use pest::iterators::Pairs;
+use decl::check_decl;
+use expr::check_expr;
 
 use crate::{env::Environment, error::AlthreadResult, no_rule, parser::Rule};
 
 use super::{
-    eval::{assign::eval_assign, decl::eval_decl, expr::eval_expr},
-    Ast,
+    node::{Atomic, Node},
+    Ast, Brick,
 };
 
 impl<'a> Ast<'a> {
     pub fn check(&self, env: &mut Environment) -> AlthreadResult<()> {
-        for (_, pairs) in &self.process_bricks {
-            env.push_table();
-            check_pairs(pairs.clone(), env)?;
-            env.pop_table();
+        for (_, brick) in &self.process_bricks {
+            brick.check(env)?;
         }
         Ok(())
     }
 }
 
-fn check_pairs<'a>(pairs: Pairs<'a, Rule>, env: &mut Environment) -> AlthreadResult<()> {
-    for pair in pairs {
-        match pair.as_rule() {
-            Rule::expr => {
-                eval_expr(pair, env)?;
-            }
-            Rule::print_stmt => check_call(pair, env)?,
-            Rule::decl => eval_decl(pair, env)?,
-            Rule::assignment => eval_assign(pair, env)?,
-            Rule::run_stmt | Rule::if_stmt | Rule::while_stmt | Rule::scope => {
+impl<'a> Brick<'a> {
+    pub fn check(&self, env: &mut Environment) -> AlthreadResult<()> {
+        env.push_table();
+        for node in &self.nodes {
+            node.check(env)?;
+        }
+        env.pop_table();
+        Ok(())
+    }
+}
+
+impl<'a> Node<'a> {
+    pub fn check(&self, env: &mut Environment) -> AlthreadResult<()> {
+        match self {
+            Node::Atomic(atomic) => atomic.check(env)?,
+            Node::Block(block) => {
                 unimplemented!()
             }
-            _ => return Err(no_rule!(pair)),
         }
+        Ok(())
     }
+}
 
-    Ok(())
+impl<'a> Atomic<'a> {
+    pub fn check(&self, env: &mut Environment) -> AlthreadResult<()> {
+        match self.pair.as_rule() {
+            Rule::assignment => check_assign(self.pair.clone(), env)?,
+            Rule::decl => check_decl(self.pair.clone(), env)?,
+
+            Rule::expr => {
+                check_expr(self.pair.clone(), env)?;
+            }
+            Rule::print_stmt => check_call(self.pair.clone(), env)?,
+            Rule::run_stmt => {
+                unimplemented!()
+            }
+            _ => return Err(no_rule!(self.pair)),
+        }
+        Ok(())
+    }
 }

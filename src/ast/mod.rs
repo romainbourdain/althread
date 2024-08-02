@@ -1,7 +1,7 @@
-// pub mod check;
+pub mod check;
 pub mod display;
+pub mod eval;
 pub mod node;
-// pub mod eval;
 
 use node::Node;
 use pest::iterators::Pairs;

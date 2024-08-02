@@ -13,17 +13,17 @@ use crate::{args::Config, env::Environment, error::AlthreadResult, no_rule, pars
 
 use super::Ast;
 
-impl<'a> Ast<'a> {
-    pub fn eval(&self, env: &mut Environment, config: &Config) -> AlthreadResult<()> {
-        for (_, pairs) in &self.process_bricks {
-            env.push_table();
-            eval_pairs(pairs.clone(), env, config)?;
-            env.pop_table();
-        }
+// impl<'a> Ast<'a> {
+//     pub fn eval(&self, env: &mut Environment, config: &Config) -> AlthreadResult<()> {
+//         for (_, pairs) in &self.process_bricks {
+//             env.push_table();
+//             eval_pairs(pairs.clone(), env, config)?;
+//             env.pop_table();
+//         }
 
-        Ok(())
-    }
-}
+//         Ok(())
+//     }
+// }
 
 fn eval_pairs<'a>(
     mut pairs: Pairs<'a, Rule>,
