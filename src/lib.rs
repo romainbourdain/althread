@@ -21,19 +21,20 @@ pub fn run(source: &str, config: &Config) -> Result<(), AlthreadError> {
 
     // check ast
     {
-        let mut global_table = SymbolTable::new();
-        let mut env = Environment::new(&mut global_table);
+        // let mut global_table = SymbolTable::new();
+        // let mut env = Environment::new(&mut global_table);
 
-        ast.check(&mut env)?;
+        // ast.check(&mut env)?;
     }
 
     // run ast
-    // {
-    //     let mut global_table = SymbolTable::new();
-    //     let mut env = Environment::new(&mut global_table);
+    {
+        let mut ast = ast;
+        let mut global_table = SymbolTable::new();
+        let mut env = Environment::new(&mut global_table);
 
-    //     ast.eval(&mut env, config)?;
-    // }
+        ast.eval(&mut env, config)?;
+    }
 
     Ok(())
 }

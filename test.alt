@@ -1,3 +1,6 @@
 main {
-
+   let a = 7;
+   while (true) {
+      let a= 8;
+   }
 }

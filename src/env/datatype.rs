@@ -1,6 +1,4 @@
-use std::{f32::consts::E, fmt};
-
-use crate::error::AlthreadResult;
+use std::fmt;
 
 use super::value::Value;
 

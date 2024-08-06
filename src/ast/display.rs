@@ -25,14 +25,14 @@ impl<'a> Ast<'a> {
 
             match node {
                 Node::Atomic(atomic) => {
-                    let pair = &atomic.pair;
                     write!(
                         f,
-                        "{}{}── {:?}",
+                        "{}{}── Atomic({:?})",
                         prefix,
                         if has_next { "├" } else { "└" },
-                        pair.as_rule()
+                        atomic.kind
                     )?;
+                    let pair = &atomic.pair;
                     let mut inner_pairs = pair.clone().into_inner();
                     if inner_pairs.clone().count() == 0 {
                         writeln!(f, ": {}", pair.as_str())?;
@@ -59,7 +59,7 @@ impl<'a> Ast<'a> {
                         "{}{}── Block({:?})",
                         prefix,
                         if has_next { "├" } else { "└" },
-                        block.pair.as_rule()
+                        block.kind
                     )?;
                     self.draw_nodes(&block.children, level + 1, &new_prefix, f)?;
                 }

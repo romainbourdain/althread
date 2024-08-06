@@ -28,26 +28,62 @@ impl Node<'_> {
 
 #[derive(Debug)]
 pub struct Atomic<'a> {
+    pub kind: AtomicKind,
     pub pair: Pair<'a, Rule>,
+}
+
+#[derive(Debug)]
+pub enum AtomicKind {
+    Assignment,
+    Decl,
+    Expr,
+    Print,
+    Run,
 }
 
 impl Atomic<'_> {
     pub fn new<'a>(pair: Pair<'a, Rule>) -> Atomic<'a> {
-        Atomic { pair }
+        Atomic {
+            kind: match pair.as_rule() {
+                Rule::assignment => AtomicKind::Assignment,
+                Rule::decl => AtomicKind::Decl,
+                Rule::expr => AtomicKind::Expr,
+                Rule::print_stmt => AtomicKind::Print,
+                Rule::run_stmt => AtomicKind::Run,
+                _ => panic!("Invalid atomic rule"),
+            },
+            pair,
+        }
     }
 }
 
 #[derive(Debug)]
 pub struct Block<'a> {
+    pub kind: BlockKind,
     pub pair: Pair<'a, Rule>,
     pub children: Vec<Node<'a>>,
+    pub current: usize,
+}
+
+#[derive(Debug)]
+pub enum BlockKind {
+    Scope,
+    If,
+    While,
 }
 
 impl Block<'_> {
     pub fn new<'a>(pair: Pair<'a, Rule>) -> Block<'a> {
         Block {
+            kind: match pair.as_rule() {
+                Rule::scope => BlockKind::Scope,
+                Rule::if_stmt => BlockKind::If,
+                Rule::while_stmt => BlockKind::While,
+                _ => panic!("Invalid block rule"),
+            },
             pair,
             children: Vec::new(),
+            current: 0,
         }
     }
 }

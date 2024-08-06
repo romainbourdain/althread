@@ -11,7 +11,7 @@ use expr::check_expr;
 use crate::{env::Environment, error::AlthreadResult, no_rule, parser::Rule};
 
 use super::{
-    node::{Atomic, Node},
+    node::{Atomic, Block, Node},
     Ast, Brick,
 };
 
@@ -40,7 +40,9 @@ impl<'a> Node<'a> {
         match self {
             Node::Atomic(atomic) => atomic.check(env)?,
             Node::Block(block) => {
-                unimplemented!()
+                env.push_table();
+                block.check(env)?;
+                env.pop_table();
             }
         }
         Ok(())
@@ -58,6 +60,23 @@ impl<'a> Atomic<'a> {
             }
             Rule::print_stmt => check_call(self.pair.clone(), env)?,
             Rule::run_stmt => {
+                unimplemented!("run")
+            }
+            _ => return Err(no_rule!(self.pair)),
+        }
+        Ok(())
+    }
+}
+
+impl<'a> Block<'a> {
+    pub fn check(&self, env: &mut Environment) -> AlthreadResult<()> {
+        match self.pair.as_rule() {
+            Rule::scope => {
+                for node in &self.children {
+                    node.check(env)?;
+                }
+            }
+            Rule::if_stmt | Rule::while_stmt => {
                 unimplemented!()
             }
             _ => return Err(no_rule!(self.pair)),

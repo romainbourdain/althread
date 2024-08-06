@@ -1,4 +1,4 @@
-pub mod check;
+// pub mod check;
 pub mod display;
 pub mod eval;
 pub mod node;
@@ -55,6 +55,7 @@ impl<'a> Ast<'a> {
 #[derive(Debug)]
 pub struct Brick<'a> {
     pub nodes: Vec<Node<'a>>,
+    pub current: usize,
 }
 
 impl Brick<'_> {
@@ -63,6 +64,6 @@ impl Brick<'_> {
         for pair in pairs {
             nodes.push(Node::build(pair)?);
         }
-        Ok(Brick { nodes })
+        Ok(Brick { nodes, current: 0 })
     }
 }

@@ -38,6 +38,13 @@ impl Value {
         }
     }
 
+    pub fn is_true(&self) -> bool {
+        match self {
+            Value::Bool(b) => *b,
+            _ => false,
+        }
+    }
+
     pub fn is_null(&self) -> bool {
         match self {
             Value::Null | Value::Int(0) | Value::Float(0.0) => true,
