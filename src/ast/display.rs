@@ -4,7 +4,7 @@ use pest::iterators::Pairs;
 
 use crate::parser::Rule;
 
-use super::{Ast, Node};
+use super::{node::Node, Ast};
 
 impl<'a> Ast<'a> {
     fn draw_nodes(
@@ -116,7 +116,7 @@ impl<'a> Ast<'a> {
     }
 }
 
-impl<'a> fmt::Display for Ast<'a> {
+impl fmt::Display for Ast<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "Process Bricks:")?;
         for (name, brick) in &self.process_bricks {

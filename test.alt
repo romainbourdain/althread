@@ -1,3 +1,24 @@
 main {
-   {}
+   let a = 6;
+   if (a < 3) {
+      a = 8;
+   } else {
+      let a = 9;
+   }
+
+   if (a == 9) {
+      print("a est 9");
+   }
+
+   while (a > 0) {
+      a--;
+      print(a);
+   }
+
+   {
+      let a = 8;
+      print(a);
+   }
+
+   print(a);
 }

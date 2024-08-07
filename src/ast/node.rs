@@ -1,6 +1,8 @@
 use pest::iterators::Pair;
 
-use crate::{error::AlthreadResult, no_rule, parser::Rule};
+use crate::{args::Config, env::Environment, error::AlthreadResult, no_rule, parser::Rule};
+
+use super::{atomic::Atomic, block::Block};
 
 #[derive(Debug)]
 pub enum Node<'a> {
@@ -24,66 +26,21 @@ impl Node<'_> {
             _ => return Err(no_rule!(pair)),
         })
     }
-}
 
-#[derive(Debug)]
-pub struct Atomic<'a> {
-    pub kind: AtomicKind,
-    pub pair: Pair<'a, Rule>,
-}
-
-#[derive(Debug)]
-pub enum AtomicKind {
-    Assignment,
-    Decl,
-    Expr,
-    Print,
-    Run,
-}
-
-impl Atomic<'_> {
-    pub fn new<'a>(pair: Pair<'a, Rule>) -> Atomic<'a> {
-        Atomic {
-            kind: match pair.as_rule() {
-                Rule::assignment => AtomicKind::Assignment,
-                Rule::decl => AtomicKind::Decl,
-                Rule::expr => AtomicKind::Expr,
-                Rule::print_stmt => AtomicKind::Print,
-                Rule::run_stmt => AtomicKind::Run,
-                _ => panic!("Invalid atomic rule"),
-            },
-            pair,
+    pub fn consume(&mut self, env: &mut Environment, config: &Config) -> AlthreadResult<bool> {
+        match self {
+            Node::Atomic(atomic) => {
+                atomic.consume(env)?;
+                Ok(false)
+            }
+            Node::Block(block) => Ok(block.consume(env, config)?),
         }
     }
-}
 
-#[derive(Debug)]
-pub struct Block<'a> {
-    pub kind: BlockKind,
-    pub pair: Pair<'a, Rule>,
-    pub children: Vec<Node<'a>>,
-    pub current: usize,
-}
-
-#[derive(Debug)]
-pub enum BlockKind {
-    Scope,
-    If,
-    While,
-}
-
-impl Block<'_> {
-    pub fn new<'a>(pair: Pair<'a, Rule>) -> Block<'a> {
-        Block {
-            kind: match pair.as_rule() {
-                Rule::scope => BlockKind::Scope,
-                Rule::if_stmt => BlockKind::If,
-                Rule::while_stmt => BlockKind::While,
-                _ => panic!("Invalid block rule"),
-            },
-            pair,
-            children: Vec::new(),
-            current: 0,
+    pub fn reset(&mut self) {
+        match self {
+            Node::Block(block) => block.reset(),
+            _ => (),
         }
     }
 }

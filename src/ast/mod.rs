@@ -1,13 +1,15 @@
-// pub mod check;
+pub mod atomic;
+pub mod block;
+pub mod brick;
 pub mod display;
-pub mod eval;
 pub mod node;
 
-use node::Node;
-use pest::iterators::Pairs;
 use std::collections::HashMap;
 
-use crate::{error::AlthreadResult, no_rule, parser::Rule};
+use brick::Brick;
+use pest::iterators::Pairs;
+
+use crate::{args::Config, env::Environment, error::AlthreadResult, no_rule, parser::Rule};
 
 #[derive(Debug)]
 pub struct Ast<'a> {
@@ -52,18 +54,27 @@ impl<'a> Ast<'a> {
     }
 }
 
-#[derive(Debug)]
-pub struct Brick<'a> {
-    pub nodes: Vec<Node<'a>>,
-    pub current: usize,
-}
-
-impl Brick<'_> {
-    pub fn build<'a>(pairs: Pairs<'a, Rule>) -> AlthreadResult<Brick<'a>> {
-        let mut nodes = Vec::new();
-        for pair in pairs {
-            nodes.push(Node::build(pair)?);
+impl Ast<'_> {
+    pub fn eval(&mut self, env: &mut Environment, config: &Config) -> AlthreadResult<()> {
+        for brick in &mut self.global_bricks {
+            brick.consume(env, config)?;
         }
-        Ok(Brick { nodes, current: 0 })
+        for brick in &mut self.condition_bricks {
+            brick.consume(env, config)?;
+        }
+        for (_, brick) in &mut self.process_bricks {
+            loop {
+                /*                 io::stdout().flush().expect("Erreur de flush");
+                let mut input = String::new();
+                io::stdin()
+                    .read_line(&mut input)
+                    .expect("Erreur de lecture"); */
+
+                if !brick.consume(env, config)? {
+                    break;
+                }
+            }
+        }
+        Ok(())
     }
 }

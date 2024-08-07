@@ -3,30 +3,45 @@ use std::iter::Rev;
 use pest::iterators::{Pair, Pairs};
 
 use crate::{
+    ast::node::Node,
     env::{value::Value, Environment},
     error::{AlthreadError, AlthreadResult, ErrorType},
     no_rule,
     parser::Rule,
 };
 
-pub fn eval_expr<'a>(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<Value> {
+pub fn consume_condition(node: &Node, env: &mut Environment) -> AlthreadResult<bool> {
+    Ok(match node {
+        Node::Atomic(atomic) => match atomic.pair.as_rule() {
+            Rule::expr => {
+                println!("{:?}", atomic.pair.as_str());
+                let val = consume_expr(atomic.pair.clone(), env)?;
+                val.is_true()
+            }
+            _ => return Err(no_rule!(atomic.pair)),
+        },
+        _ => unreachable!(),
+    })
+}
+
+pub fn consume_expr<'a>(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<Value> {
     match pair.as_rule() {
-        Rule::primary => Ok(eval_primary(pair.into_inner().next().unwrap(), env)?),
-        Rule::unary => Ok(eval_unary(pair.into_inner(), env)?),
+        Rule::primary => Ok(consume_primary(pair.into_inner().next().unwrap(), env)?),
+        Rule::unary => Ok(consume_unary(pair.into_inner(), env)?),
         Rule::expr
         | Rule::logical_or
         | Rule::logical_and
         | Rule::equality
         | Rule::comparison
         | Rule::term
-        | Rule::factor => Ok(eval_binary(pair.into_inner().rev(), env)?),
+        | Rule::factor => Ok(consume_binary(pair.into_inner().rev(), env)?),
         _ => {
             return Err(no_rule!(pair));
         }
     }
 }
 
-fn eval_primary(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<Value> {
+fn consume_primary(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<Value> {
     let val = pair.as_str();
 
     Ok(match pair.as_rule() {
@@ -39,15 +54,15 @@ fn eval_primary(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<Value
             let symbol = env.get_symbol(&pair)?;
             symbol.value.clone()
         }
-        Rule::expr => eval_expr(pair, env)?,
+        Rule::expr => consume_expr(pair, env)?,
         _ => return Err(no_rule!(pair)),
     })
 }
 
-fn eval_unary<'a>(mut pairs: Pairs<'a, Rule>, env: &mut Environment) -> AlthreadResult<Value> {
+fn consume_unary<'a>(mut pairs: Pairs<'a, Rule>, env: &mut Environment) -> AlthreadResult<Value> {
     let pair: Pair<'a, Rule> = pairs.next().unwrap();
     if let Some(val) = pairs.next() {
-        let val = eval_expr(val, env)?;
+        let val = consume_expr(val, env)?;
         let op = pair;
         Ok(match op.as_str() {
             "+" => Ok(val),
@@ -64,17 +79,17 @@ fn eval_unary<'a>(mut pairs: Pairs<'a, Rule>, env: &mut Environment) -> Althread
             )
         })?)
     } else {
-        Ok(eval_expr(pair, env)?)
+        Ok(consume_expr(pair, env)?)
     }
 }
 
-fn eval_binary<'a>(
+fn consume_binary<'a>(
     mut pairs: Rev<Pairs<'a, Rule>>,
     env: &mut Environment,
 ) -> AlthreadResult<Value> {
-    let right_value = eval_expr(pairs.next().unwrap(), env)?;
+    let right_value = consume_expr(pairs.next().unwrap(), env)?;
     if let Some(op) = pairs.next() {
-        let left_value = eval_binary(pairs, env)?;
+        let left_value = consume_binary(pairs, env)?;
 
         Ok(match op.as_str() {
             "+" => left_value.add(&right_value),
