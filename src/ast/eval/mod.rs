@@ -6,7 +6,11 @@ pub mod expr;
 
 use std::io::{self, Write};
 
+use assign::eval_assign;
 use blocks::{eval_if, eval_scope, eval_while};
+use call::eval_call;
+use decl::eval_decl;
+use expr::eval_expr;
 
 use crate::{args::Config, env::Environment, error::AlthreadResult};
 
@@ -42,16 +46,23 @@ impl<'a> Ast<'a> {
 
 impl<'a> Brick<'a> {
     pub fn consume(&mut self, env: &mut Environment, config: &Config) -> AlthreadResult<bool> {
+        if self.nodes.is_empty() {
+            return Ok(false);
+        }
+
         if self.current == 0 {
             env.push_table();
-        } else if self.current >= self.nodes.len() {
-            env.pop_table();
-            return Ok(false);
         }
 
         if !self.nodes[self.current].consume(env, config)? {
             self.current += 1;
         }
+
+        if self.current >= self.nodes.len() {
+            env.pop_table();
+            return Ok(false);
+        }
+
         Ok(true)
     }
 }
@@ -81,19 +92,19 @@ impl<'a> Atomic<'a> {
         println!("{:?}", pair.as_str());
         match self.kind {
             AtomicKind::Expr => {
-                // eval_expr(pair, env)?;
+                eval_expr(pair, env)?;
             }
             AtomicKind::Print => {
-                // eval_call(pair, env)?;
+                eval_call(pair, env)?;
             }
             AtomicKind::Decl => {
-                // eval_decl(pair, env)?;
+                eval_decl(pair, env)?;
             }
             AtomicKind::Assignment => {
-                // eval_assign(pair, env)?;
+                eval_assign(pair, env)?;
             }
             AtomicKind::Run => {
-                // unimplemented!();
+                unimplemented!();
             }
         }
         Ok(())
@@ -105,10 +116,7 @@ impl<'a> Block<'a> {
         match self.kind {
             BlockKind::Scope => Ok(eval_scope(self, env, config)?),
             BlockKind::If => Ok(eval_if(self, env, config)?),
-            BlockKind::While => {
-                eval_while(self, env, config)?;
-                Ok(true)
-            }
+            BlockKind::While => Ok(eval_while(self, env, config)?),
         }
     }
 

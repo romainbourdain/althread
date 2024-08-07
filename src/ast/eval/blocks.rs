@@ -14,6 +14,10 @@ pub fn eval_scope<'a>(
     env: &mut Environment,
     config: &Config,
 ) -> AlthreadResult<bool> {
+    if block.children.is_empty() {
+        return Ok(false);
+    }
+
     if block.current == 0 {
         env.push_table();
     }
@@ -26,6 +30,7 @@ pub fn eval_scope<'a>(
         env.pop_table();
         return Ok(false);
     }
+
     Ok(true)
 }
 
@@ -40,13 +45,12 @@ pub fn eval_if<'a>(
         } else {
             2
         };
+        Ok(true)
     } else if block.current < block.children.len() {
-        if !block.children[block.current].consume(env, config)? {
-            return Ok(false);
-        }
+        Ok(block.children[block.current].consume(env, config)?)
+    } else {
+        Ok(true)
     }
-
-    Ok(true)
 }
 
 pub fn evaluate_condition(node: &Node, env: &mut Environment) -> AlthreadResult<bool> {
