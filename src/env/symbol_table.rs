@@ -9,26 +9,31 @@ use crate::{
 
 use super::{datatype::DataType, value::Value, Environment, Symbol};
 
-pub type SymbolTable = HashMap<String, Symbol>;
+pub type SingleSymbolTable = HashMap<String, Symbol>;
 
-impl<'a> Environment<'a> {
-    pub fn new(global_table: &'a mut SymbolTable) -> Self {
+#[derive(Debug)]
+pub struct SymbolTable {
+    pub symbols: Vec<SingleSymbolTable>,
+}
+
+impl SymbolTable {
+    pub fn new() -> Self {
         Self {
-            symbol_tables: Vec::new(),
-            global_table,
+            symbols: Vec::new(),
         }
     }
 
-    pub fn push_table(&mut self) {
-        self.symbol_tables.push(SymbolTable::new());
+    pub fn push(&mut self) {
+        self.symbols.push(SingleSymbolTable::new());
     }
 
-    pub fn pop_table(&mut self) {
-        self.symbol_tables.pop();
+    pub fn pop(&mut self) {
+        self.symbols.pop();
     }
 
-    pub fn insert_symbol(
+    pub fn insert(
         &mut self,
+        env: &mut Environment,
         mutable: bool,
         identifier: &Pair<Rule>,
         datatype: Option<DataType>,
@@ -36,10 +41,7 @@ impl<'a> Environment<'a> {
     ) -> AlthreadResult<()> {
         let (line, column) = identifier.line_col();
         let identifier = identifier.as_str().to_string();
-        let current_symbol_table = self
-            .symbol_tables
-            .last_mut()
-            .unwrap_or(&mut self.global_table);
+        let current_symbol_table = self.symbols.last_mut().unwrap_or(&mut env.global_table);
 
         if current_symbol_table.contains_key(&identifier) {
             return Err(AlthreadError::new(
@@ -58,14 +60,18 @@ impl<'a> Environment<'a> {
         Ok(())
     }
 
-    pub fn get_symbol(&self, identifier: &Pair<Rule>) -> AlthreadResult<&Symbol> {
-        for table in self.symbol_tables.iter().rev() {
+    pub fn get<'a>(
+        &'a self,
+        env: &'a Environment,
+        identifier: &Pair<Rule>,
+    ) -> AlthreadResult<&'a Symbol> {
+        for table in self.symbols.iter().rev() {
             if let Some(symbol) = table.get(identifier.as_str()) {
                 return Ok(symbol);
             }
         }
 
-        if let Some(symbol) = self.global_table.get(identifier.as_str()) {
+        if let Some(symbol) = env.global_table.get(identifier.as_str()) {
             return Ok(symbol);
         }
 
@@ -77,8 +83,13 @@ impl<'a> Environment<'a> {
         ))
     }
 
-    pub fn update_symbol(&mut self, identifier: &Pair<Rule>, value: Value) -> AlthreadResult<()> {
-        for table in self.symbol_tables.iter_mut().rev() {
+    pub fn update(
+        &mut self,
+        env: &mut Environment,
+        identifier: &Pair<Rule>,
+        value: Value,
+    ) -> AlthreadResult<()> {
+        for table in self.symbols.iter_mut().rev() {
             if let Some(symbol) = table.get_mut(identifier.as_str()) {
                 symbol.update(value).map_err(|e| {
                     AlthreadError::new(
@@ -92,7 +103,7 @@ impl<'a> Environment<'a> {
             }
         }
 
-        if let Some(symbol) = self.global_table.get_mut(identifier.as_str()) {
+        if let Some(symbol) = env.global_table.get_mut(identifier.as_str()) {
             symbol.update(value).map_err(|e| {
                 AlthreadError::new(
                     ErrorType::VariableError,

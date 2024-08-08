@@ -1,6 +1,11 @@
 use pest::iterators::Pair;
 
-use crate::{args::Config, env::Environment, error::AlthreadResult, no_rule, parser::Rule};
+use crate::{
+    env::{symbol_table::SymbolTable, Environment},
+    error::AlthreadResult,
+    no_rule,
+    parser::Rule,
+};
 
 use super::{atomic::Atomic, block::Block};
 
@@ -27,13 +32,17 @@ impl Node<'_> {
         })
     }
 
-    pub fn consume(&mut self, env: &mut Environment, config: &Config) -> AlthreadResult<bool> {
+    pub fn consume(
+        &mut self,
+        symbol_table: &mut SymbolTable,
+        env: &mut Environment,
+    ) -> AlthreadResult<bool> {
         match self {
             Node::Atomic(atomic) => {
-                atomic.consume(env)?;
+                atomic.consume(symbol_table, env)?;
                 Ok(false)
             }
-            Node::Block(block) => Ok(block.consume(env, config)?),
+            Node::Block(block) => Ok(block.consume(symbol_table, env)?),
         }
     }
 

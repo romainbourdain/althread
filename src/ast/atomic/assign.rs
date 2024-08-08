@@ -1,7 +1,7 @@
 use pest::iterators::Pair;
 
 use crate::{
-    env::Environment,
+    env::{symbol_table::SymbolTable, Environment},
     error::{AlthreadError, AlthreadResult, ErrorType},
     no_rule,
     parser::Rule,
@@ -9,21 +9,29 @@ use crate::{
 
 use super::expr::consume_expr;
 
-pub fn consume_assign(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<()> {
+pub fn consume_assign(
+    pair: Pair<Rule>,
+    symbol_table: &mut SymbolTable,
+    env: &mut Environment,
+) -> AlthreadResult<()> {
     let pair = pair.into_inner().next().unwrap();
     match pair.as_rule() {
-        Rule::assign_unary => consume_assign_unary(pair, env),
-        Rule::assign_binary => consume_assign_binary(pair, env),
+        Rule::assign_unary => consume_assign_unary(pair, symbol_table, env),
+        Rule::assign_binary => consume_assign_binary(pair, symbol_table, env),
         _ => Err(no_rule!(pair)),
     }
 }
 
-fn consume_assign_unary(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<()> {
+fn consume_assign_unary(
+    pair: Pair<Rule>,
+    symbol_table: &mut SymbolTable,
+    env: &mut Environment,
+) -> AlthreadResult<()> {
     let mut pairs = pair.into_inner();
     let identifier = pairs.next().unwrap();
     let op = pairs.next().unwrap();
 
-    let current_value = env.get_symbol(&identifier)?.value.clone();
+    let current_value = symbol_table.get(env, &identifier)?.value.clone();
 
     let value = match op.as_str() {
         "++" => current_value.increment(),
@@ -39,16 +47,20 @@ fn consume_assign_unary(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResu
         )
     })?;
 
-    env.update_symbol(&identifier, value)
+    symbol_table.update(env, &identifier, value)
 }
 
-fn consume_assign_binary(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<()> {
+fn consume_assign_binary(
+    pair: Pair<Rule>,
+    symbol_table: &mut SymbolTable,
+    env: &mut Environment,
+) -> AlthreadResult<()> {
     let mut pairs = pair.into_inner();
     let identifier = pairs.next().unwrap();
     let op = pairs.next().unwrap();
-    let expr = consume_expr(pairs.next().unwrap(), env)?;
+    let expr = consume_expr(pairs.next().unwrap(), symbol_table, env)?;
 
-    let current_value = env.get_symbol(&identifier)?.value.clone();
+    let current_value = symbol_table.get(env, &identifier)?.value.clone();
 
     let value = match op.as_str() {
         "=" => Ok(expr),
@@ -68,5 +80,5 @@ fn consume_assign_binary(pair: Pair<Rule>, env: &mut Environment) -> AlthreadRes
         )
     })?;
 
-    env.update_symbol(&identifier, value)
+    symbol_table.update(env, &identifier, value)
 }

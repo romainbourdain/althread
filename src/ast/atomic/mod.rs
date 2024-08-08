@@ -9,7 +9,11 @@ use decl::consume_decl;
 use expr::consume_expr;
 use pest::iterators::Pair;
 
-use crate::{env::Environment, error::AlthreadResult, parser::Rule};
+use crate::{
+    env::{symbol_table::SymbolTable, Environment},
+    error::AlthreadResult,
+    parser::Rule,
+};
 
 #[derive(Debug)]
 pub struct Atomic<'a> {
@@ -41,21 +45,25 @@ impl Atomic<'_> {
         }
     }
 
-    pub fn consume(&self, env: &mut Environment) -> AlthreadResult<()> {
+    pub fn consume(
+        &self,
+        symbol_table: &mut SymbolTable,
+        env: &mut Environment,
+    ) -> AlthreadResult<()> {
         let pair = self.pair.clone();
         println!("{:?}", pair.as_str());
         match self.kind {
             AtomicKind::Expr => {
-                consume_expr(pair, env)?;
+                consume_expr(pair, symbol_table, env)?;
             }
             AtomicKind::Print => {
-                consume_call(pair, env)?;
+                consume_call(pair, symbol_table, env)?;
             }
             AtomicKind::Decl => {
-                consume_decl(pair, env)?;
+                consume_decl(pair, symbol_table, env)?;
             }
             AtomicKind::Assignment => {
-                consume_assign(pair, env)?;
+                consume_assign(pair, symbol_table, env)?;
             }
             AtomicKind::Run => {
                 unimplemented!();

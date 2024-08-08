@@ -7,7 +7,11 @@ use pest::iterators::Pair;
 use scope::consume_scope;
 use while_block::consume_while;
 
-use crate::{args::Config, env::Environment, error::AlthreadResult, parser::Rule};
+use crate::{
+    env::{symbol_table::SymbolTable, Environment},
+    error::AlthreadResult,
+    parser::Rule,
+};
 
 use super::node::Node;
 
@@ -41,11 +45,15 @@ impl Block<'_> {
         }
     }
 
-    pub fn consume(&mut self, env: &mut Environment, config: &Config) -> AlthreadResult<bool> {
+    pub fn consume(
+        &mut self,
+        symbol_table: &mut SymbolTable,
+        env: &mut Environment,
+    ) -> AlthreadResult<bool> {
         match self.kind {
-            BlockKind::Scope => Ok(consume_scope(self, env, config)?),
-            BlockKind::If => Ok(consume_if(self, env, config)?),
-            BlockKind::While => Ok(consume_while(self, env, config)?),
+            BlockKind::Scope => Ok(consume_scope(self, symbol_table, env)?),
+            BlockKind::If => Ok(consume_if(self, symbol_table, env)?),
+            BlockKind::While => Ok(consume_while(self, symbol_table, env)?),
         }
     }
 

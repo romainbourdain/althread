@@ -4,18 +4,22 @@ use pest::iterators::{Pair, Pairs};
 
 use crate::{
     ast::node::Node,
-    env::{value::Value, Environment},
+    env::{symbol_table::SymbolTable, value::Value, Environment},
     error::{AlthreadError, AlthreadResult, ErrorType},
     no_rule,
     parser::Rule,
 };
 
-pub fn consume_condition(node: &Node, env: &mut Environment) -> AlthreadResult<bool> {
+pub fn consume_condition(
+    node: &Node,
+    symbol_table: &SymbolTable,
+    env: &Environment,
+) -> AlthreadResult<bool> {
     Ok(match node {
         Node::Atomic(atomic) => match atomic.pair.as_rule() {
             Rule::expr => {
                 println!("{:?}", atomic.pair.as_str());
-                let val = consume_expr(atomic.pair.clone(), env)?;
+                let val = consume_expr(atomic.pair.clone(), symbol_table, env)?;
                 val.is_true()
             }
             _ => return Err(no_rule!(atomic.pair)),
@@ -24,24 +28,36 @@ pub fn consume_condition(node: &Node, env: &mut Environment) -> AlthreadResult<b
     })
 }
 
-pub fn consume_expr<'a>(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<Value> {
+pub fn consume_expr<'a>(
+    pair: Pair<Rule>,
+    symbol_table: &SymbolTable,
+    env: &Environment,
+) -> AlthreadResult<Value> {
     match pair.as_rule() {
-        Rule::primary => Ok(consume_primary(pair.into_inner().next().unwrap(), env)?),
-        Rule::unary => Ok(consume_unary(pair.into_inner(), env)?),
+        Rule::primary => Ok(consume_primary(
+            pair.into_inner().next().unwrap(),
+            symbol_table,
+            env,
+        )?),
+        Rule::unary => Ok(consume_unary(pair.into_inner(), symbol_table, env)?),
         Rule::expr
         | Rule::logical_or
         | Rule::logical_and
         | Rule::equality
         | Rule::comparison
         | Rule::term
-        | Rule::factor => Ok(consume_binary(pair.into_inner().rev(), env)?),
+        | Rule::factor => Ok(consume_binary(pair.into_inner().rev(), symbol_table, env)?),
         _ => {
             return Err(no_rule!(pair));
         }
     }
 }
 
-fn consume_primary(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<Value> {
+fn consume_primary(
+    pair: Pair<Rule>,
+    symbol_table: &SymbolTable,
+    env: &Environment,
+) -> AlthreadResult<Value> {
     let val = pair.as_str();
 
     Ok(match pair.as_rule() {
@@ -51,18 +67,22 @@ fn consume_primary(pair: Pair<Rule>, env: &mut Environment) -> AlthreadResult<Va
         Rule::FLOAT => Value::Float(val.parse::<f64>().unwrap()),
         Rule::STRING => Value::String(val.to_string()),
         Rule::IDENTIFIER => {
-            let symbol = env.get_symbol(&pair)?;
+            let symbol = symbol_table.get(env, &pair)?;
             symbol.value.clone()
         }
-        Rule::expr => consume_expr(pair, env)?,
+        Rule::expr => consume_expr(pair, symbol_table, env)?,
         _ => return Err(no_rule!(pair)),
     })
 }
 
-fn consume_unary<'a>(mut pairs: Pairs<'a, Rule>, env: &mut Environment) -> AlthreadResult<Value> {
+fn consume_unary<'a>(
+    mut pairs: Pairs<'a, Rule>,
+    symbol_table: &SymbolTable,
+    env: &Environment,
+) -> AlthreadResult<Value> {
     let pair: Pair<'a, Rule> = pairs.next().unwrap();
     if let Some(val) = pairs.next() {
-        let val = consume_expr(val, env)?;
+        let val = consume_expr(val, symbol_table, env)?;
         let op = pair;
         Ok(match op.as_str() {
             "+" => Ok(val),
@@ -79,17 +99,18 @@ fn consume_unary<'a>(mut pairs: Pairs<'a, Rule>, env: &mut Environment) -> Althr
             )
         })?)
     } else {
-        Ok(consume_expr(pair, env)?)
+        Ok(consume_expr(pair, symbol_table, env)?)
     }
 }
 
 fn consume_binary<'a>(
     mut pairs: Rev<Pairs<'a, Rule>>,
-    env: &mut Environment,
+    symbol_table: &SymbolTable,
+    env: &Environment,
 ) -> AlthreadResult<Value> {
-    let right_value = consume_expr(pairs.next().unwrap(), env)?;
+    let right_value = consume_expr(pairs.next().unwrap(), symbol_table, env)?;
     if let Some(op) = pairs.next() {
-        let left_value = consume_binary(pairs, env)?;
+        let left_value = consume_binary(pairs, symbol_table, env)?;
 
         Ok(match op.as_str() {
             "+" => left_value.add(&right_value),
