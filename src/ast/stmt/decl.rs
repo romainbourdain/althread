@@ -3,7 +3,7 @@ use pest::iterators::Pair;
 use crate::{
     ast::{
         datatype::DataType,
-        token::{FromPair, Token},
+        node::{Build, Node},
     },
     error::AlthreadResult,
     no_rule,
@@ -14,31 +14,28 @@ use super::expr::{primary_expr::Identifier, Expr};
 
 #[derive(Debug)]
 pub struct Decl {
-    pub keyword: Token<DeclKeyword>,
-    pub identifier: Token<Identifier>,
-    pub datatype: Option<Token<DataType>>,
-    pub value: Option<Expr>,
-    pub line: usize,
-    pub column: usize,
+    pub keyword: Node<DeclKeyword>,
+    pub identifier: Node<Identifier>,
+    pub datatype: Option<Node<DataType>>,
+    pub value: Option<Node<Expr>>,
 }
 
-impl Decl {
-    pub fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        let (line, column) = pair.line_col();
+impl Build for Decl {
+    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
         let mut pairs = pair.into_inner();
 
-        let keyword = Token::build(pairs.next().unwrap())?;
-        let identifier = Token::build(pairs.next().unwrap())?;
+        let keyword = Node::build(pairs.next().unwrap())?;
+        let identifier = Node::build(pairs.next().unwrap())?;
         let mut datatype = None;
         let mut value = None;
 
         for pair in pairs {
             match pair.as_rule() {
                 Rule::DATATYPE => {
-                    datatype = Some(Token::build(pair)?);
+                    datatype = Some(Node::build(pair)?);
                 }
                 Rule::expr => {
-                    value = Some(Expr::build(pair)?);
+                    value = Some(Node::build(pair)?);
                 }
                 _ => return Err(no_rule!(pair)),
             }
@@ -49,8 +46,6 @@ impl Decl {
             identifier,
             datatype,
             value,
-            line,
-            column,
         })
     }
 }
@@ -61,8 +56,8 @@ pub enum DeclKeyword {
     Const,
 }
 
-impl FromPair for DeclKeyword {
-    fn from_pair(pair: Pair<Rule>) -> AlthreadResult<Self> {
+impl Build for DeclKeyword {
+    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
         match pair.as_str() {
             "let" => Ok(Self::Let),
             "const" => Ok(Self::Const),

@@ -3,21 +3,21 @@ use pest::iterators::Pair;
 use crate::{error::AlthreadResult, parser::Rule};
 
 #[derive(Debug, Clone)]
-pub struct Token<T> {
+pub struct Node<T> {
     pub value: T,
     pub line: usize,
     pub column: usize,
 }
 
-pub trait FromPair: Sized {
-    fn from_pair(pair: Pair<Rule>) -> AlthreadResult<Self>;
+pub trait Build: Sized {
+    fn build(pair: Pair<Rule>) -> AlthreadResult<Self>;
 }
 
-impl<T: FromPair> Token<T> {
+impl<T: Build> Node<T> {
     pub fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
         let (line, col) = pair.line_col();
-        Ok(Token {
-            value: T::from_pair(pair)?,
+        Ok(Node {
+            value: T::build(pair)?,
             line,
             column: col,
         })

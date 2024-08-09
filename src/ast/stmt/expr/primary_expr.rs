@@ -3,7 +3,7 @@ use std::str::FromStr;
 use pest::iterators::Pair;
 
 use crate::{
-    ast::token::FromPair,
+    ast::node::Build,
     error::{AlthreadError, AlthreadResult, ErrorType},
     no_rule,
     parser::Rule,
@@ -11,8 +11,8 @@ use crate::{
 
 pub type Identifier = String;
 
-impl FromPair for Identifier {
-    fn from_pair(pair: Pair<Rule>) -> AlthreadResult<Self> {
+impl Build for Identifier {
+    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
         match pair.as_rule() {
             Rule::IDENTIFIER => Ok(pair.as_str().to_string()),
             _ => Err(no_rule!(pair)),
@@ -30,10 +30,8 @@ pub enum PrimaryExpr {
     Identifier(Identifier),
 }
 
-impl FromPair for PrimaryExpr {
-    fn from_pair(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        let (line, col) = pair.line_col();
-
+impl Build for PrimaryExpr {
+    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
         fn parse_with_error<T: FromStr>(pair: Pair<Rule>) -> AlthreadResult<T> {
             let (line, col) = pair.line_col();
             pair.as_str().parse::<T>().map_err(|_| {
@@ -52,7 +50,7 @@ impl FromPair for PrimaryExpr {
             Rule::INTEGER => Ok(Self::Int(parse_with_error::<i64>(pair)?)),
             Rule::FLOAT => Ok(Self::Float(parse_with_error::<f64>(pair)?)),
             Rule::STRING => Ok(Self::String(pair.as_str().to_string())),
-            Rule::IDENTIFIER => Ok(Self::Identifier(Identifier::from_pair(pair)?)),
+            Rule::IDENTIFIER => Ok(Self::Identifier(Identifier::build(pair)?)),
             _ => Err(no_rule!(pair)),
         }
     }

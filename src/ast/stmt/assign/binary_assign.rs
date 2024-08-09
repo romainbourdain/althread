@@ -2,8 +2,8 @@ use pest::iterators::Pair;
 
 use crate::{
     ast::{
-        node::expr::{primary_expr::Identifier, Expr},
-        token::{FromPair, Token},
+        node::{Build, Node},
+        stmt::expr::{primary_expr::Identifier, Expr},
     },
     error::AlthreadResult,
     no_rule,
@@ -12,28 +12,23 @@ use crate::{
 
 #[derive(Debug)]
 pub struct BinaryAssign {
-    pub identifier: Token<Identifier>,
-    pub operator: Token<BinaryAssignOp>,
-    pub value: Expr,
-    pub line: usize,
-    pub column: usize,
+    pub identifier: Node<Identifier>,
+    pub operator: Node<BinaryAssignOp>,
+    pub value: Node<Expr>,
 }
 
-impl BinaryAssign {
-    pub fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        let (line, column) = pair.line_col();
+impl Build for BinaryAssign {
+    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
         let mut pairs = pair.into_inner();
 
-        let identifier = Token::build(pairs.next().unwrap())?;
-        let operator = Token::build(pairs.next().unwrap())?;
-        let value = Expr::build(pairs.next().unwrap())?;
+        let identifier = Node::build(pairs.next().unwrap())?;
+        let operator = Node::build(pairs.next().unwrap())?;
+        let value = Node::build(pairs.next().unwrap())?;
 
         Ok(Self {
             identifier,
             operator,
             value,
-            line,
-            column,
         })
     }
 }
@@ -48,8 +43,8 @@ pub enum BinaryAssignOp {
     ModAssign,
 }
 
-impl FromPair for BinaryAssignOp {
-    fn from_pair(pair: Pair<Rule>) -> AlthreadResult<Self> {
+impl Build for BinaryAssignOp {
+    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
         match pair.as_str() {
             "=" => Ok(Self::Assign),
             "+=" => Ok(Self::AddAssign),

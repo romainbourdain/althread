@@ -4,7 +4,7 @@ use pest::iterators::Pair;
 
 use crate::{error::AlthreadResult, no_rule, parser::Rule};
 
-use super::token::FromPair;
+use super::node::Build;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum DataType {
@@ -108,8 +108,8 @@ impl DataType {
     }
 }
 
-impl FromPair for DataType {
-    fn from_pair(pair: Pair<Rule>) -> AlthreadResult<Self> {
+impl Build for DataType {
+    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
         match pair.as_str() {
             "bool" => Ok(Self::Bool),
             "int" => Ok(Self::Int),

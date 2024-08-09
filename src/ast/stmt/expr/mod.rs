@@ -7,18 +7,22 @@ use pest::iterators::Pair;
 use primary_expr::PrimaryExpr;
 use unary_expr::UnaryExpr;
 
-use crate::{ast::token::Token, error::AlthreadResult, parser::Rule};
+use crate::{
+    ast::node::{Build, Node},
+    error::AlthreadResult,
+    parser::Rule,
+};
 
 #[derive(Debug)]
 pub enum Expr {
-    Binary(BinaryExpr),
-    Unary(UnaryExpr),
-    Primary(Token<PrimaryExpr>),
+    Binary(Node<BinaryExpr>),
+    Unary(Node<UnaryExpr>),
+    Primary(Node<PrimaryExpr>),
 }
 
-impl Expr {
-    pub fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        Ok(Self::Primary(Token {
+impl Build for Expr {
+    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
+        Ok(Self::Primary(Node {
             value: PrimaryExpr::Null(),
             line: 0,
             column: 0,

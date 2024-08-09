@@ -1,14 +1,12 @@
-use crate::ast::token::Token;
+use crate::ast::node::Node;
 
 use super::Expr;
 
 #[derive(Debug)]
 pub struct BinaryExpr {
-    pub left: Box<Expr>,
-    pub operator: Token<BinaryOp>,
-    pub right: Box<Expr>,
-    pub line: usize,
-    pub column: usize,
+    pub left: Box<Node<Expr>>,
+    pub operator: Node<BinaryOp>,
+    pub right: Box<Node<Expr>>,
 }
 
 #[derive(Debug)]
