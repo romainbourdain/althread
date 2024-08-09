@@ -1,3 +1,5 @@
+use std::fmt;
+
 use pest::iterators::Pair;
 
 use crate::{error::AlthreadResult, parser::Rule};
@@ -30,5 +32,15 @@ impl Brick {
         Self {
             children: Vec::new(),
         }
+    }
+}
+
+impl fmt::Display for Brick {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for stmt in &self.children {
+            writeln!(f, "{}", stmt)?;
+        }
+
+        Ok(())
     }
 }

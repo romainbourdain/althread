@@ -1,3 +1,5 @@
+use std::fmt;
+
 use pest::iterators::Pair;
 
 use crate::{
@@ -20,5 +22,11 @@ impl Build for Print {
         let value = Node::build(pairs.next().unwrap())?;
 
         Ok(Self { value })
+    }
+}
+
+impl fmt::Display for Print {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "print {}", self.value)
     }
 }

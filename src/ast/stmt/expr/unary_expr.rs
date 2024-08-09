@@ -1,4 +1,6 @@
-use crate::ast::node::Node;
+use std::fmt;
+
+use crate::ast::{node::Node, token::unary_op::UnaryOp};
 
 use super::Expr;
 
@@ -8,9 +10,11 @@ pub struct UnaryExpr {
     pub operand: Box<Node<Expr>>,
 }
 
-#[derive(Debug)]
-pub enum UnaryOp {
-    Pos,
-    Neg,
-    Not,
+impl fmt::Display for UnaryExpr {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.operator)?;
+        write!(f, "{}", self.operand)?;
+
+        Ok(())
+    }
 }

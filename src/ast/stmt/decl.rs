@@ -1,16 +1,18 @@
+use std::fmt;
+
 use pest::iterators::Pair;
 
 use crate::{
     ast::{
-        datatype::DataType,
         node::{Build, Node},
+        token::{datatype::DataType, decl_keyword::DeclKeyword, identifier::Identifier},
     },
     error::AlthreadResult,
     no_rule,
     parser::Rule,
 };
 
-use super::expr::{primary_expr::Identifier, Expr};
+use super::expr::Expr;
 
 #[derive(Debug)]
 pub struct Decl {
@@ -50,18 +52,17 @@ impl Build for Decl {
     }
 }
 
-#[derive(Debug)]
-pub enum DeclKeyword {
-    Let,
-    Const,
-}
-
-impl Build for DeclKeyword {
-    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        match pair.as_str() {
-            "let" => Ok(Self::Let),
-            "const" => Ok(Self::Const),
-            _ => Err(no_rule!(pair)),
+impl fmt::Display for Decl {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} ", self.keyword)?;
+        write!(f, "{} ", self.identifier)?;
+        if let Some(datatype) = &self.datatype {
+            write!(f, ": {}", datatype)?;
         }
+        if let Some(value) = &self.value {
+            write!(f, " = {}", value)?;
+        }
+
+        Ok(())
     }
 }

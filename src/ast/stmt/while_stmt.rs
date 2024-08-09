@@ -1,3 +1,5 @@
+use std::fmt;
+
 use pest::iterators::Pair;
 
 use crate::{
@@ -25,5 +27,11 @@ impl Build for WhileStmt {
             condition,
             then_block,
         })
+    }
+}
+
+impl fmt::Display for WhileStmt {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "while {} {}", self.condition, self.then_block)
     }
 }

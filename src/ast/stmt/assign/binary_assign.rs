@@ -1,12 +1,14 @@
+use std::fmt;
+
 use pest::iterators::Pair;
 
 use crate::{
     ast::{
         node::{Build, Node},
-        stmt::expr::{primary_expr::Identifier, Expr},
+        stmt::expr::Expr,
+        token::{binary_assign_op::BinaryAssignOp, identifier::Identifier},
     },
     error::AlthreadResult,
-    no_rule,
     parser::Rule,
 };
 
@@ -33,26 +35,12 @@ impl Build for BinaryAssign {
     }
 }
 
-#[derive(Debug)]
-pub enum BinaryAssignOp {
-    Assign,
-    AddAssign,
-    SubAssign,
-    MulAssign,
-    DivAssign,
-    ModAssign,
-}
+impl fmt::Display for BinaryAssign {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.identifier)?;
+        write!(f, " {} ", self.operator)?;
+        write!(f, "{}", self.value)?;
 
-impl Build for BinaryAssignOp {
-    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        match pair.as_str() {
-            "=" => Ok(Self::Assign),
-            "+=" => Ok(Self::AddAssign),
-            "-=" => Ok(Self::SubAssign),
-            "*=" => Ok(Self::MulAssign),
-            "/=" => Ok(Self::DivAssign),
-            "%=" => Ok(Self::ModAssign),
-            _ => Err(no_rule!(pair)),
-        }
+        Ok(())
     }
 }

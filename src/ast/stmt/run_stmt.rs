@@ -1,12 +1,15 @@
+use std::fmt;
+
 use pest::iterators::Pair;
 
 use crate::{
-    ast::node::{Build, Node},
+    ast::{
+        node::{Build, Node},
+        token::identifier::Identifier,
+    },
     error::AlthreadResult,
     parser::Rule,
 };
-
-use super::expr::primary_expr::Identifier;
 
 #[derive(Debug)]
 pub struct RunStmt {
@@ -20,5 +23,11 @@ impl Build for RunStmt {
         let identifier = Node::build(pairs.next().unwrap())?;
 
         Ok(Self { identifier })
+    }
+}
+
+impl fmt::Display for RunStmt {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "run {}", self.identifier)
     }
 }

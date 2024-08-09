@@ -1,3 +1,7 @@
+shared {
+   let a = 8;
+}
+
 main {
    print(a);
    let a = 7;

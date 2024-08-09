@@ -7,6 +7,8 @@ pub mod run_stmt;
 pub mod scope;
 pub mod while_stmt;
 
+use std::fmt;
+
 use assign::Assign;
 use decl::Decl;
 use expr::Expr;
@@ -45,6 +47,21 @@ impl Build for Stmt {
             Rule::while_stmt => Ok(Self::While(Node::build(pair)?)),
             Rule::scope => Ok(Self::Scope(Node::build(pair)?)),
             _ => Err(no_rule!(pair)),
+        }
+    }
+}
+
+impl fmt::Display for Stmt {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match &self {
+            Stmt::Assign(assign) => write!(f, "{}", assign),
+            Stmt::Decl(decl) => write!(f, "{}", decl),
+            Stmt::Expr(expr) => write!(f, "{}", expr),
+            Stmt::Print(print) => write!(f, "{}", print),
+            Stmt::Run(run) => write!(f, "{}", run),
+            Stmt::If(if_stmt) => write!(f, "{}", if_stmt),
+            Stmt::While(while_stmt) => write!(f, "{}", while_stmt),
+            Stmt::Scope(scope) => write!(f, "{}", scope),
         }
     }
 }

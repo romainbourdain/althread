@@ -1,3 +1,5 @@
+use std::fmt;
+
 use pest::iterators::Pair;
 
 use crate::{
@@ -28,5 +30,18 @@ impl Build for IfStmt {
             then_block,
             else_block,
         })
+    }
+}
+
+impl fmt::Display for IfStmt {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "if {} ", self.condition)?;
+        write!(f, "{}", self.then_block)?;
+
+        if let Some(else_block) = &self.else_block {
+            write!(f, " else {}", else_block)?;
+        }
+
+        Ok(())
     }
 }

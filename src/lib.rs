@@ -15,7 +15,7 @@ pub fn run(source: &str, config: &Config) -> Result<(), AlthreadError> {
     let pairs = parse(&source).map_err(|e| e)?;
     let ast = Ast::build(pairs)?;
 
-    println!("{:#?}", ast);
+    println!("{}", ast);
 
     Ok(())
 }

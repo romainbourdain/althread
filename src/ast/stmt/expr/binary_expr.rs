@@ -1,4 +1,6 @@
-use crate::ast::node::Node;
+use std::fmt;
+
+use crate::ast::{node::Node, token::binary_op::BinaryOp};
 
 use super::Expr;
 
@@ -9,19 +11,12 @@ pub struct BinaryExpr {
     pub right: Box<Node<Expr>>,
 }
 
-#[derive(Debug)]
-pub enum BinaryOp {
-    Add,
-    Sub,
-    Mul,
-    Div,
-    Mod,
-    Eq,
-    Ne,
-    Lt,
-    Le,
-    Gt,
-    Ge,
-    And,
-    Or,
+impl fmt::Display for BinaryExpr {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.left)?;
+        write!(f, " {} ", self.operator)?;
+        write!(f, "{}", self.right)?;
+
+        Ok(())
+    }
 }

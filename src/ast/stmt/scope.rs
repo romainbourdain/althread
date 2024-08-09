@@ -1,3 +1,5 @@
+use std::fmt;
+
 use pest::iterators::Pair;
 
 use crate::{
@@ -22,5 +24,15 @@ impl Build for Scope {
             .collect::<AlthreadResult<Vec<Node<Stmt>>>>()?;
 
         Ok(Self { children })
+    }
+}
+
+impl fmt::Display for Scope {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for stmt in &self.children {
+            writeln!(f, "{}", stmt)?;
+        }
+
+        Ok(())
     }
 }

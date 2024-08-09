@@ -1,8 +1,9 @@
 pub mod brick;
-pub mod datatype;
-// pub mod display;
 pub mod node;
 pub mod stmt;
+pub mod token;
+
+use std::fmt;
 
 use std::collections::HashMap;
 
@@ -65,5 +66,22 @@ impl Ast {
         }
 
         Ok(ast)
+    }
+}
+
+impl fmt::Display for Ast {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if let Some(global_brick) = &self.global_brick {
+            writeln!(f, "shared: {}", global_brick)?;
+        }
+        for (process_name, process_brick) in &self.process_bricks {
+            writeln!(f, "{}: {}", process_name, process_brick)?;
+        }
+
+        for (condition_name, condition_brick) in &self.condition_bricks {
+            writeln!(f, "{}: {}", condition_name, condition_brick)?;
+        }
+
+        Ok(())
     }
 }

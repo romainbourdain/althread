@@ -1,10 +1,8 @@
-use core::fmt;
+use std::fmt;
 
 use pest::iterators::Pair;
 
-use crate::{error::AlthreadResult, no_rule, parser::Rule};
-
-use super::node::Build;
+use crate::{ast::node::Build, error::AlthreadResult, no_rule, parser::Rule};
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum DataType {
@@ -15,7 +13,7 @@ pub enum DataType {
     String,
 }
 
-impl DataType {
+/* impl DataType {
     pub fn from_str(value: &str) -> Self {
         match value {
             "bool" => Self::Bool,
@@ -106,7 +104,7 @@ impl DataType {
             i => Err(format!("Cannot negate {}", i)),
         }
     }
-}
+} */
 
 impl Build for DataType {
     fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
@@ -123,6 +121,14 @@ impl Build for DataType {
 
 impl fmt::Display for DataType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.as_str())
+        let datatype = match self {
+            DataType::Void => "void",
+            DataType::Bool => "bool",
+            DataType::Int => "int",
+            DataType::Float => "float",
+            DataType::String => "string",
+        };
+
+        write!(f, "{}", datatype)
     }
 }

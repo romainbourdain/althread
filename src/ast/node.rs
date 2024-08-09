@@ -1,3 +1,6 @@
+use std::fmt;
+use std::fmt::Formatter;
+
 use pest::iterators::Pair;
 
 use crate::{error::AlthreadResult, parser::Rule};
@@ -21,5 +24,11 @@ impl<T: Build> Node<T> {
             line,
             column: col,
         })
+    }
+}
+
+impl<T: fmt::Display> fmt::Display for Node<T> {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}", self.value)
     }
 }

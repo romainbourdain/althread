@@ -1,6 +1,8 @@
 pub mod binary_assign;
 pub mod unary_assign;
 
+use std::fmt;
+
 use binary_assign::BinaryAssign;
 use pest::iterators::Pair;
 use unary_assign::UnaryAssign;
@@ -26,6 +28,15 @@ impl Build for Assign {
             Rule::assign_unary => Ok(Self::Unary(Node::build(pair)?)),
             Rule::assign_binary => Ok(Self::Binary(Node::build(pair)?)),
             _ => Err(no_rule!(pair)),
+        }
+    }
+}
+
+impl fmt::Display for Assign {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match &self {
+            Assign::Unary(unary_assign) => write!(f, "{}", unary_assign),
+            Assign::Binary(binary_assign) => write!(f, "{}", binary_assign),
         }
     }
 }

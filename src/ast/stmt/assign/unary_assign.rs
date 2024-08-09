@@ -1,12 +1,13 @@
+use std::fmt;
+
 use pest::iterators::Pair;
 
 use crate::{
     ast::{
         node::{Build, Node},
-        stmt::expr::primary_expr::Identifier,
+        token::{identifier::Identifier, unary_assign_op::UnaryAssignOp},
     },
     error::AlthreadResult,
-    no_rule,
     parser::Rule,
 };
 
@@ -30,18 +31,11 @@ impl Build for UnaryAssign {
     }
 }
 
-#[derive(Debug)]
-pub enum UnaryAssignOp {
-    Increment,
-    Decrement,
-}
+impl fmt::Display for UnaryAssign {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.identifier)?;
+        write!(f, " {} ", self.operator)?;
 
-impl Build for UnaryAssignOp {
-    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        match pair.as_str() {
-            "++" => Ok(Self::Increment),
-            "--" => Ok(Self::Decrement),
-            _ => Err(no_rule!(pair)),
-        }
+        Ok(())
     }
 }
