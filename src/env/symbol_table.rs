@@ -11,7 +11,7 @@ use super::{datatype::DataType, value::Value, Environment, Symbol};
 
 pub type SingleSymbolTable = HashMap<String, Symbol>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SymbolTable {
     pub symbols: Vec<SingleSymbolTable>,
 }

@@ -1,6 +1,6 @@
 use super::{datatype::DataType, value::Value};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Symbol {
     pub datatype: DataType,
     pub mutable: bool,

@@ -1,4 +1,4 @@
-use pest::iterators::Pairs;
+use pest::iterators::{Pair, Pairs};
 
 use crate::{
     ast::node::Node,
@@ -7,20 +7,20 @@ use crate::{
     parser::Rule,
 };
 
-#[derive(Debug)]
-pub struct Process<'a> {
-    pub nodes: Vec<Node<'a>>,
+#[derive(Debug, Clone)]
+pub struct Brick<'a> {
+    pub nodes: Vec<Pair<'a>>,
     pub current: usize,
     pub symbol_table: SymbolTable,
 }
 
-impl Process<'_> {
-    pub fn build<'a>(pairs: Pairs<'a, Rule>) -> AlthreadResult<Process<'a>> {
+impl Brick<'_> {
+    pub fn build<'a>(pairs: Pairs<'a, Rule>) -> AlthreadResult<Brick<'a>> {
         let mut nodes = Vec::new();
         for pair in pairs {
             nodes.push(Node::build(pair)?);
         }
-        Ok(Process {
+        Ok(Brick {
             nodes,
             current: 0,
             symbol_table: SymbolTable::new(),

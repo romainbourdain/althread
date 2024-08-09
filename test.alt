@@ -1,7 +1,3 @@
-shared {
-   let a = 5;
-}
-
 main {
    print(a);
    let a = 7;

@@ -15,13 +15,13 @@ use crate::{
     parser::Rule,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Atomic<'a> {
     pub kind: AtomicKind,
     pub pair: Pair<'a, Rule>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum AtomicKind {
     Assignment,
     Decl,

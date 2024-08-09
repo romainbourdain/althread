@@ -12,10 +12,15 @@ program = _{ SOI ~ bricks* ~ EOI }
 /// - The always block is used check condition at each atomic step.
 /// - The process block is used to run code in parallel.
 bricks        = _{ main_brick | global_brick | cond_brick | process_brick }
-main_brick    =  { "main" ~ "{" ~ stmt* ~ "}" }
-global_brick  =  { "shared" ~ "{" ~ decl_stmt* ~ "}" }
-cond_brick    =  { "always" ~ "{" ~ expr_stmt* ~ "}" }
-process_brick =  { "process" ~ IDENTIFIER ~ "(" ~ ")" ~ "{" ~ stmt* ~ "}" }
+main_brick    =  { "main" ~ "{" ~ brick ~ "}" }
+global_brick  =  { "shared" ~ "{" ~ decl_brick ~ "}" }
+cond_brick    =  { cond_brick_keyword ~ "{" ~ expr_brick ~ "}" }
+process_brick =  { "process" ~ IDENTIFIER ~ "(" ~ ")" ~ "{" ~ brick ~ "}" }
+
+brick              = { stmt* }
+decl_brick         = { decl_stmt* }
+expr_brick         = { expr_stmt* }
+cond_brick_keyword = { "always" | "never" | "eventually" }
 
 stmt = _{ assign_stmt | decl_stmt | expr_stmt | print_stmt | run_stmt | if_stmt | while_stmt | scope }
 

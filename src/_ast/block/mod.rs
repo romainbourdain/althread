@@ -15,7 +15,7 @@ use crate::{
 
 use super::node::Node;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Block<'a> {
     pub kind: BlockKind,
     pub pair: Pair<'a, Rule>,
@@ -23,7 +23,7 @@ pub struct Block<'a> {
     pub current: usize,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum BlockKind {
     Scope,
     If,

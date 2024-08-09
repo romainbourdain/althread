@@ -9,7 +9,7 @@ use crate::{
 
 use super::{atomic::Atomic, block::Block};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Node<'a> {
     Atomic(Atomic<'a>),
     Block(Block<'a>),
