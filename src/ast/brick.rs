@@ -5,7 +5,9 @@ use pest::iterators::Pair;
 use crate::{error::AlthreadResult, parser::Rule};
 
 use super::{
-    display::AstDisplay, node::{Build, Node}, stmt::Stmt
+    display::{AstDisplay, Prefix},
+    node::{Build, Node},
+    stmt::Stmt,
 };
 
 #[derive(Debug)]
@@ -35,9 +37,15 @@ impl Brick {
 }
 
 impl AstDisplay for Brick {
-    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
+    fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
+        let mut node_count = self.children.len();
         for node in &self.children {
-            node.ast_fmt(f, indent_level)?;
+            node_count -= 1;
+            if node_count == 0 {
+                node.ast_fmt(f, &prefix.switch())?;
+            } else {
+                node.ast_fmt(f, &prefix)?;
+            }
         }
 
         Ok(())

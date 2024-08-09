@@ -4,7 +4,7 @@ use pest::iterators::Pair;
 
 use crate::{error::AlthreadResult, parser::Rule};
 
-use super::display::AstDisplay;
+use super::display::{AstDisplay, Prefix};
 
 #[derive(Debug, Clone)]
 pub struct Node<T> {
@@ -29,8 +29,8 @@ impl<T: Build> Node<T> {
 }
 
 impl<T: AstDisplay> AstDisplay for Node<T> {
-    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
-        self.value.ast_fmt(f, indent_level)
+    fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
+        self.value.ast_fmt(f, prefix)
     }
 }
 

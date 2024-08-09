@@ -4,13 +4,12 @@ use pest::iterators::Pair;
 
 use crate::{
     ast::{
-        display::AstDisplay,
+        display::{AstDisplay, Prefix},
         node::{Build, Node},
         token::{identifier::Identifier, unary_assign_op::UnaryAssignOp},
     },
     error::AlthreadResult,
     parser::Rule,
-    write_indent,
 };
 
 #[derive(Debug)]
@@ -34,10 +33,15 @@ impl Build for UnaryAssign {
 }
 
 impl AstDisplay for UnaryAssign {
-    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
-        write_indent!(f, indent_level, "unary_assign")?;
-        write_indent!(f, indent_level + 1, "ident: {}", self.identifier)?;
-        write_indent!(f, indent_level + 1, "op: {}", self.operator)?;
+    fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
+        writeln!(f, "{}unary_assign", prefix)?;
+
+        let prefix = &prefix.add_branch();
+        writeln!(f, "{}ident: {}", prefix, self.identifier)?;
+
+        let prefix = &prefix.switch();
+        writeln!(f, "{}op: {}", prefix, self.operator)?;
+
         Ok(())
     }
 }

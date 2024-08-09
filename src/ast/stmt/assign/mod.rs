@@ -9,13 +9,12 @@ use unary_assign::UnaryAssign;
 
 use crate::{
     ast::{
-        display::AstDisplay,
+        display::{AstDisplay, Prefix},
         node::{Build, Node},
     },
     error::AlthreadResult,
     no_rule,
     parser::Rule,
-    write_indent,
 };
 
 #[derive(Debug)]
@@ -37,10 +36,10 @@ impl Build for Assign {
 }
 
 impl AstDisplay for Assign {
-    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
+    fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
         match self {
-            Self::Unary(node) => node.ast_fmt(f, indent_level),
-            Self::Binary(node) => node.ast_fmt(f, indent_level),
+            Self::Unary(node) => node.ast_fmt(f, prefix),
+            Self::Binary(node) => node.ast_fmt(f, prefix),
         }
     }
 }

@@ -4,14 +4,13 @@ use pest::iterators::Pair;
 
 use crate::{
     ast::{
-        display::AstDisplay,
+        display::{AstDisplay, Prefix},
         node::{Build, Node},
         token::{datatype::DataType, decl_keyword::DeclKeyword, identifier::Identifier},
     },
     error::AlthreadResult,
     no_rule,
     parser::Rule,
-    write_indent,
 };
 
 use super::expr::Expr;
@@ -55,17 +54,35 @@ impl Build for Decl {
 }
 
 impl AstDisplay for Decl {
-    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
-        write_indent!(f, indent_level, "decl")?;
-        write_indent!(f, indent_level + 1, "keyword: {}", self.keyword)?;
-        write_indent!(f, indent_level + 1, "ident: {}", self.identifier)?;
+    fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
+        writeln!(f, "{prefix}decl")?;
 
-        if let Some(datatype) = &self.datatype {
-            write_indent!(f, indent_level + 1, "datatype: {}", datatype)?;
-        }
+        let prefix = &prefix.add_branch();
+        writeln!(f, "{prefix}keyword: {}", self.keyword)?;
 
-        if let Some(value) = &self.value {
-            value.ast_fmt(f, indent_level + 1)?;
+        match (&self.datatype, &self.value) {
+            (Some(datatype), Some(value)) => {
+                writeln!(f, "{prefix}ident: {}", self.identifier)?;
+                writeln!(f, "{prefix}datatype: {datatype}")?;
+                let prefix = prefix.switch();
+                writeln!(f, "{prefix}value")?;
+                value.ast_fmt(f, &prefix.add_leaf())?;
+            }
+            (Some(datatype), None) => {
+                writeln!(f, "{prefix}ident: {}", self.identifier)?;
+                let prefix = prefix.switch();
+                writeln!(f, "{prefix}datatype: {datatype}")?;
+            }
+            (None, Some(value)) => {
+                writeln!(f, "{prefix}ident: {}", self.identifier)?;
+                let prefix = prefix.switch();
+                writeln!(f, "{prefix}value")?;
+                value.ast_fmt(f, &prefix.add_leaf())?;
+            }
+            (None, None) => {
+                let prefix = prefix.switch();
+                writeln!(f, "{prefix}ident: {}", self.identifier)?;
+            }
         }
 
         Ok(())

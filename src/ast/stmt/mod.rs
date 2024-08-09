@@ -22,7 +22,7 @@ use while_stmt::WhileStmt;
 use crate::{error::AlthreadResult, no_rule, parser::Rule};
 
 use super::{
-    display::AstDisplay,
+    display::{AstDisplay, Prefix},
     node::{Build, Node},
 };
 
@@ -64,16 +64,16 @@ impl Stmt {
 }
 
 impl AstDisplay for Stmt {
-    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
+    fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
         match self {
-            Stmt::Assign(node) => node.ast_fmt(f, indent_level),
-            Stmt::Decl(node) => node.ast_fmt(f, indent_level),
-            Stmt::Expr(node) => node.ast_fmt(f, indent_level),
-            Stmt::Print(node) => node.ast_fmt(f, indent_level),
-            Stmt::Run(node) => node.ast_fmt(f, indent_level),
-            Stmt::If(node) => node.ast_fmt(f, indent_level),
-            Stmt::While(node) => node.ast_fmt(f, indent_level),
-            Stmt::Scope(node) => node.ast_fmt(f, indent_level),
+            Stmt::Assign(node) => node.ast_fmt(f, prefix),
+            Stmt::Decl(node) => node.ast_fmt(f, prefix),
+            Stmt::Expr(node) => node.ast_fmt(f, prefix),
+            Stmt::Print(node) => node.ast_fmt(f, prefix),
+            Stmt::Run(node) => node.ast_fmt(f, prefix),
+            Stmt::If(node) => node.ast_fmt(f, prefix),
+            Stmt::While(node) => node.ast_fmt(f, prefix),
+            Stmt::Scope(node) => node.ast_fmt(f, prefix),
         }
     }
 }

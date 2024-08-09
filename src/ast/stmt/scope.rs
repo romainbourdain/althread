@@ -4,7 +4,7 @@ use pest::iterators::Pair;
 
 use crate::{
     ast::{
-        display::AstDisplay,
+        display::{AstDisplay, Prefix},
         node::{Build, Node},
         stmt::Stmt,
     },
@@ -29,9 +29,17 @@ impl Build for Scope {
 }
 
 impl AstDisplay for Scope {
-    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
+    fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
+        writeln!(f, "{prefix}scope")?;
+        let prefix = &prefix.add_branch();
+        let mut child_count = self.children.len();
         for child in &self.children {
-            child.ast_fmt(f, indent_level)?;
+            child_count -= 1;
+            if child_count == 0 {
+                child.ast_fmt(f, &prefix.switch())?;
+            } else {
+                child.ast_fmt(f, prefix)?;
+            }
         }
 
         Ok(())

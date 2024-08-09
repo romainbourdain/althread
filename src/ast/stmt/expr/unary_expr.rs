@@ -1,8 +1,9 @@
 use std::fmt;
 
-use crate::{
-    ast::{display::AstDisplay, node::Node, token::unary_op::UnaryOp},
-    write_indent,
+use crate::ast::{
+    display::{AstDisplay, Prefix},
+    node::Node,
+    token::unary_op::UnaryOp,
 };
 
 use super::Expr;
@@ -14,11 +15,14 @@ pub struct UnaryExpr {
 }
 
 impl AstDisplay for UnaryExpr {
-    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
-        write_indent!(f, indent_level, "unary_expr:")?;
-        write_indent!(f, indent_level + 1, "expr:")?;
-        self.operand.ast_fmt(f, indent_level + 1)?;
-        write_indent!(f, indent_level + 1, "op: {}", self.operator)?;
+    fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
+        writeln!(f, "{}unary_expr", prefix)?;
+        let prefix = &prefix.add_branch();
+        writeln!(f, "{}op: {}", prefix, self.operator)?;
+
+        let prefix = &prefix.switch();
+        writeln!(f, "{}expr", prefix)?;
+        self.operand.ast_fmt(f, &prefix.add_leaf())?;
 
         Ok(())
     }

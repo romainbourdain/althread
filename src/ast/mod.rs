@@ -10,11 +10,11 @@ use std::{
 };
 
 use brick::Brick;
-use display::AstDisplay;
+use display::{AstDisplay, Prefix};
 use node::Node;
 use pest::iterators::Pairs;
 
-use crate::{error::AlthreadResult, no_rule, parser::Rule, write_indent};
+use crate::{error::AlthreadResult, no_rule, parser::Rule};
 
 #[derive(Debug)]
 pub struct Ast {
@@ -74,21 +74,22 @@ impl Ast {
 
 impl fmt::Display for Ast {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        self.ast_fmt(f, 0)
+        self.ast_fmt(f, &Prefix::new())
     }
 }
 
 impl AstDisplay for Ast {
-    fn ast_fmt(&self, f: &mut Formatter, indent_level: usize) -> fmt::Result {
-        writeln!(f, "ast")?;
+    fn ast_fmt(&self, f: &mut Formatter, prefix: &Prefix) -> fmt::Result {
         if let Some(global_node) = &self.global_brick {
-            write_indent!(f, indent_level, "shared")?;
-            global_node.ast_fmt(f, indent_level + 1)?;
+            writeln!(f, "{}shared", prefix)?;
+            global_node.ast_fmt(f, &prefix.add_branch())?;
         }
 
+        writeln!(f, "")?;
+
         for (process_name, process_node) in &self.process_bricks {
-            write_indent!(f, indent_level, "{}", process_name)?;
-            process_node.ast_fmt(f, indent_level + 1)?;
+            writeln!(f, "{}{}", prefix, process_name)?;
+            process_node.ast_fmt(f, &prefix.add_branch())?;
         }
 
         Ok(())

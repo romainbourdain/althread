@@ -4,12 +4,11 @@ use pest::iterators::Pair;
 
 use crate::{
     ast::{
-        display::AstDisplay,
+        display::{AstDisplay, Prefix},
         node::{Build, Node},
     },
     error::AlthreadResult,
     parser::Rule,
-    write_indent,
 };
 
 use super::expr::Expr;
@@ -30,9 +29,9 @@ impl Build for Print {
 }
 
 impl AstDisplay for Print {
-    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
-        write_indent!(f, indent_level, "print")?;
-        self.value.ast_fmt(f, indent_level + 1)?;
+    fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
+        writeln!(f, "{prefix}print")?;
+        self.value.ast_fmt(f, &prefix.add_leaf())?;
 
         Ok(())
     }

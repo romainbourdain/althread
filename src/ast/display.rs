@@ -11,10 +11,13 @@ macro_rules! write_indent {
 }
 
 pub trait AstDisplay {
-    fn ast_fmt(&self, f: &mut Formatter, prefix: Prefix) -> fmt::Result;
+    fn ast_fmt(&self, f: &mut Formatter, prefix: &Prefix) -> fmt::Result;
 }
 
-pub type Prefix = Vec<TreeMarker>;
+#[derive(Clone)]
+pub struct Prefix {
+    pub prefix: Vec<TreeMarker>,
+}
 
 #[derive(Clone)]
 pub enum TreeMarker {
@@ -22,33 +25,46 @@ pub enum TreeMarker {
     Branch,
 }
 
-impl fmt::Display for TreeMarker {
+impl fmt::Display for Prefix {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        match self {
-            TreeMarker::Leaf => write!(f, "└── "),
-            TreeMarker::Branch => write!(f, "├── "),
-        }
-    }
-}
-
-pub fn display_prefix(prefix: Prefix, f: &mut Formatter<'_>) -> fmt::Result {
-    for (i, p) in prefix.iter().enumerate() {
-        // Si ce n'est pas le dernier élément, on ajoute des espaces
-        if i < prefix.len() - 1 {
-            match p {
+        let mut index = self.prefix.len();
+        for marker in &self.prefix {
+            index -= 1;
+            match marker {
+                TreeMarker::Leaf if index == 0 => write!(f, "└── ")?,
+                TreeMarker::Branch if index == 0 => write!(f, "├── ")?,
                 TreeMarker::Leaf => write!(f, "    ")?,
                 TreeMarker::Branch => write!(f, "│   ")?,
             }
-        } else {
-            // Dernier élément (feuille ou branche finale)
-            write!(f, "{}", p)?;
         }
-    }
-    Ok(())
-}
 
-pub fn concat_prefix(prefix: Prefix, marker: TreeMarker) -> Prefix {
-    let mut new_prefix = prefix.clone();
-    new_prefix.push(marker);
-    new_prefix
+        Ok(())
+    }
+}
+impl Prefix {
+    pub fn new() -> Self {
+        Self { prefix: Vec::new() }
+    }
+
+    pub fn add_branch(&self) -> Self {
+        let mut new = self.clone();
+        new.prefix.push(TreeMarker::Branch);
+        new
+    }
+
+    pub fn add_leaf(&self) -> Self {
+        let mut new = self.clone();
+        new.prefix.push(TreeMarker::Leaf);
+        new
+    }
+
+    pub fn switch(&self) -> Self {
+        let mut new = self.clone();
+        let last = new.prefix.pop().unwrap();
+        match last {
+            TreeMarker::Leaf => new.prefix.push(TreeMarker::Branch),
+            TreeMarker::Branch => new.prefix.push(TreeMarker::Leaf),
+        }
+        new
+    }
 }

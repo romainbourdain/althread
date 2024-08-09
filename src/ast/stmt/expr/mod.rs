@@ -9,13 +9,12 @@ use unary_expr::UnaryExpr;
 
 use crate::{
     ast::{
-        display::AstDisplay,
+        display::{AstDisplay, Prefix},
         node::{Build, Node},
         token::literals::Literal,
     },
     error::AlthreadResult,
     parser::Rule,
-    write_indent,
 };
 
 #[derive(Debug)]
@@ -36,11 +35,11 @@ impl Build for Expr {
 }
 
 impl AstDisplay for Expr {
-    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
+    fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
         match self {
-            Self::Binary(node) => node.ast_fmt(f, indent_level),
-            Self::Unary(node) => node.ast_fmt(f, indent_level),
-            Self::Primary(node) => write_indent!(f, indent_level, "literal: {}", node.value),
+            Self::Binary(node) => node.ast_fmt(f, prefix),
+            Self::Unary(node) => node.ast_fmt(f, prefix),
+            Self::Primary(node) => writeln!(f, "{}literal: {}", prefix, node.value),
         }
     }
 }

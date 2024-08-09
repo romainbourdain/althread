@@ -4,12 +4,11 @@ use pest::iterators::Pair;
 
 use crate::{
     ast::{
-        display::AstDisplay,
+        display::{AstDisplay, Prefix},
         node::{Build, Node},
     },
     error::AlthreadResult,
     parser::Rule,
-    write_indent,
 };
 
 use super::{expr::Expr, scope::Scope};
@@ -35,12 +34,22 @@ impl Build for WhileStmt {
 }
 
 impl AstDisplay for WhileStmt {
-    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
-        write_indent!(f, indent_level, "if_stmt")?;
-        write_indent!(f, indent_level + 1, "condition:")?;
-        self.condition.ast_fmt(f, indent_level + 2)?;
-        write_indent!(f, indent_level + 1, "then_block:")?;
-        self.then_block.ast_fmt(f, indent_level + 2)?;
+    fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
+        writeln!(f, "{prefix}if_stmt")?;
+
+        let prefix = prefix.add_branch();
+        writeln!(f, "{prefix}condition")?;
+        {
+            let prefix = prefix.add_leaf();
+            self.condition.ast_fmt(f, &prefix)?;
+        }
+
+        let prefix = prefix.switch();
+        writeln!(f, "{prefix}then")?;
+        {
+            let prefix = prefix.add_leaf();
+            self.then_block.ast_fmt(f, &prefix)?;
+        }
 
         Ok(())
     }
