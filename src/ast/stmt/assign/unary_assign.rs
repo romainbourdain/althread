@@ -1,14 +1,16 @@
-use std::fmt;
+use std::fmt::{self};
 
 use pest::iterators::Pair;
 
 use crate::{
     ast::{
+        display::AstDisplay,
         node::{Build, Node},
         token::{identifier::Identifier, unary_assign_op::UnaryAssignOp},
     },
     error::AlthreadResult,
     parser::Rule,
+    write_indent,
 };
 
 #[derive(Debug)]
@@ -31,11 +33,11 @@ impl Build for UnaryAssign {
     }
 }
 
-impl fmt::Display for UnaryAssign {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.identifier)?;
-        write!(f, " {} ", self.operator)?;
-
+impl AstDisplay for UnaryAssign {
+    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
+        write_indent!(f, indent_level, "unary_assign")?;
+        write_indent!(f, indent_level + 1, "ident: {}", self.identifier)?;
+        write_indent!(f, indent_level + 1, "op: {}", self.operator)?;
         Ok(())
     }
 }

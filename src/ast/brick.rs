@@ -5,8 +5,7 @@ use pest::iterators::Pair;
 use crate::{error::AlthreadResult, parser::Rule};
 
 use super::{
-    node::{Build, Node},
-    stmt::Stmt,
+    display::AstDisplay, node::{Build, Node}, stmt::Stmt
 };
 
 #[derive(Debug)]
@@ -35,10 +34,10 @@ impl Brick {
     }
 }
 
-impl fmt::Display for Brick {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        for stmt in &self.children {
-            writeln!(f, "{}", stmt)?;
+impl AstDisplay for Brick {
+    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
+        for node in &self.children {
+            node.ast_fmt(f, indent_level)?;
         }
 
         Ok(())

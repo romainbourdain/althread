@@ -1,9 +1,10 @@
 use std::fmt;
-use std::fmt::Formatter;
 
 use pest::iterators::Pair;
 
 use crate::{error::AlthreadResult, parser::Rule};
+
+use super::display::AstDisplay;
 
 #[derive(Debug, Clone)]
 pub struct Node<T> {
@@ -27,8 +28,14 @@ impl<T: Build> Node<T> {
     }
 }
 
+impl<T: AstDisplay> AstDisplay for Node<T> {
+    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
+        self.value.ast_fmt(f, indent_level)
+    }
+}
+
 impl<T: fmt::Display> fmt::Display for Node<T> {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.value)
     }
 }

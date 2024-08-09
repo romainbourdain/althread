@@ -4,12 +4,14 @@ use pest::iterators::Pair;
 
 use crate::{
     ast::{
+        display::AstDisplay,
         node::{Build, Node},
         token::{datatype::DataType, decl_keyword::DeclKeyword, identifier::Identifier},
     },
     error::AlthreadResult,
     no_rule,
     parser::Rule,
+    write_indent,
 };
 
 use super::expr::Expr;
@@ -52,15 +54,18 @@ impl Build for Decl {
     }
 }
 
-impl fmt::Display for Decl {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} ", self.keyword)?;
-        write!(f, "{} ", self.identifier)?;
+impl AstDisplay for Decl {
+    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
+        write_indent!(f, indent_level, "decl")?;
+        write_indent!(f, indent_level + 1, "keyword: {}", self.keyword)?;
+        write_indent!(f, indent_level + 1, "ident: {}", self.identifier)?;
+
         if let Some(datatype) = &self.datatype {
-            write!(f, ": {}", datatype)?;
+            write_indent!(f, indent_level + 1, "datatype: {}", datatype)?;
         }
+
         if let Some(value) = &self.value {
-            write!(f, " = {}", value)?;
+            value.ast_fmt(f, indent_level + 1)?;
         }
 
         Ok(())

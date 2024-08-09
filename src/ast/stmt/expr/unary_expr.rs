@@ -1,6 +1,9 @@
 use std::fmt;
 
-use crate::ast::{node::Node, token::unary_op::UnaryOp};
+use crate::{
+    ast::{display::AstDisplay, node::Node, token::unary_op::UnaryOp},
+    write_indent,
+};
 
 use super::Expr;
 
@@ -10,10 +13,12 @@ pub struct UnaryExpr {
     pub operand: Box<Node<Expr>>,
 }
 
-impl fmt::Display for UnaryExpr {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.operator)?;
-        write!(f, "{}", self.operand)?;
+impl AstDisplay for UnaryExpr {
+    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
+        write_indent!(f, indent_level, "unary_expr:")?;
+        write_indent!(f, indent_level + 1, "expr:")?;
+        self.operand.ast_fmt(f, indent_level + 1)?;
+        write_indent!(f, indent_level + 1, "op: {}", self.operator)?;
 
         Ok(())
     }

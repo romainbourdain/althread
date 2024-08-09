@@ -3,9 +3,13 @@ use std::fmt;
 use pest::iterators::Pair;
 
 use crate::{
-    ast::node::{Build, Node},
+    ast::{
+        display::AstDisplay,
+        node::{Build, Node},
+    },
     error::AlthreadResult,
     parser::Rule,
+    write_indent,
 };
 
 use super::{expr::Expr, scope::Scope};
@@ -30,8 +34,14 @@ impl Build for WhileStmt {
     }
 }
 
-impl fmt::Display for WhileStmt {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "while {} {}", self.condition, self.then_block)
+impl AstDisplay for WhileStmt {
+    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
+        write_indent!(f, indent_level, "if_stmt")?;
+        write_indent!(f, indent_level + 1, "condition:")?;
+        self.condition.ast_fmt(f, indent_level + 2)?;
+        write_indent!(f, indent_level + 1, "then_block:")?;
+        self.then_block.ast_fmt(f, indent_level + 2)?;
+
+        Ok(())
     }
 }

@@ -3,9 +3,13 @@ use std::fmt;
 use pest::iterators::Pair;
 
 use crate::{
-    ast::node::{Build, Node},
+    ast::{
+        display::AstDisplay,
+        node::{Build, Node},
+    },
     error::AlthreadResult,
     parser::Rule,
+    write_indent,
 };
 
 use super::expr::Expr;
@@ -25,8 +29,11 @@ impl Build for Print {
     }
 }
 
-impl fmt::Display for Print {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "print {}", self.value)
+impl AstDisplay for Print {
+    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
+        write_indent!(f, indent_level, "print")?;
+        self.value.ast_fmt(f, indent_level + 1)?;
+
+        Ok(())
     }
 }

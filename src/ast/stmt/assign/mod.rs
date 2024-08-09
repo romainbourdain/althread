@@ -1,17 +1,21 @@
 pub mod binary_assign;
 pub mod unary_assign;
 
-use std::fmt;
+use std::fmt::{self};
 
 use binary_assign::BinaryAssign;
 use pest::iterators::Pair;
 use unary_assign::UnaryAssign;
 
 use crate::{
-    ast::node::{Build, Node},
+    ast::{
+        display::AstDisplay,
+        node::{Build, Node},
+    },
     error::AlthreadResult,
     no_rule,
     parser::Rule,
+    write_indent,
 };
 
 #[derive(Debug)]
@@ -32,11 +36,11 @@ impl Build for Assign {
     }
 }
 
-impl fmt::Display for Assign {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match &self {
-            Assign::Unary(unary_assign) => write!(f, "{}", unary_assign),
-            Assign::Binary(binary_assign) => write!(f, "{}", binary_assign),
+impl AstDisplay for Assign {
+    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
+        match self {
+            Self::Unary(node) => node.ast_fmt(f, indent_level),
+            Self::Binary(node) => node.ast_fmt(f, indent_level),
         }
     }
 }

@@ -4,11 +4,13 @@ use pest::iterators::Pair;
 
 use crate::{
     ast::{
+        display::AstDisplay,
         node::{Build, Node},
         token::identifier::Identifier,
     },
     error::AlthreadResult,
     parser::Rule,
+    write_indent,
 };
 
 #[derive(Debug)]
@@ -26,8 +28,10 @@ impl Build for RunStmt {
     }
 }
 
-impl fmt::Display for RunStmt {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "run {}", self.identifier)
+impl AstDisplay for RunStmt {
+    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
+        write_indent!(f, indent_level, "run: {}", self.identifier)?;
+
+        Ok(())
     }
 }

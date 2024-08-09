@@ -21,7 +21,10 @@ use while_stmt::WhileStmt;
 
 use crate::{error::AlthreadResult, no_rule, parser::Rule};
 
-use super::node::{Build, Node};
+use super::{
+    display::AstDisplay,
+    node::{Build, Node},
+};
 
 #[derive(Debug)]
 pub enum Stmt {
@@ -51,17 +54,26 @@ impl Build for Stmt {
     }
 }
 
-impl fmt::Display for Stmt {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match &self {
-            Stmt::Assign(assign) => write!(f, "{}", assign),
-            Stmt::Decl(decl) => write!(f, "{}", decl),
-            Stmt::Expr(expr) => write!(f, "{}", expr),
-            Stmt::Print(print) => write!(f, "{}", print),
-            Stmt::Run(run) => write!(f, "{}", run),
-            Stmt::If(if_stmt) => write!(f, "{}", if_stmt),
-            Stmt::While(while_stmt) => write!(f, "{}", while_stmt),
-            Stmt::Scope(scope) => write!(f, "{}", scope),
+impl Stmt {
+    pub fn is_atomic(&self) -> bool {
+        match self {
+            Self::Assign(_) | Self::Decl(_) | Self::Expr(_) | Self::Print(_) | Self::Run(_) => true,
+            _ => false,
+        }
+    }
+}
+
+impl AstDisplay for Stmt {
+    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
+        match self {
+            Stmt::Assign(node) => node.ast_fmt(f, indent_level),
+            Stmt::Decl(node) => node.ast_fmt(f, indent_level),
+            Stmt::Expr(node) => node.ast_fmt(f, indent_level),
+            Stmt::Print(node) => node.ast_fmt(f, indent_level),
+            Stmt::Run(node) => node.ast_fmt(f, indent_level),
+            Stmt::If(node) => node.ast_fmt(f, indent_level),
+            Stmt::While(node) => node.ast_fmt(f, indent_level),
+            Stmt::Scope(node) => node.ast_fmt(f, indent_level),
         }
     }
 }

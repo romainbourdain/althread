@@ -10,9 +10,16 @@ main {
    let c = 8;
    {
       let d = 8;
+      {
+         let e  = 9;
+      }
    }
 
    if (c < 8) {
       run A();
+
+      if (b == 9) {
+         print(a);
+      }
    }
 }

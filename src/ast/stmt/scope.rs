@@ -4,6 +4,7 @@ use pest::iterators::Pair;
 
 use crate::{
     ast::{
+        display::AstDisplay,
         node::{Build, Node},
         stmt::Stmt,
     },
@@ -27,10 +28,10 @@ impl Build for Scope {
     }
 }
 
-impl fmt::Display for Scope {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        for stmt in &self.children {
-            writeln!(f, "{}", stmt)?;
+impl AstDisplay for Scope {
+    fn ast_fmt(&self, f: &mut fmt::Formatter, indent_level: usize) -> fmt::Result {
+        for child in &self.children {
+            child.ast_fmt(f, indent_level)?;
         }
 
         Ok(())

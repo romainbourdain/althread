@@ -1,17 +1,20 @@
 pub mod brick;
+pub mod display;
 pub mod node;
 pub mod stmt;
 pub mod token;
 
-use std::fmt;
-
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    fmt::{self, Formatter},
+};
 
 use brick::Brick;
+use display::AstDisplay;
 use node::Node;
 use pest::iterators::Pairs;
 
-use crate::{error::AlthreadResult, no_rule, parser::Rule};
+use crate::{error::AlthreadResult, no_rule, parser::Rule, write_indent};
 
 #[derive(Debug)]
 pub struct Ast {
@@ -70,16 +73,22 @@ impl Ast {
 }
 
 impl fmt::Display for Ast {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if let Some(global_brick) = &self.global_brick {
-            writeln!(f, "shared: {}", global_brick)?;
-        }
-        for (process_name, process_brick) in &self.process_bricks {
-            writeln!(f, "{}: {}", process_name, process_brick)?;
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        self.ast_fmt(f, 0)
+    }
+}
+
+impl AstDisplay for Ast {
+    fn ast_fmt(&self, f: &mut Formatter, indent_level: usize) -> fmt::Result {
+        writeln!(f, "ast")?;
+        if let Some(global_node) = &self.global_brick {
+            write_indent!(f, indent_level, "shared")?;
+            global_node.ast_fmt(f, indent_level + 1)?;
         }
 
-        for (condition_name, condition_brick) in &self.condition_bricks {
-            writeln!(f, "{}: {}", condition_name, condition_brick)?;
+        for (process_name, process_node) in &self.process_bricks {
+            write_indent!(f, indent_level, "{}", process_name)?;
+            process_node.ast_fmt(f, indent_level + 1)?;
         }
 
         Ok(())
