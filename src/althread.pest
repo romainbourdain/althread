@@ -70,10 +70,11 @@ term_op = { "+" | "-" }
 factor    = { unary ~ (factor_op ~ unary)* }
 factor_op = { "*" | "/" | "%" }
 
-unary    = { unary_op? ~ primary }
+unary    = { unary_op? ~ atomic }
 unary_op = { "+" | "-" | "!" }
 
-primary = { BOOLEAN | FLOAT | INTEGER | STRING | NULL | IDENTIFIER | "(" ~ expr ~ ")" }
+atomic  = _{ primary | "(" ~ expr ~ ")" }
+primary =  { BOOLEAN | FLOAT | INTEGER | STRING | NULL | IDENTIFIER }
 
 /// # Calls
 run_stmt   = { "run" ~ IDENTIFIER ~ "(" ~ ")" ~ ";" }

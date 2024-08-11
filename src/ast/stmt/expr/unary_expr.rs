@@ -1,9 +1,14 @@
 use std::fmt;
 
-use crate::ast::{
-    display::{AstDisplay, Prefix},
-    node::Node,
-    token::unary_op::UnaryOp,
+use pest::iterators::Pair;
+
+use crate::{
+    ast::{
+        display::{AstDisplay, Prefix},
+        node::{Build, Node},
+        token::unary_op::UnaryOp,
+    },
+    parser::Rule,
 };
 
 use super::Expr;
@@ -12,6 +17,20 @@ use super::Expr;
 pub struct UnaryExpr {
     pub operator: Node<UnaryOp>,
     pub operand: Box<Node<Expr>>,
+}
+
+impl Build for UnaryExpr {
+    fn build(pair: Pair<Rule>) -> crate::error::AlthreadResult<Self> {
+        let mut pairs = pair.into_inner();
+
+        let operator = Node::build(pairs.next().unwrap())?;
+        let operand = Node::build(pairs.next().unwrap())?;
+
+        Ok(Self {
+            operator,
+            operand: Box::new(operand),
+        })
+    }
 }
 
 impl AstDisplay for UnaryExpr {
