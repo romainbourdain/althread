@@ -54,7 +54,7 @@ declaration_keyword = { LET_KW | CONST_KW }
 /// Expressions evaluate values based on arithmetic and logical operations, following standard precedence rules.
 expression = { binary_expression | unary_expression | primary_expression }
 
-primary_expression = _{ BOOL | FLOAT | INT | STR | NULL | IDENT | "(" ~ expression ~ ")" }
+primary_expression = _{ BOOL | FLOAT | INT | STR | NULL | identifier | "(" ~ expression ~ ")" }
 
 unary_expression = _{ unary_operator? ~ primary_expression }
 unary_operator   =  { POS_OP | NEG_OP | NOT_OP }

@@ -39,12 +39,13 @@ impl AstDisplay for BinaryAssignment {
         writeln!(f, "{}binary_assign", prefix)?;
 
         let prefix = prefix.add_branch();
-        writeln!(f, "{}ident: {}", prefix, self.identifier)?;
-        writeln!(f, "{}op: {}", prefix, self.operator)?;
+        writeln!(f, "{}ident: {}", &prefix, self.identifier)?;
+        writeln!(f, "{}op: {}", &prefix, self.operator)?;
 
-        let prefix = &prefix.switch();
-        writeln!(f, "{}value: {}", prefix, self.operator)?;
-        self.value.ast_fmt(f, prefix)?;
+        let prefix = prefix.switch();
+        writeln!(f, "{}value:", &prefix)?;
+        let prefix = prefix.add_leaf();
+        self.value.ast_fmt(f, &prefix)?;
         Ok(())
     }
 }

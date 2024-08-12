@@ -36,7 +36,7 @@ impl AstNode for IfControl {
 
 impl AstDisplay for IfControl {
     fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
-        writeln!(f, "{prefix}if_stmt")?;
+        writeln!(f, "{prefix}if_control")?;
 
         let prefix = prefix.add_branch();
         writeln!(f, "{prefix}condition")?;

@@ -33,7 +33,7 @@ impl AstNode for WhileControl {
 
 impl AstDisplay for WhileControl {
     fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
-        writeln!(f, "{prefix}if_stmt")?;
+        writeln!(f, "{prefix}while_control")?;
 
         let prefix = prefix.add_branch();
         writeln!(f, "{prefix}condition")?;

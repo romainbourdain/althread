@@ -25,7 +25,7 @@ pub enum PrimaryExpression {
     Int(i64),
     Float(f64),
     String(String),
-    Identifier(Identifier),
+    Identifier(Node<Identifier>),
     Expr(Box<Node<Expression>>),
 }
 
@@ -52,7 +52,7 @@ impl PrimaryExpression {
                 Rule::INT => Self::Int(parse_with_error::<i64>(pair)?),
                 Rule::FLOAT => Self::Float(parse_with_error::<f64>(pair)?),
                 Rule::STR => Self::String(pair.as_str().to_string()),
-                Rule::IDENT => Self::Identifier(Identifier::build(pair.into_inner())?),
+                Rule::identifier => Self::Identifier(Node::build(pair)?),
                 Rule::expression => Self::Expr(Box::new(Node::build(pair)?)),
                 _ => return Err(no_rule!(pair)),
             },
