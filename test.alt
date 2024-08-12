@@ -1,8 +1,17 @@
+shared {
+   let a = 6;
+}
+
+always {
+   c==7;
+   a > 4;
+}
+
+process A() {
+   let b= 8;
+}
+
 
 main {
-  if (a==7) {
-   print(a);
-  } else {
-   run A();
-  }
+  c  = 8;
 }

@@ -86,9 +86,16 @@ impl AstDisplay for Ast {
 
         writeln!(f, "")?;
 
+        for (condition_name, condition_node) in &self.condition_blocks {
+            writeln!(f, "{}{}", prefix, condition_name)?;
+            condition_node.ast_fmt(f, &prefix.add_branch())?;
+            writeln!(f, "")?;
+        }
+
         for (process_name, process_node) in &self.process_blocks {
             writeln!(f, "{}{}", prefix, process_name)?;
             process_node.ast_fmt(f, &prefix.add_branch())?;
+            writeln!(f, "")?;
         }
 
         Ok(())

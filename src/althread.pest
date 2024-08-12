@@ -11,8 +11,8 @@ program = _{ SOI ~ blocks* ~ EOI }
 /// - **Process Block**: Encapsulates code that runs concurrently in parallel processes.
 blocks = _{ main_block | global_block | condition_block | process_block }
 
-global_block    = { GLOBAL_KW ~ "{" ~ declaration_statements ~ "}" }
-condition_block = { condition_keywords ~ "{" ~ expression_statements ~ "}" }
+global_block    = { GLOBAL_KW ~ "{" ~ statements ~ "}" }
+condition_block = { condition_keywords ~ "{" ~ statements ~ "}" }
 process_block   = { PROCESS_KW ~ identifier ~ "(" ~ ")" ~ "{" ~ statements ~ "}" }
 main_block      = { MAIN_KW ~ "{" ~ statements ~ "}" }
 
@@ -22,16 +22,14 @@ condition_keywords = { ALWAYS_KW | NEVER_KW | EVENTUALLY_KW }
 /// Statements are the executable instructions in the language.
 /// They include assignments, declarations, expressions, print statements,
 /// function calls, and control flow structures.
+statements = { statement* }
+
 statement             =  { assignment_statement | declaration_statement | expression_statement | print_statement | run_statement | if_control | while_control | scope }
 assignment_statement  = _{ assignment ~ ";" }
 declaration_statement = _{ declaration ~ ";" }
 expression_statement  = _{ expression ~ ";" }
 run_statement         = _{ run_call ~ ";" }
 print_statement       = _{ print_call ~ ";" }
-
-statements             = { statement* }
-expression_statements  = { expression_statement* }
-declaration_statements = { declaration_statement* }
 
 /// ### Assignments
 /// Assignments assign values to variables.
