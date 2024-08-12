@@ -25,19 +25,19 @@ impl Build for BinaryOp {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let pair = pairs.next().unwrap();
         match pair.as_rule() {
-            Rule::add_op => Ok(Self::Add),
-            Rule::sub_op => Ok(Self::Sub),
-            Rule::mul_op => Ok(Self::Mul),
-            Rule::div_op => Ok(Self::Div),
-            Rule::mod_op => Ok(Self::Mod),
-            Rule::eq_op => Ok(Self::Eq),
-            Rule::ne_op => Ok(Self::Ne),
-            Rule::lt_op => Ok(Self::Lt),
-            Rule::le_op => Ok(Self::Le),
-            Rule::gt_op => Ok(Self::Gt),
-            Rule::ge_op => Ok(Self::Ge),
-            Rule::and_op => Ok(Self::And),
-            Rule::or_op => Ok(Self::Or),
+            Rule::ADD_OP => Ok(Self::Add),
+            Rule::SUB_OP => Ok(Self::Sub),
+            Rule::MUL_OP => Ok(Self::Mul),
+            Rule::DIV_OP => Ok(Self::Div),
+            Rule::MOD_OP => Ok(Self::Mod),
+            Rule::EQ_OP => Ok(Self::Eq),
+            Rule::NE_OP => Ok(Self::Ne),
+            Rule::LT_OP => Ok(Self::Lt),
+            Rule::LE_OP => Ok(Self::Le),
+            Rule::GT_OP => Ok(Self::Gt),
+            Rule::GE_OP => Ok(Self::Ge),
+            Rule::AND_OP => Ok(Self::And),
+            Rule::OR_OP => Ok(Self::Or),
             _ => Err(no_rule!(pair)),
         }
     }

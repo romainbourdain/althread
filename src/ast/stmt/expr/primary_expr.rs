@@ -48,12 +48,12 @@ impl PrimaryExpr {
             column: pair.line_col().1,
             value: match pair.as_rule() {
                 Rule::NULL => Self::Null(),
-                Rule::BOOLEAN => Self::Bool(parse_with_error::<bool>(pair)?),
-                Rule::INTEGER => Self::Int(parse_with_error::<i64>(pair)?),
+                Rule::BOOL => Self::Bool(parse_with_error::<bool>(pair)?),
+                Rule::INT => Self::Int(parse_with_error::<i64>(pair)?),
                 Rule::FLOAT => Self::Float(parse_with_error::<f64>(pair)?),
-                Rule::STRING => Self::String(pair.as_str().to_string()),
-                Rule::IDENTIFIER => Self::Identifier(Identifier::build(pair.into_inner())?),
-                Rule::expr => Self::Expr(Box::new(Node::build(pair)?)),
+                Rule::STR => Self::String(pair.as_str().to_string()),
+                Rule::IDENT => Self::Identifier(Identifier::build(pair.into_inner())?),
+                Rule::expression => Self::Expr(Box::new(Node::build(pair)?)),
                 _ => return Err(no_rule!(pair)),
             },
         })

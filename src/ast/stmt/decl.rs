@@ -32,10 +32,10 @@ impl Build for Decl {
 
         for pair in pairs {
             match pair.as_rule() {
-                Rule::DATATYPE => {
+                Rule::datatype => {
                     datatype = Some(Node::build(pair)?);
                 }
-                Rule::expr => {
+                Rule::expression => {
                     value = Some(Node::build(pair)?);
                 }
                 _ => return Err(no_rule!(pair)),

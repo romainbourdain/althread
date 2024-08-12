@@ -15,9 +15,9 @@ impl Build for UnaryOp {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let pair = pairs.next().unwrap();
         match pair.as_rule() {
-            Rule::pos_op => Ok(Self::Pos),
-            Rule::neg_op => Ok(Self::Neg),
-            Rule::not_op => Ok(Self::Not),
+            Rule::POS_OP => Ok(Self::Pos),
+            Rule::NEG_OP => Ok(Self::Neg),
+            Rule::NOT_OP => Ok(Self::Not),
             _ => Err(no_rule!(pair)),
         }
     }

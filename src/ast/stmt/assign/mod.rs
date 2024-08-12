@@ -28,8 +28,8 @@ impl Build for Assign {
         let pair = pairs.next().unwrap();
 
         match pair.as_rule() {
-            Rule::assign_unary => Ok(Self::Unary(Node::build(pair)?)),
-            Rule::assign_binary => Ok(Self::Binary(Node::build(pair)?)),
+            Rule::unary_assignment => Ok(Self::Unary(Node::build(pair)?)),
+            Rule::binary_assignment => Ok(Self::Binary(Node::build(pair)?)),
             _ => Err(no_rule!(pair)),
         }
     }

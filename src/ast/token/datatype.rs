@@ -110,11 +110,11 @@ impl Build for DataType {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let pair = pairs.next().unwrap();
         match pair.as_rule() {
-            Rule::BOOL_DATATYPE => Ok(Self::Bool),
-            Rule::INT_DATATYPE => Ok(Self::Int),
-            Rule::FLOAT_DATATYPE => Ok(Self::Float),
-            Rule::STRING_DATATYPE => Ok(Self::String),
-            Rule::VOID_DATATYPE => Ok(Self::Void),
+            Rule::BOOL_TYPE => Ok(Self::Bool),
+            Rule::INT_TYPE => Ok(Self::Int),
+            Rule::FLOAT_TYPE => Ok(Self::Float),
+            Rule::STR_TYPE => Ok(Self::String),
+            Rule::VOID_TYPE => Ok(Self::Void),
             _ => Err(no_rule!(pair)),
         }
     }

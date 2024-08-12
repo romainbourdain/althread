@@ -11,11 +11,11 @@ use super::{
 };
 
 #[derive(Debug)]
-pub struct Brick {
+pub struct Block {
     pub children: Vec<Node<Stmt>>,
 }
 
-impl Build for Brick {
+impl Build for Block {
     fn build(pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let mut brick = Self::new();
 
@@ -28,7 +28,7 @@ impl Build for Brick {
     }
 }
 
-impl Brick {
+impl Block {
     pub fn new() -> Self {
         Self {
             children: Vec::new(),
@@ -36,7 +36,7 @@ impl Brick {
     }
 }
 
-impl AstDisplay for Brick {
+impl AstDisplay for Block {
     fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
         let mut node_count = self.children.len();
         for node in &self.children {

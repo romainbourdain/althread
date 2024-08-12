@@ -23,13 +23,13 @@ lazy_static::lazy_static! {
         use pest::pratt_parser::{Assoc::*, Op};
 
         PrattParser::new()
-            .op(Op::infix(Rule::or_priority, Left))
-            .op(Op::infix(Rule::and_priority, Left))
-            .op(Op::infix(Rule::eq_priority, Left))
-            .op(Op::infix(Rule::comp_priority, Left))
-            .op(Op::infix(Rule::term_priority, Left))
-            .op(Op::infix(Rule::factor_priority, Left))
-            .op(Op::prefix(Rule::unary_op))
+            .op(Op::infix(Rule::or_operator, Left))
+            .op(Op::infix(Rule::and_operator, Left))
+            .op(Op::infix(Rule::equality_operator, Left))
+            .op(Op::infix(Rule::comparison_operator, Left))
+            .op(Op::infix(Rule::term_operator, Left))
+            .op(Op::infix(Rule::factor_operator, Left))
+            .op(Op::prefix(Rule::unary_operator))
     };
 }
 

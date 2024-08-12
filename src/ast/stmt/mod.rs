@@ -44,12 +44,12 @@ impl Build for Stmt {
 
         match pair.as_rule() {
             Rule::assignment => Ok(Self::Assign(Node::build(pair)?)),
-            Rule::decl => Ok(Self::Decl(Node::build(pair)?)),
-            Rule::expr => Ok(Self::Expr(Node::build(pair)?)),
-            Rule::print_stmt => Ok(Self::Print(Node::build(pair)?)),
-            Rule::run_stmt => Ok(Self::Run(Node::build(pair)?)),
-            Rule::if_stmt => Ok(Self::If(Node::build(pair)?)),
-            Rule::while_stmt => Ok(Self::While(Node::build(pair)?)),
+            Rule::declaration => Ok(Self::Decl(Node::build(pair)?)),
+            Rule::expression => Ok(Self::Expr(Node::build(pair)?)),
+            Rule::print_call => Ok(Self::Print(Node::build(pair)?)),
+            Rule::run_call => Ok(Self::Run(Node::build(pair)?)),
+            Rule::if_control => Ok(Self::If(Node::build(pair)?)),
+            Rule::while_control => Ok(Self::While(Node::build(pair)?)),
             Rule::scope => Ok(Self::Scope(Node::build(pair)?)),
             _ => Err(no_rule!(pair)),
         }

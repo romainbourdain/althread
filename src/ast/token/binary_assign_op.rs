@@ -18,12 +18,12 @@ impl Build for BinaryAssignOp {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let pair = pairs.next().unwrap();
         match pair.as_rule() {
-            Rule::assign_op => Ok(Self::Assign),
-            Rule::assign_add_op => Ok(Self::AddAssign),
-            Rule::assign_sub_op => Ok(Self::SubAssign),
-            Rule::assign_mul_op => Ok(Self::MulAssign),
-            Rule::assign_div_op => Ok(Self::DivAssign),
-            Rule::assign_mod_op => Ok(Self::ModAssign),
+            Rule::ASSIGN_OP => Ok(Self::Assign),
+            Rule::ADD_ASSIGN_OP => Ok(Self::AddAssign),
+            Rule::SUB_ASSIGN_OP => Ok(Self::SubAssign),
+            Rule::MUL_ASSIGN_OP => Ok(Self::MulAssign),
+            Rule::DIV_ASSIGN_OP => Ok(Self::DivAssign),
+            Rule::MOD_ASSIGN_OP => Ok(Self::ModAssign),
             _ => Err(no_rule!(pair)),
         }
     }

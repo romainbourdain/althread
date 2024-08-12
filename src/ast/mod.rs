@@ -9,7 +9,7 @@ use std::{
     fmt::{self, Formatter},
 };
 
-use brick::Brick;
+use brick::Block;
 use display::{AstDisplay, Prefix};
 use node::Node;
 use pest::iterators::Pairs;
@@ -18,9 +18,9 @@ use crate::{error::AlthreadResult, no_rule, parser::Rule};
 
 #[derive(Debug)]
 pub struct Ast {
-    pub process_bricks: HashMap<String, Node<Brick>>,
-    pub condition_bricks: HashMap<String, Node<Brick>>,
-    pub global_brick: Option<Node<Brick>>,
+    pub process_bricks: HashMap<String, Node<Block>>,
+    pub condition_bricks: HashMap<String, Node<Block>>,
+    pub global_brick: Option<Node<Block>>,
 }
 
 impl Ast {
@@ -36,26 +36,26 @@ impl Ast {
         let mut ast = Self::new();
         for pair in pairs {
             match pair.as_rule() {
-                Rule::main_brick => {
+                Rule::main_block => {
                     let mut pairs = pair.into_inner();
 
                     let main_brick = Node::build(pairs.next().unwrap())?;
                     ast.process_bricks.insert("main".to_string(), main_brick);
                 }
-                Rule::global_brick => {
+                Rule::global_block => {
                     let mut pairs = pair.into_inner();
 
                     let global_brick = Node::build(pairs.next().unwrap())?;
                     ast.global_brick = Some(global_brick);
                 }
-                Rule::cond_brick => {
+                Rule::condition_block => {
                     let mut pairs = pair.into_inner();
 
                     let cond_brick_key = pairs.next().unwrap().as_str().to_string();
                     let cond_brick = Node::build(pairs.next().unwrap())?;
                     ast.condition_bricks.insert(cond_brick_key, cond_brick);
                 }
-                Rule::process_brick => {
+                Rule::process_block => {
                     let mut pairs = pair.into_inner();
 
                     let process_brick_ident = pairs.next().unwrap().as_str().to_string();

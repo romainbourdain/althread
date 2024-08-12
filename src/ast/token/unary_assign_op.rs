@@ -14,8 +14,8 @@ impl Build for UnaryAssignOp {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let pair = pairs.next().unwrap();
         match pair.as_rule() {
-            Rule::inc_op => Ok(Self::Increment),
-            Rule::dec_op => Ok(Self::Decrement),
+            Rule::INC_OP => Ok(Self::Increment),
+            Rule::DEC_OP => Ok(Self::Decrement),
             _ => Err(no_rule!(pair)),
         }
     }

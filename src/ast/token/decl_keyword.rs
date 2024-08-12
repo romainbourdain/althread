@@ -14,8 +14,8 @@ impl Build for DeclKeyword {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let pair = pairs.next().unwrap();
         match pair.as_rule() {
-            Rule::let_keyword => Ok(Self::Let),
-            Rule::const_keyword => Ok(Self::Const),
+            Rule::LET_KW => Ok(Self::Let),
+            Rule::CONST_KW => Ok(Self::Const),
             _ => Err(no_rule!(pair)),
         }
     }

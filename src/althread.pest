@@ -11,7 +11,7 @@ program = _{ SOI ~ blocks* ~ EOI }
 /// - **Process Brick**: Encapsulates code that runs concurrently in parallel processes.
 blocks = _{ main_block | global_block | condition_block | process_block }
 
-global_block    = { SHARED_KW ~ "{" ~ declaration_statements ~ "}" }
+global_block    = { GLOBAL_KW ~ "{" ~ declaration_statements ~ "}" }
 condition_block = { condition_keywords ~ "{" ~ expression_statements ~ "}" }
 process_block   = { PROCESS_KW ~ identifier ~ "(" ~ ")" ~ "{" ~ statements ~ "}" }
 main_block      = { MAIN_KW ~ "{" ~ statements ~ "}" }
@@ -43,7 +43,7 @@ unary_assignment          = { identifier ~ unary_assignment_operator }
 unary_assignment_operator = { INC_OP | DEC_OP }
 
 binary_assignment          = { identifier ~ binary_assignment_operator ~ expression }
-binary_assignment_operator = { ASSING_OP | ADD_ASSIGN_OP | SUB_ASSIGN_OP | MUL_ASSIGN_OP | DIV_ASSIGN_OP | MOD_ASSIGN_OP }
+binary_assignment_operator = { ASSIGN_OP | ADD_ASSIGN_OP | SUB_ASSIGN_OP | MUL_ASSIGN_OP | DIV_ASSIGN_OP | MOD_ASSIGN_OP }
 
 /// ### Declarations
 /// Declarations introduce new variables, which can be mutable (let) or immutable (const).
@@ -54,7 +54,7 @@ declaration_keyword = { LET_KW | CONST_KW }
 /// Expressions evaluate values based on arithmetic and logical operations, following standard precedence rules.
 expression = { binary_expression | unary_expression | primary_expression }
 
-primary_expression = _{ BOOLEAN | FLOAT | INTEGER | STRING | NULL | IDENTIFIER | "(" ~ expression ~ ")" }
+primary_expression = _{ BOOL | FLOAT | INT | STR | NULL | IDENT | "(" ~ expression ~ ")" }
 
 unary_expression = _{ unary_operator? ~ primary_expression }
 unary_operator   =  { POS_OP | NEG_OP | NOT_OP }
@@ -84,10 +84,10 @@ while_control = { WHILE_KW ~ "(" ~ expression ~ ")" ~ scope }
 
 /// ### Keywords
 /// Keywords define the core constructs of the language.
-KEYWORDS = _{ MAIN_KW | SHARED_KW | PROCESS_KW | ALWAYS_KW | NEVER_KW | EVENTUALLY_KW | LET_KW | CONST_KW | IF_KW | ELSE_KW | WHILE_KW | RUN_KW | PRINT_KW | BOOLEAN | INT_DT | FLOAT_DT | STRING_DT | VOID_DT }
+KEYWORDS = _{ MAIN_KW | GLOBAL_KW | PROCESS_KW | ALWAYS_KW | NEVER_KW | EVENTUALLY_KW | LET_KW | CONST_KW | IF_KW | ELSE_KW | WHILE_KW | RUN_KW | PRINT_KW | BOOL | INT_TYPE | FLOAT_TYPE | STR_TYPE | VOID_TYPE }
 
 MAIN_KW       = _{ "main" }
-SHARED_KW     = _{ "shared" }
+GLOBAL_KW     = _{ "shared" }
 PROCESS_KW    = _{ "process" }
 ALWAYS_KW     =  { "always" }
 NEVER_KW      =  { "never" }
@@ -128,7 +128,7 @@ GE_OP  = { ">=" }
 AND_OP = { "&&" }
 OR_OP  = { "||" }
 
-ASSING_OP     = { "=" }
+ASSIGN_OP     = { "=" }
 ADD_ASSIGN_OP = { "+=" }
 SUB_ASSIGN_OP = { "-=" }
 MUL_ASSIGN_OP = { "*=" }
@@ -140,27 +140,28 @@ DEC_OP = { "--" }
 
 /// ### Datatypes
 /// Datatypes supported in Althread include boolean, integer, float, string, and void.
-datatype  = { BOOL_DT | INT_DT | FLOAT_DT | STRING_DT | VOID_DT }
-BOOL_DT   = { "bool" }
-INT_DT    = { "int" }
-FLOAT_DT  = { "float" }
-STRING_DT = { "string" }
-VOID_DT   = { "void" }
+datatype   = { BOOL_TYPE | INT_TYPE | FLOAT_TYPE | STR_TYPE | VOID_TYPE }
+BOOL_TYPE  = { "bool" }
+INT_TYPE   = { "int" }
+FLOAT_TYPE = { "float" }
+STR_TYPE   = { "string" }
+VOID_TYPE  = { "void" }
 
 /// ### Values
 /// Values include literals such as booleans, integers, floats, strings, and null.
-BOOLEAN = @{ TRUE_KW | FALSE_KW }
-INTEGER = @{ ASCII_DIGIT+ }
-FLOAT   = @{ ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT* }
-STRING  = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
-NULL    = @{ NULL_KW }
+BOOL  = @{ TRUE_KW | FALSE_KW }
+INT   = @{ ASCII_DIGIT+ }
+FLOAT = @{ ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT* }
+STR   = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
+NULL  = @{ NULL_KW }
 
 /// ### Identifiers
 /// Identifiers are used for naming variables, functions, and other constructs.
-identifier        =  { IDENTIFIER }
-IDENTIFIER        = @{ !reserved_keywords ~ ASCII_ALPHA ~ IDENTIFIER_CHAR* }
-IDENTIFIER_CHAR   = _{ ASCII_ALPHANUMERIC | "_" }
-reserved_keywords =  { (KEYWORDS | datatype) ~ !IDENTIFIER_CHAR }
+identifier        = { IDENT }
+reserved_keywords = { (KEYWORDS | datatype) ~ !IDENT_CHAR }
+
+IDENT      = @{ !reserved_keywords ~ ASCII_ALPHA ~ IDENT_CHAR* }
+IDENT_CHAR = _{ ASCII_ALPHANUMERIC | "_" }
 
 /// ## Whitespace and Comments
 /// Whitespace and comments are ignored by the parser.
