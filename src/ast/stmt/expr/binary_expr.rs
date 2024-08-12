@@ -5,7 +5,7 @@ use pest::iterators::Pair;
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{Build, Node},
+        node::Node,
         token::binary_op::BinaryOp,
     },
     error::AlthreadResult,
@@ -21,18 +21,20 @@ pub struct BinaryExpr {
     pub right: Box<Node<Expr>>,
 }
 
-impl Build for BinaryExpr {
-    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        let mut pairs = pair.into_inner();
-
-        let left = Node::build(pairs.next().unwrap())?;
-        let operator = Node::build(pairs.next().unwrap())?;
-        let right = Node::build(pairs.next().unwrap())?;
-
-        Ok(Self {
-            left: Box::new(left),
-            operator,
-            right: Box::new(right),
+impl BinaryExpr {
+    pub fn build(
+        left: Node<Expr>,
+        operator: Pair<Rule>,
+        right: Node<Expr>,
+    ) -> AlthreadResult<Node<Self>> {
+        Ok(Node {
+            line: operator.line_col().0,
+            column: operator.line_col().1,
+            value: Self {
+                left: Box::new(left),
+                operator: Node::build(operator)?,
+                right: Box::new(right),
+            },
         })
     }
 }

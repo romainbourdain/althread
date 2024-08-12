@@ -1,6 +1,6 @@
 use std::fmt;
 
-use pest::iterators::Pair;
+use pest::iterators::Pairs;
 
 use crate::{
     ast::{
@@ -19,9 +19,7 @@ pub struct Print {
 }
 
 impl Build for Print {
-    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        let mut pairs = pair.into_inner();
-
+    fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let value = Node::build(pairs.next().unwrap())?;
 
         Ok(Self { value })

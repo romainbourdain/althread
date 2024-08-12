@@ -1,14 +1,14 @@
-use crate::ast::token::{datatype::DataType, literals::Literal};
+use crate::ast::{stmt::expr::primary_expr::PrimaryExpr, token::datatype::DataType};
 
 #[derive(Debug)]
 pub struct Symbol {
     pub mutable: bool,
     pub datatype: DataType,
-    pub value: Literal,
+    pub value: PrimaryExpr,
 }
 
 impl Symbol {
-    pub fn new(mutable: bool, datatype: DataType, value: Literal) -> Self {
+    pub fn new(mutable: bool, datatype: DataType, value: PrimaryExpr) -> Self {
         Self {
             mutable,
             datatype,

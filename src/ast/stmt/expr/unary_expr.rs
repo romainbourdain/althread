@@ -5,9 +5,10 @@ use pest::iterators::Pair;
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{Build, Node},
+        node::Node,
         token::unary_op::UnaryOp,
     },
+    error::AlthreadResult,
     parser::Rule,
 };
 
@@ -19,16 +20,15 @@ pub struct UnaryExpr {
     pub operand: Box<Node<Expr>>,
 }
 
-impl Build for UnaryExpr {
-    fn build(pair: Pair<Rule>) -> crate::error::AlthreadResult<Self> {
-        let mut pairs = pair.into_inner();
-
-        let operator = Node::build(pairs.next().unwrap())?;
-        let operand = Node::build(pairs.next().unwrap())?;
-
-        Ok(Self {
-            operator,
-            operand: Box::new(operand),
+impl UnaryExpr {
+    pub fn build(operator: Pair<Rule>, operand: Node<Expr>) -> AlthreadResult<Node<Self>> {
+        Ok(Node {
+            line: operator.line_col().0,
+            column: operator.line_col().1,
+            value: Self {
+                operator: Node::build(operator)?,
+                operand: Box::new(operand),
+            },
         })
     }
 }

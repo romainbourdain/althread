@@ -4,7 +4,7 @@ pub mod unary_assign;
 use std::fmt::{self};
 
 use binary_assign::BinaryAssign;
-use pest::iterators::Pair;
+use pest::iterators::Pairs;
 use unary_assign::UnaryAssign;
 
 use crate::{
@@ -24,8 +24,8 @@ pub enum Assign {
 }
 
 impl Build for Assign {
-    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        let pair = pair.into_inner().next().unwrap();
+    fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
+        let pair = pairs.next().unwrap();
 
         match pair.as_rule() {
             Rule::assign_unary => Ok(Self::Unary(Node::build(pair)?)),

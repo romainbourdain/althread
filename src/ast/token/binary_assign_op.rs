@@ -1,6 +1,6 @@
 use std::fmt;
 
-use pest::iterators::Pair;
+use pest::iterators::Pairs;
 
 use crate::{ast::node::Build, error::AlthreadResult, no_rule, parser::Rule};
 
@@ -15,14 +15,15 @@ pub enum BinaryAssignOp {
 }
 
 impl Build for BinaryAssignOp {
-    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        match pair.as_str() {
-            "=" => Ok(Self::Assign),
-            "+=" => Ok(Self::AddAssign),
-            "-=" => Ok(Self::SubAssign),
-            "*=" => Ok(Self::MulAssign),
-            "/=" => Ok(Self::DivAssign),
-            "%=" => Ok(Self::ModAssign),
+    fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
+        let pair = pairs.next().unwrap();
+        match pair.as_rule() {
+            Rule::assign_op => Ok(Self::Assign),
+            Rule::assign_add_op => Ok(Self::AddAssign),
+            Rule::assign_sub_op => Ok(Self::SubAssign),
+            Rule::assign_mul_op => Ok(Self::MulAssign),
+            Rule::assign_div_op => Ok(Self::DivAssign),
+            Rule::assign_mod_op => Ok(Self::ModAssign),
             _ => Err(no_rule!(pair)),
         }
     }

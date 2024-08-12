@@ -1,6 +1,6 @@
 use std::fmt;
 
-use pest::iterators::Pair;
+use pest::iterators::Pairs;
 
 use crate::{
     ast::{
@@ -18,9 +18,8 @@ pub struct Scope {
 }
 
 impl Build for Scope {
-    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        let children = pair
-            .into_inner()
+    fn build(pairs: Pairs<Rule>) -> AlthreadResult<Self> {
+        let children = pairs
             .map(Node::build)
             .collect::<AlthreadResult<Vec<Node<Stmt>>>>()?;
 

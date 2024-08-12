@@ -14,15 +14,19 @@ program = _{ SOI ~ bricks* ~ EOI }
 bricks        = _{ main_brick | global_brick | cond_brick | process_brick }
 main_brick    =  { "main" ~ "{" ~ brick ~ "}" }
 global_brick  =  { "shared" ~ "{" ~ decl_brick ~ "}" }
-cond_brick    =  { cond_brick_keyword ~ "{" ~ expr_brick ~ "}" }
+cond_brick    =  { cond_keyword ~ "{" ~ expr_brick ~ "}" }
 process_brick =  { "process" ~ IDENTIFIER ~ "(" ~ ")" ~ "{" ~ brick ~ "}" }
 
-brick              = { stmt* }
-decl_brick         = { decl_stmt* }
-expr_brick         = { expr_stmt* }
-cond_brick_keyword = { "always" | "never" | "eventually" }
+brick      = { stmt* }
+decl_brick = { decl_stmt* }
+expr_brick = { expr_stmt* }
 
-stmt = _{ assign_stmt | decl_stmt | expr_stmt | print_stmt | run_stmt | if_stmt | while_stmt | scope }
+cond_keyword       = { always_keyword | never_keyword | eventually_keyword }
+always_keyword     = { "always" }
+never_keyword      = { "never" }
+eventually_keyword = { "eventually" }
+
+stmt = { assign_stmt | decl_stmt | expr_stmt | print_stmt | run_stmt | if_stmt | while_stmt | scope }
 
 /// # Assignments
 /// Assignments are used to assign values to variables.
@@ -34,47 +38,70 @@ assign_stmt = _{ assignment ~ ";" }
 assignment  =  { assign_unary | assign_binary }
 
 assign_unary    = { IDENTIFIER ~ assign_unary_op }
-assign_unary_op = { "++" | "--" }
+assign_unary_op = { inc_op | dec_op }
+inc_op          = { "++" }
+dec_op          = { "--" }
 
 assign_binary    = { IDENTIFIER ~ assign_binary_op ~ expr }
-assign_binary_op = { "=" | "+=" | "-=" | "*=" | "/=" | "%=" }
+assign_binary_op = { assign_op | assign_add_op | assign_sub_op | assign_mul_op | assign_div_op | assign_mod_op }
+assign_op        = { "=" }
+assign_add_op    = { "+=" }
+assign_sub_op    = { "-=" }
+assign_mul_op    = { "*=" }
+assign_div_op    = { "/=" }
+assign_mod_op    = { "%=" }
 
 /// # Declarations
 /// Declarations are used to declare variables.
 /// There are two types of declarations: let and const.
-decl_stmt    = _{ decl ~ ";" }
-decl         =  { decl_keyword ~ IDENTIFIER ~ (":" ~ DATATYPE)? ~ ("=" ~ expr)? }
-decl_keyword =  { "let" | "const" }
+decl_stmt = _{ decl ~ ";" }
+decl      =  { decl_keyword ~ IDENTIFIER ~ (":" ~ DATATYPE)? ~ ("=" ~ expr)? }
+
+decl_keyword  = { let_keyword | const_keyword }
+let_keyword   = { "let" }
+const_keyword = { "const" }
 
 /// # Expressions
 /// Expressions are used to evaluate values.
 /// The expressions in althread language follow the arithmetic precedence rules.
 expr_stmt = _{ expr ~ ";" }
-expr      =  { logical_or }
+expr      =  { binary_expr | unary_expr | primary_expr }
 
-logical_or = { logical_and ~ (or_op ~ logical_and)* }
-or_op      = { "||" }
+binary_expr = _{ unary_expr ~ (binary_op ~ unary_expr)* }
+binary_op   = _{ or_priority | and_priority | eq_priority | comp_priority | term_priority | factor_priority }
 
-logical_and = { equality ~ (and_op ~ equality)* }
-and_op      = { "&&" }
+or_priority = { or_op }
+or_op       = { "||" }
 
-equality    = { comparison ~ (equality_op ~ comparison)* }
-equality_op = { "==" | "!=" }
+and_priority = { and_op }
+and_op       = { "&&" }
 
-comparison    = { term ~ (comparison_op ~ term)* }
-comparison_op = { "<=" | ">=" | "<" | ">" }
+eq_priority = { eq_op | ne_op }
+eq_op       = { "==" }
+ne_op       = { "!=" }
 
-term    = { factor ~ (term_op ~ factor)* }
-term_op = { "+" | "-" }
+comp_priority = { lt_op | gt_op | le_op | ge_op }
+lt_op         = { "<" }
+gt_op         = { ">" }
+le_op         = { "<=" }
+ge_op         = { ">=" }
 
-factor    = { unary ~ (factor_op ~ unary)* }
-factor_op = { "*" | "/" | "%" }
+term_priority = { add_op | sub_op }
+add_op        = { "+" }
+sub_op        = { "-" }
 
-unary    = { unary_op? ~ atomic }
-unary_op = { "+" | "-" | "!" }
+factor_priority = { mul_op | div_op | mod_op }
+mul_op          = { "*" }
+div_op          = { "/" }
+mod_op          = { "%" }
 
-atomic  = _{ primary | "(" ~ expr ~ ")" }
-primary =  { BOOLEAN | FLOAT | INTEGER | STRING | NULL | IDENTIFIER }
+unary_expr = _{ unary_op? ~ primary_expr }
+unary_op   =  { pos_op | neg_op | not_op }
+pos_op     =  { "+" }
+neg_op     =  { "-" }
+not_op     =  { "!" }
+
+primary_expr = _{ BOOLEAN | FLOAT | INTEGER | STRING | NULL | IDENTIFIER | "(" ~ expr ~ ")" }
 
 /// # Calls
 run_stmt   = { "run" ~ IDENTIFIER ~ "(" ~ ")" ~ ";" }
@@ -88,7 +115,12 @@ while_stmt = { "while" ~ "(" ~ expr ~ ")" ~ scope }
 /// # Lexical Structure
 /// The lexical structure of the althread language.
 /// The language supports the following datatypes: bool, int, float, void, and string.
-DATATYPE = { "bool" | "int" | "float" | "string" | "void" }
+DATATYPE        = { BOOL_DATATYPE | INT_DATATYPE | FLOAT_DATATYPE | STRING_DATATYPE | VOID_DATATYPE }
+BOOL_DATATYPE   = { "bool" }
+INT_DATATYPE    = { "int" }
+FLOAT_DATATYPE  = { "float" }
+STRING_DATATYPE = { "string" }
+VOID_DATATYPE   = { "void" }
 
 BOOLEAN = @{ "true" | "false" }
 INTEGER = @{ ASCII_DIGIT+ }

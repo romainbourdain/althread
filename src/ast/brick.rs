@@ -1,6 +1,6 @@
 use std::fmt;
 
-use pest::iterators::Pair;
+use pest::iterators::Pairs;
 
 use crate::{error::AlthreadResult, parser::Rule};
 
@@ -16,10 +16,10 @@ pub struct Brick {
 }
 
 impl Build for Brick {
-    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
+    fn build(pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let mut brick = Self::new();
 
-        for pair in pair.into_inner() {
+        for pair in pairs {
             let node = Node::build(pair)?;
             brick.children.push(node);
         }

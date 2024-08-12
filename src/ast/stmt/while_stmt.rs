@@ -1,6 +1,6 @@
 use std::fmt;
 
-use pest::iterators::Pair;
+use pest::iterators::Pairs;
 
 use crate::{
     ast::{
@@ -20,9 +20,7 @@ pub struct WhileStmt {
 }
 
 impl Build for WhileStmt {
-    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        let mut pairs = pair.into_inner();
-
+    fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let condition = Node::build(pairs.next().unwrap())?;
         let then_block = Node::build(pairs.next().unwrap())?;
 

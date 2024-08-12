@@ -1,6 +1,6 @@
 use std::fmt;
 
-use pest::iterators::Pair;
+use pest::iterators::Pairs;
 
 use crate::{ast::node::Build, error::AlthreadResult, no_rule, parser::Rule};
 
@@ -107,13 +107,14 @@ pub enum DataType {
 } */
 
 impl Build for DataType {
-    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        match pair.as_str() {
-            "bool" => Ok(Self::Bool),
-            "int" => Ok(Self::Int),
-            "float" => Ok(Self::Float),
-            "string" => Ok(Self::String),
-            "void" => Ok(Self::Void),
+    fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
+        let pair = pairs.next().unwrap();
+        match pair.as_rule() {
+            Rule::BOOL_DATATYPE => Ok(Self::Bool),
+            Rule::INT_DATATYPE => Ok(Self::Int),
+            Rule::FLOAT_DATATYPE => Ok(Self::Float),
+            Rule::STRING_DATATYPE => Ok(Self::String),
+            Rule::VOID_DATATYPE => Ok(Self::Void),
             _ => Err(no_rule!(pair)),
         }
     }

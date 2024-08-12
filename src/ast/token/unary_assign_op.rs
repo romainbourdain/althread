@@ -1,6 +1,6 @@
 use std::fmt;
 
-use pest::iterators::Pair;
+use pest::iterators::Pairs;
 
 use crate::{ast::node::Build, error::AlthreadResult, no_rule, parser::Rule};
 
@@ -11,10 +11,11 @@ pub enum UnaryAssignOp {
 }
 
 impl Build for UnaryAssignOp {
-    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        match pair.as_str() {
-            "++" => Ok(Self::Increment),
-            "--" => Ok(Self::Decrement),
+    fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
+        let pair = pairs.next().unwrap();
+        match pair.as_rule() {
+            Rule::inc_op => Ok(Self::Increment),
+            Rule::dec_op => Ok(Self::Decrement),
             _ => Err(no_rule!(pair)),
         }
     }

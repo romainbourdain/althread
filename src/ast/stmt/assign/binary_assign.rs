@@ -1,6 +1,6 @@
 use std::fmt::{self};
 
-use pest::iterators::Pair;
+use pest::iterators::Pairs;
 
 use crate::{
     ast::{
@@ -21,10 +21,8 @@ pub struct BinaryAssign {
 }
 
 impl Build for BinaryAssign {
-    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        let mut pairs = pair.into_inner();
-
-        let identifier = Node::build(pairs.next().unwrap())?;
+    fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
+        let identifier = Node::build_token(pairs.next().unwrap())?;
         let operator = Node::build(pairs.next().unwrap())?;
         let value = Node::build(pairs.next().unwrap())?;
 

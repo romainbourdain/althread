@@ -13,7 +13,7 @@ use assign::Assign;
 use decl::Decl;
 use expr::Expr;
 use if_stmt::IfStmt;
-use pest::iterators::Pair;
+use pest::iterators::Pairs;
 use print_stmt::Print;
 use run_stmt::RunStmt;
 use scope::Scope;
@@ -39,7 +39,9 @@ pub enum Stmt {
 }
 
 impl Build for Stmt {
-    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
+    fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
+        let pair = pairs.next().unwrap();
+
         match pair.as_rule() {
             Rule::assignment => Ok(Self::Assign(Node::build(pair)?)),
             Rule::decl => Ok(Self::Decl(Node::build(pair)?)),

@@ -1,6 +1,6 @@
 use std::fmt;
 
-use pest::iterators::Pair;
+use pest::iterators::Pairs;
 
 use crate::{ast::node::Build, error::AlthreadResult, no_rule, parser::Rule};
 
@@ -11,10 +11,11 @@ pub enum DeclKeyword {
 }
 
 impl Build for DeclKeyword {
-    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        match pair.as_str() {
-            "let" => Ok(Self::Let),
-            "const" => Ok(Self::Const),
+    fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
+        let pair = pairs.next().unwrap();
+        match pair.as_rule() {
+            Rule::let_keyword => Ok(Self::Let),
+            Rule::const_keyword => Ok(Self::Const),
             _ => Err(no_rule!(pair)),
         }
     }

@@ -1,6 +1,6 @@
 use std::fmt;
 
-use pest::iterators::Pair;
+use pest::iterators::Pairs;
 
 use crate::{ast::node::Build, error::AlthreadResult, no_rule, parser::Rule};
 
@@ -22,21 +22,22 @@ pub enum BinaryOp {
 }
 
 impl Build for BinaryOp {
-    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        match pair.as_str() {
-            "+" => Ok(Self::Add),
-            "-" => Ok(Self::Sub),
-            "*" => Ok(Self::Mul),
-            "/" => Ok(Self::Div),
-            "%" => Ok(Self::Mod),
-            "==" => Ok(Self::Eq),
-            "!=" => Ok(Self::Ne),
-            "<" => Ok(Self::Lt),
-            "<=" => Ok(Self::Le),
-            ">" => Ok(Self::Gt),
-            ">=" => Ok(Self::Ge),
-            "&&" => Ok(Self::And),
-            "||" => Ok(Self::Or),
+    fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
+        let pair = pairs.next().unwrap();
+        match pair.as_rule() {
+            Rule::add_op => Ok(Self::Add),
+            Rule::sub_op => Ok(Self::Sub),
+            Rule::mul_op => Ok(Self::Mul),
+            Rule::div_op => Ok(Self::Div),
+            Rule::mod_op => Ok(Self::Mod),
+            Rule::eq_op => Ok(Self::Eq),
+            Rule::ne_op => Ok(Self::Ne),
+            Rule::lt_op => Ok(Self::Lt),
+            Rule::le_op => Ok(Self::Le),
+            Rule::gt_op => Ok(Self::Gt),
+            Rule::ge_op => Ok(Self::Ge),
+            Rule::and_op => Ok(Self::And),
+            Rule::or_op => Ok(Self::Or),
             _ => Err(no_rule!(pair)),
         }
     }

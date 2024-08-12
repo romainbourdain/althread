@@ -1,6 +1,6 @@
 use std::fmt;
 
-use pest::iterators::Pair;
+use pest::iterators::Pairs;
 
 use crate::{
     ast::{
@@ -24,11 +24,9 @@ pub struct Decl {
 }
 
 impl Build for Decl {
-    fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        let mut pairs = pair.into_inner();
-
+    fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let keyword = Node::build(pairs.next().unwrap())?;
-        let identifier = Node::build(pairs.next().unwrap())?;
+        let identifier = Node::build_token(pairs.next().unwrap())?;
         let mut datatype = None;
         let mut value = None;
 
