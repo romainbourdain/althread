@@ -19,7 +19,7 @@ pub struct RunStmt {
 
 impl Build for RunStmt {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
-        let identifier = Node::build_token(pairs.next().unwrap())?;
+        let identifier = Node::build(pairs.next().unwrap())?;
 
         Ok(Self { identifier })
     }

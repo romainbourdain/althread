@@ -22,7 +22,7 @@ pub struct BinaryAssign {
 
 impl Build for BinaryAssign {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
-        let identifier = Node::build_token(pairs.next().unwrap())?;
+        let identifier = Node::build(pairs.next().unwrap())?;
         let operator = Node::build(pairs.next().unwrap())?;
         let value = Node::build(pairs.next().unwrap())?;
 

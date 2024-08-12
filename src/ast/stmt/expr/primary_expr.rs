@@ -8,7 +8,7 @@ use pest::iterators::Pair;
 use crate::{
     ast::{
         display::AstDisplay,
-        node::{Node, Token},
+        node::{Build, Node},
         token::identifier::Identifier,
     },
     error::{AlthreadError, AlthreadResult, ErrorType},
@@ -52,7 +52,7 @@ impl PrimaryExpr {
                 Rule::INTEGER => Self::Int(parse_with_error::<i64>(pair)?),
                 Rule::FLOAT => Self::Float(parse_with_error::<f64>(pair)?),
                 Rule::STRING => Self::String(pair.as_str().to_string()),
-                Rule::IDENTIFIER => Self::Identifier(Identifier::build(pair)?),
+                Rule::IDENTIFIER => Self::Identifier(Identifier::build(pair.into_inner())?),
                 Rule::expr => Self::Expr(Box::new(Node::build(pair)?)),
                 _ => return Err(no_rule!(pair)),
             },

@@ -17,26 +17,11 @@ pub trait Build: Sized {
     fn build(pairs: Pairs<Rule>) -> AlthreadResult<Self>;
 }
 
-pub trait Token: Sized {
-    fn build(pair: Pair<Rule>) -> AlthreadResult<Self>;
-}
-
 impl<T: Build> Node<T> {
     pub fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
         let (line, col) = pair.line_col();
         Ok(Node {
             value: T::build(pair.into_inner())?,
-            line,
-            column: col,
-        })
-    }
-}
-
-impl<T: Token> Node<T> {
-    pub fn build_token(pair: Pair<Rule>) -> AlthreadResult<Self> {
-        let (line, col) = pair.line_col();
-        Ok(Node {
-            value: T::build(pair)?,
             line,
             column: col,
         })

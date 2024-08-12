@@ -1,137 +1,169 @@
-/// # Althread
-/// This file contains the grammar for the althread language.
+/// # Althread Grammar
+/// This file defines the grammar for the Althread programming language,
 
-program = _{ SOI ~ bricks* ~ EOI }
+program = _{ SOI ~ blocks* ~ EOI }
 
-/// # Bricks
-/// Bricks are the main building blocks of the program.
-/// They are the main, shared, always, and process blocks.
-///
-/// - The main block is the entry point of the program.
-/// - The shared block is used to declare global variables.
-/// - The always block is used check condition at each atomic step.
-/// - The process block is used to run code in parallel.
-bricks        = _{ main_brick | global_brick | cond_brick | process_brick }
-main_brick    =  { "main" ~ "{" ~ brick ~ "}" }
-global_brick  =  { "shared" ~ "{" ~ decl_brick ~ "}" }
-cond_brick    =  { cond_keyword ~ "{" ~ expr_brick ~ "}" }
-process_brick =  { "process" ~ IDENTIFIER ~ "(" ~ ")" ~ "{" ~ brick ~ "}" }
+/// ## Program Structure
+/// The main building blocks of an Althread program are:
+/// - **Main Brick**: The entry point of the program.
+/// - **Shared Brick**: Declares global variables accessible across different parts of the program.
+/// - **Condition Brick**: Monitors conditions at each atomic step (e.g., always, never, eventually).
+/// - **Process Brick**: Encapsulates code that runs concurrently in parallel processes.
+blocks = _{ main_block | global_block | condition_block | process_block }
 
-brick      = { stmt* }
-decl_brick = { decl_stmt* }
-expr_brick = { expr_stmt* }
+global_block    = { SHARED_KEYWORD ~ "{" ~ declaration_statements ~ "}" }
+condition_block = { condition_keywords ~ "{" ~ expression_statements ~ "}" }
+process_block   = { PROCESS_KEYWORD ~ identifier ~ "(" ~ ")" ~ "{" ~ statements ~ "}" }
+main_block      = { MAIN_KEYWORD ~ "{" ~ statements ~ "}" }
 
-cond_keyword       = { always_keyword | never_keyword | eventually_keyword }
-always_keyword     = { "always" }
-never_keyword      = { "never" }
-eventually_keyword = { "eventually" }
+condition_keywords = { ALWAYS_KEYWORD | NEVER_KEYWORD | EVENTUALLY_KEYWORD }
 
-stmt = { assign_stmt | decl_stmt | expr_stmt | print_stmt | run_stmt | if_stmt | while_stmt | scope }
+/// ## Statements
+/// Statements are the executable instructions in the language.
+/// They include assignments, declarations, expressions, print statements,
+/// function calls, and control flow structures.
+stmt                  =  { assignment_statement | declaration_statement | expression_statement | print_statement | run_statement | if_control | while_control | scope }
+assignment_statement  = _{ assignment ~ ";" }
+declaration_statement = _{ declaration ~ ";" }
+expression_statement  = _{ expression ~ ";" }
+run_statement         = _{ run_call ~ ";" }
+print_statement       = _{ print_call ~ ";" }
 
-/// # Assignments
-/// Assignments are used to assign values to variables.
-/// There are two types of assignments: unary and binary.
-///
-/// - Unary assignments are used to increment or decrement the value of a variable (e.g. a++).
-/// - Binary assignments are used to assign the result of an expression to a variable (e.g. a = b + c).
-assign_stmt = _{ assignment ~ ";" }
-assignment  =  { assign_unary | assign_binary }
+statements             = { stmt* }
+expression_statements  = { expression_statement* }
+declaration_statements = { declaration_statement* }
 
-assign_unary    = { IDENTIFIER ~ assign_unary_op }
-assign_unary_op = { inc_op | dec_op }
-inc_op          = { "++" }
-dec_op          = { "--" }
+/// ### Assignments
+/// Assignments assign values to variables.
+/// - **Unary Assignments**: Increment or decrement a variable (e.g., a++).
+/// - **Binary Assignments**: Assign the result of an expression to a variable (e.g., a = b + c).
+assignment = { unary_assignment | binary_assignment }
 
-assign_binary    = { IDENTIFIER ~ assign_binary_op ~ expr }
-assign_binary_op = { assign_op | assign_add_op | assign_sub_op | assign_mul_op | assign_div_op | assign_mod_op }
-assign_op        = { "=" }
-assign_add_op    = { "+=" }
-assign_sub_op    = { "-=" }
-assign_mul_op    = { "*=" }
-assign_div_op    = { "/=" }
-assign_mod_op    = { "%=" }
+unary_assignment          = { identifier ~ unary_assignment_operator }
+unary_assignment_operator = { INC_OP | DEC_OP }
 
-/// # Declarations
-/// Declarations are used to declare variables.
-/// There are two types of declarations: let and const.
-decl_stmt = _{ decl ~ ";" }
-decl      =  { decl_keyword ~ IDENTIFIER ~ (":" ~ DATATYPE)? ~ ("=" ~ expr)? }
+binary_assignment          = { identifier ~ binary_assignment_operator ~ expression }
+binary_assignment_operator = { ASSING_OP | ADD_ASSIGN_OP | SUB_ASSIGN_OP | MUL_ASSIGN_OP | DIV_ASSIGN_OP | MOD_ASSIGN_OP }
 
-decl_keyword  = { let_keyword | const_keyword }
-let_keyword   = { "let" }
-const_keyword = { "const" }
+/// ### Declarations
+/// Declarations introduce new variables, which can be mutable (let) or immutable (const).
+declaration         = { declaration_keyword ~ identifier ~ (":" ~ datatype)? ~ ("=" ~ expression)? }
+declaration_keyword = { LET_KEYWORD | CONST_KEYWORD }
 
-/// # Expressions
-/// Expressions are used to evaluate values.
-/// The expressions in althread language follow the arithmetic precedence rules.
-expr_stmt = _{ expr ~ ";" }
-expr      =  { binary_expr | unary_expr | primary_expr }
+/// ### Expressions
+/// Expressions evaluate values based on arithmetic and logical operations, following standard precedence rules.
+expression = { binary_expression | unary_expression | primary_expression }
 
-binary_expr = _{ unary_expr ~ (binary_op ~ unary_expr)* }
-binary_op   = _{ or_priority | and_priority | eq_priority | comp_priority | term_priority | factor_priority }
+primary_expression = _{ BOOLEAN | FLOAT | INTEGER | STRING | NULL | IDENTIFIER | "(" ~ expression ~ ")" }
 
-or_priority = { or_op }
-or_op       = { "||" }
+unary_expression = _{ unary_operator? ~ primary_expression }
+unary_operator   =  { POS_OP | NEG_OP | NOT_OP }
 
-and_priority = { and_op }
-and_op       = { "&&" }
+binary_expression   = _{ unary_expression ~ (binary_operator ~ unary_expression)* }
+binary_operator     = _{ or_operator | and_operator | equality_operator | comparison_operator | term_operator | factor_operator }
+or_operator         =  { OR_OP }
+and_operator        =  { AND_OP }
+equality_operator   =  { EQ_OP | NE_OP }
+comparison_operator =  { LT_OP | GT_OP | LE_OP | GE_OP }
+term_operator       =  { ADD_OP | SUB_OP }
+factor_operator     =  { MUL_OP | DIV_OP | MOD_OP }
 
-eq_priority = { eq_op | ne_op }
-eq_op       = { "==" }
-ne_op       = { "!=" }
+/// ### Function Calls
+/// Function calls include running parallel processes and printing to the console.
+run_call   = { RUN_KEYWORD ~ identifier ~ "(" ~ ")" }
+print_call = { PRINT_KEYWORD ~ "(" ~ expression ~ ")" }
 
-comp_priority = { lt_op | gt_op | le_op | ge_op }
-lt_op         = { "<" }
-gt_op         = { ">" }
-le_op         = { "<=" }
-ge_op         = { ">=" }
+/// ### Control Flow
+/// Control flow structures include conditional execution and loops.
+scope         = { "{" ~ stmt* ~ "}" }
+if_control    = { IF_KEYWORD ~ "(" ~ expression ~ ")" ~ scope ~ (ELSE_KEYWORD ~ scope)? }
+while_control = { WHILE_KEYWORD ~ "(" ~ expression ~ ")" ~ scope }
 
-term_priority = { add_op | sub_op }
-add_op        = { "+" }
-sub_op        = { "-" }
+/// ## Tokens
+/// This section defines the keywords, operators, datatypes, and other tokens used in Althread.
 
-factor_priority = { mul_op | div_op | mod_op }
-mul_op          = { "*" }
-div_op          = { "/" }
-mod_op          = { "%" }
+/// ### Keywords
+/// Keywords define the core constructs of the language.
+KEYWORDS = _{ MAIN_KEYWORD | SHARED_KEYWORD | PROCESS_KEYWORD | ALWAYS_KEYWORD | NEVER_KEYWORD | EVENTUALLY_KEYWORD | LET_KEYWORD | CONST_KEYWORD | IF_KEYWORD | ELSE_KEYWORD | WHILE_KEYWORD | RUN_KEYWORD | PRINT_KEYWORD | BOOLEAN | INT_DATATYPE | FLOAT_DATATYPE | STRING_DATATYPE | VOID_DATATYPE }
 
-unary_expr = _{ unary_op? ~ primary_expr }
-unary_op   =  { pos_op | neg_op | not_op }
-pos_op     =  { "+" }
-neg_op     =  { "-" }
-not_op     =  { "!" }
+MAIN_KEYWORD       = _{ "main" }
+SHARED_KEYWORD     = _{ "shared" }
+PROCESS_KEYWORD    = _{ "process" }
+ALWAYS_KEYWORD     =  { "always" }
+NEVER_KEYWORD      =  { "never" }
+EVENTUALLY_KEYWORD =  { "eventually" }
 
-primary_expr = _{ BOOLEAN | FLOAT | INTEGER | STRING | NULL | IDENTIFIER | "(" ~ expr ~ ")" }
+LET_KEYWORD   = { "let" }
+CONST_KEYWORD = { "const" }
 
-/// # Calls
-run_stmt   = { "run" ~ IDENTIFIER ~ "(" ~ ")" ~ ";" }
-print_stmt = { "print" ~ "(" ~ expr ~ ")" ~ ";" }
+IF_KEYWORD    = _{ "if" }
+ELSE_KEYWORD  = _{ "else" }
+WHILE_KEYWORD = _{ "while" }
 
-/// # Control Flow
-scope      = { "{" ~ stmt* ~ "}" }
-if_stmt    = { "if" ~ "(" ~ expr ~ ")" ~ scope ~ ("else" ~ scope)? }
-while_stmt = { "while" ~ "(" ~ expr ~ ")" ~ scope }
+RUN_KEYWORD   = _{ "run" }
+PRINT_KEYWORD = _{ "print" }
 
-/// # Lexical Structure
-/// The lexical structure of the althread language.
-/// The language supports the following datatypes: bool, int, float, void, and string.
-DATATYPE        = { BOOL_DATATYPE | INT_DATATYPE | FLOAT_DATATYPE | STRING_DATATYPE | VOID_DATATYPE }
+TRUE_KEYWORD  = _{ "true" }
+FALSE_KEYWORD = _{ "false" }
+NULL_KEYWORD  = _{ "null" }
+
+/// ### Operators
+/// Operators are used for arithmetic, logical operations, and assignments.
+POS_OP = { "+" }
+NEG_OP = { "-" }
+NOT_OP = { "!" }
+
+ADD_OP = { "+" }
+SUB_OP = { "-" }
+MUL_OP = { "*" }
+DIV_OP = { "/" }
+MOD_OP = { "%" }
+
+EQ_OP  = { "==" }
+NE_OP  = { "!=" }
+LT_OP  = { "<" }
+GT_OP  = { ">" }
+LE_OP  = { "<=" }
+GE_OP  = { ">=" }
+AND_OP = { "&&" }
+OR_OP  = { "||" }
+
+ASSING_OP     = { "=" }
+ADD_ASSIGN_OP = { "+=" }
+SUB_ASSIGN_OP = { "-=" }
+MUL_ASSIGN_OP = { "*=" }
+DIV_ASSIGN_OP = { "/=" }
+MOD_ASSIGN_OP = { "%=" }
+
+INC_OP = { "++" }
+DEC_OP = { "--" }
+
+/// ### Datatypes
+/// Datatypes supported in Althread include boolean, integer, float, string, and void.
+datatype        = { BOOL_DATATYPE | INT_DATATYPE | FLOAT_DATATYPE | STRING_DATATYPE | VOID_DATATYPE }
 BOOL_DATATYPE   = { "bool" }
 INT_DATATYPE    = { "int" }
 FLOAT_DATATYPE  = { "float" }
 STRING_DATATYPE = { "string" }
 VOID_DATATYPE   = { "void" }
 
-BOOLEAN = @{ "true" | "false" }
+/// ### Values
+/// Values include literals such as booleans, integers, floats, strings, and null.
+BOOLEAN = @{ TRUE_KEYWORD | FALSE_KEYWORD }
 INTEGER = @{ ASCII_DIGIT+ }
 FLOAT   = @{ ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT* }
 STRING  = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
-NULL    = @{ "null" }
+NULL    = @{ NULL_KEYWORD }
 
-IDENTIFIER          = @{ !(RESERVED_IDENTIFIER ~ !IDENTIFIER_CHAR) ~ ASCII_ALPHA ~ IDENTIFIER_CHAR* }
-IDENTIFIER_CHAR     = _{ ASCII_ALPHANUMERIC | "_" }
-RESERVED_IDENTIFIER =  { "let" | "const" | "print" | "true" | "false" | "null" | "main" | "shared" | "always" | "process" | "if" | "else" | "while" | "run" }
+/// ### Identifiers
+/// Identifiers are used for naming variables, functions, and other constructs.
+identifier        =  { IDENTIFIER }
+IDENTIFIER        = @{ !reserved_keywords ~ ASCII_ALPHA ~ IDENTIFIER_CHAR* }
+IDENTIFIER_CHAR   = _{ ASCII_ALPHANUMERIC | "_" }
+reserved_keywords =  { (KEYWORDS | datatype) ~ !IDENTIFIER_CHAR }
 
+/// ## Whitespace and Comments
+/// Whitespace and comments are ignored by the parser.
 WHITESPACE = _{ " " | "\t" | NEWLINE }
 NEWLINE    = _{ "\n" | "\r" | "\r\n" }
 

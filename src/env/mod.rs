@@ -25,15 +25,15 @@ impl Env {
     }
 
     pub fn run(&mut self, ast: &Ast) {
-        if let Some(global_brick) = &ast.global_brick {
+        if let Some(_global_brick) = &ast.global_brick {
             println!("Run global brick");
         }
 
-        for (name, brick) in &ast.condition_bricks {
+        for (name, _brick) in &ast.condition_bricks {
             println!("Run condition brick {}", name);
         }
 
-        for (name, brick) in &ast.process_bricks {
+        for (name, _brick) in &ast.process_bricks {
             let process = Process::new(
                 &self.global_table,
                 &self.process_table,

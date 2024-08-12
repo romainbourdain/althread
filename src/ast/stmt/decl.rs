@@ -26,7 +26,7 @@ pub struct Decl {
 impl Build for Decl {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let keyword = Node::build(pairs.next().unwrap())?;
-        let identifier = Node::build_token(pairs.next().unwrap())?;
+        let identifier = Node::build(pairs.next().unwrap())?;
         let mut datatype = None;
         let mut value = None;
 
