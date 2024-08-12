@@ -11,25 +11,25 @@ program = _{ SOI ~ blocks* ~ EOI }
 /// - **Process Brick**: Encapsulates code that runs concurrently in parallel processes.
 blocks = _{ main_block | global_block | condition_block | process_block }
 
-global_block    = { SHARED_KEYWORD ~ "{" ~ declaration_statements ~ "}" }
+global_block    = { SHARED_KW ~ "{" ~ declaration_statements ~ "}" }
 condition_block = { condition_keywords ~ "{" ~ expression_statements ~ "}" }
-process_block   = { PROCESS_KEYWORD ~ identifier ~ "(" ~ ")" ~ "{" ~ statements ~ "}" }
-main_block      = { MAIN_KEYWORD ~ "{" ~ statements ~ "}" }
+process_block   = { PROCESS_KW ~ identifier ~ "(" ~ ")" ~ "{" ~ statements ~ "}" }
+main_block      = { MAIN_KW ~ "{" ~ statements ~ "}" }
 
-condition_keywords = { ALWAYS_KEYWORD | NEVER_KEYWORD | EVENTUALLY_KEYWORD }
+condition_keywords = { ALWAYS_KW | NEVER_KW | EVENTUALLY_KW }
 
 /// ## Statements
 /// Statements are the executable instructions in the language.
 /// They include assignments, declarations, expressions, print statements,
 /// function calls, and control flow structures.
-stmt                  =  { assignment_statement | declaration_statement | expression_statement | print_statement | run_statement | if_control | while_control | scope }
+statement             =  { assignment_statement | declaration_statement | expression_statement | print_statement | run_statement | if_control | while_control | scope }
 assignment_statement  = _{ assignment ~ ";" }
 declaration_statement = _{ declaration ~ ";" }
 expression_statement  = _{ expression ~ ";" }
 run_statement         = _{ run_call ~ ";" }
 print_statement       = _{ print_call ~ ";" }
 
-statements             = { stmt* }
+statements             = { statement* }
 expression_statements  = { expression_statement* }
 declaration_statements = { declaration_statement* }
 
@@ -48,7 +48,7 @@ binary_assignment_operator = { ASSING_OP | ADD_ASSIGN_OP | SUB_ASSIGN_OP | MUL_A
 /// ### Declarations
 /// Declarations introduce new variables, which can be mutable (let) or immutable (const).
 declaration         = { declaration_keyword ~ identifier ~ (":" ~ datatype)? ~ ("=" ~ expression)? }
-declaration_keyword = { LET_KEYWORD | CONST_KEYWORD }
+declaration_keyword = { LET_KW | CONST_KW }
 
 /// ### Expressions
 /// Expressions evaluate values based on arithmetic and logical operations, following standard precedence rules.
@@ -70,42 +70,42 @@ factor_operator     =  { MUL_OP | DIV_OP | MOD_OP }
 
 /// ### Function Calls
 /// Function calls include running parallel processes and printing to the console.
-run_call   = { RUN_KEYWORD ~ identifier ~ "(" ~ ")" }
-print_call = { PRINT_KEYWORD ~ "(" ~ expression ~ ")" }
+run_call   = { RUN_KW ~ identifier ~ "(" ~ ")" }
+print_call = { PRINT_KW ~ "(" ~ expression ~ ")" }
 
 /// ### Control Flow
 /// Control flow structures include conditional execution and loops.
-scope         = { "{" ~ stmt* ~ "}" }
-if_control    = { IF_KEYWORD ~ "(" ~ expression ~ ")" ~ scope ~ (ELSE_KEYWORD ~ scope)? }
-while_control = { WHILE_KEYWORD ~ "(" ~ expression ~ ")" ~ scope }
+scope         = { "{" ~ statement* ~ "}" }
+if_control    = { IF_KW ~ "(" ~ expression ~ ")" ~ scope ~ (ELSE_KW ~ scope)? }
+while_control = { WHILE_KW ~ "(" ~ expression ~ ")" ~ scope }
 
 /// ## Tokens
 /// This section defines the keywords, operators, datatypes, and other tokens used in Althread.
 
 /// ### Keywords
 /// Keywords define the core constructs of the language.
-KEYWORDS = _{ MAIN_KEYWORD | SHARED_KEYWORD | PROCESS_KEYWORD | ALWAYS_KEYWORD | NEVER_KEYWORD | EVENTUALLY_KEYWORD | LET_KEYWORD | CONST_KEYWORD | IF_KEYWORD | ELSE_KEYWORD | WHILE_KEYWORD | RUN_KEYWORD | PRINT_KEYWORD | BOOLEAN | INT_DATATYPE | FLOAT_DATATYPE | STRING_DATATYPE | VOID_DATATYPE }
+KEYWORDS = _{ MAIN_KW | SHARED_KW | PROCESS_KW | ALWAYS_KW | NEVER_KW | EVENTUALLY_KW | LET_KW | CONST_KW | IF_KW | ELSE_KW | WHILE_KW | RUN_KW | PRINT_KW | BOOLEAN | INT_DT | FLOAT_DT | STRING_DT | VOID_DT }
 
-MAIN_KEYWORD       = _{ "main" }
-SHARED_KEYWORD     = _{ "shared" }
-PROCESS_KEYWORD    = _{ "process" }
-ALWAYS_KEYWORD     =  { "always" }
-NEVER_KEYWORD      =  { "never" }
-EVENTUALLY_KEYWORD =  { "eventually" }
+MAIN_KW       = _{ "main" }
+SHARED_KW     = _{ "shared" }
+PROCESS_KW    = _{ "process" }
+ALWAYS_KW     =  { "always" }
+NEVER_KW      =  { "never" }
+EVENTUALLY_KW =  { "eventually" }
 
-LET_KEYWORD   = { "let" }
-CONST_KEYWORD = { "const" }
+LET_KW   = { "let" }
+CONST_KW = { "const" }
 
-IF_KEYWORD    = _{ "if" }
-ELSE_KEYWORD  = _{ "else" }
-WHILE_KEYWORD = _{ "while" }
+IF_KW    = _{ "if" }
+ELSE_KW  = _{ "else" }
+WHILE_KW = _{ "while" }
 
-RUN_KEYWORD   = _{ "run" }
-PRINT_KEYWORD = _{ "print" }
+RUN_KW   = _{ "run" }
+PRINT_KW = _{ "print" }
 
-TRUE_KEYWORD  = _{ "true" }
-FALSE_KEYWORD = _{ "false" }
-NULL_KEYWORD  = _{ "null" }
+TRUE_KW  = _{ "true" }
+FALSE_KW = _{ "false" }
+NULL_KW  = _{ "null" }
 
 /// ### Operators
 /// Operators are used for arithmetic, logical operations, and assignments.
@@ -140,20 +140,20 @@ DEC_OP = { "--" }
 
 /// ### Datatypes
 /// Datatypes supported in Althread include boolean, integer, float, string, and void.
-datatype        = { BOOL_DATATYPE | INT_DATATYPE | FLOAT_DATATYPE | STRING_DATATYPE | VOID_DATATYPE }
-BOOL_DATATYPE   = { "bool" }
-INT_DATATYPE    = { "int" }
-FLOAT_DATATYPE  = { "float" }
-STRING_DATATYPE = { "string" }
-VOID_DATATYPE   = { "void" }
+datatype  = { BOOL_DT | INT_DT | FLOAT_DT | STRING_DT | VOID_DT }
+BOOL_DT   = { "bool" }
+INT_DT    = { "int" }
+FLOAT_DT  = { "float" }
+STRING_DT = { "string" }
+VOID_DT   = { "void" }
 
 /// ### Values
 /// Values include literals such as booleans, integers, floats, strings, and null.
-BOOLEAN = @{ TRUE_KEYWORD | FALSE_KEYWORD }
+BOOLEAN = @{ TRUE_KW | FALSE_KW }
 INTEGER = @{ ASCII_DIGIT+ }
 FLOAT   = @{ ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT* }
 STRING  = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
-NULL    = @{ NULL_KEYWORD }
+NULL    = @{ NULL_KW }
 
 /// ### Identifiers
 /// Identifiers are used for naming variables, functions, and other constructs.
