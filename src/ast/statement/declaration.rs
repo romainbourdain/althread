@@ -5,25 +5,27 @@ use pest::iterators::Pairs;
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{Build, Node},
-        token::{datatype::DataType, decl_keyword::DeclKeyword, identifier::Identifier},
+        node::{AstNode, Node},
+        token::{
+            datatype::DataType, declaration_keyword::DeclarationKeyword, identifier::Identifier,
+        },
     },
     error::AlthreadResult,
     no_rule,
     parser::Rule,
 };
 
-use super::expr::Expr;
+use super::expression::Expression;
 
 #[derive(Debug)]
-pub struct Decl {
-    pub keyword: Node<DeclKeyword>,
+pub struct Declaration {
+    pub keyword: Node<DeclarationKeyword>,
     pub identifier: Node<Identifier>,
     pub datatype: Option<Node<DataType>>,
-    pub value: Option<Node<Expr>>,
+    pub value: Option<Node<Expression>>,
 }
 
-impl Build for Decl {
+impl AstNode for Declaration {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let keyword = Node::build(pairs.next().unwrap())?;
         let identifier = Node::build(pairs.next().unwrap())?;
@@ -51,7 +53,7 @@ impl Build for Decl {
     }
 }
 
-impl AstDisplay for Decl {
+impl AstDisplay for Declaration {
     fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
         writeln!(f, "{prefix}decl")?;
 

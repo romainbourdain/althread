@@ -1,10 +1,10 @@
 use pest::iterators::Pairs;
 
-use crate::{ast::node::Build, error::AlthreadResult, no_rule, parser::Rule};
+use crate::{ast::node::AstNode, error::AlthreadResult, no_rule, parser::Rule};
 
 pub type Identifier = String;
 
-impl Build for Identifier {
+impl AstNode for Identifier {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let pair = pairs.next().unwrap();
         match pair.as_rule() {

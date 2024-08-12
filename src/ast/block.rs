@@ -6,25 +6,25 @@ use crate::{error::AlthreadResult, parser::Rule};
 
 use super::{
     display::{AstDisplay, Prefix},
-    node::{Build, Node},
-    stmt::Stmt,
+    node::{AstNode, Node},
+    statement::Statement,
 };
 
 #[derive(Debug)]
 pub struct Block {
-    pub children: Vec<Node<Stmt>>,
+    pub children: Vec<Node<Statement>>,
 }
 
-impl Build for Block {
+impl AstNode for Block {
     fn build(pairs: Pairs<Rule>) -> AlthreadResult<Self> {
-        let mut brick = Self::new();
+        let mut block = Self::new();
 
         for pair in pairs {
             let node = Node::build(pair)?;
-            brick.children.push(node);
+            block.children.push(node);
         }
 
-        Ok(brick)
+        Ok(block)
     }
 }
 

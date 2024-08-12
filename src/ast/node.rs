@@ -13,11 +13,11 @@ pub struct Node<T> {
     pub column: usize,
 }
 
-pub trait Build: Sized {
+pub trait AstNode: Sized {
     fn build(pairs: Pairs<Rule>) -> AlthreadResult<Self>;
 }
 
-impl<T: Build> Node<T> {
+impl<T: AstNode> Node<T> {
     pub fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
         let (line, col) = pair.line_col();
         Ok(Node {

@@ -1,16 +1,16 @@
-pub mod binary_assign;
-pub mod unary_assign;
+pub mod binary_assignment;
+pub mod unary_assignment;
 
 use std::fmt::{self};
 
-use binary_assign::BinaryAssign;
+use binary_assignment::BinaryAssignment;
 use pest::iterators::Pairs;
-use unary_assign::UnaryAssign;
+use unary_assignment::UnaryAssignment;
 
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{Build, Node},
+        node::{AstNode, Node},
     },
     error::AlthreadResult,
     no_rule,
@@ -18,12 +18,12 @@ use crate::{
 };
 
 #[derive(Debug)]
-pub enum Assign {
-    Unary(Node<UnaryAssign>),
-    Binary(Node<BinaryAssign>),
+pub enum Assignment {
+    Unary(Node<UnaryAssignment>),
+    Binary(Node<BinaryAssignment>),
 }
 
-impl Build for Assign {
+impl AstNode for Assignment {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let pair = pairs.next().unwrap();
 
@@ -35,7 +35,7 @@ impl Build for Assign {
     }
 }
 
-impl AstDisplay for Assign {
+impl AstDisplay for Assignment {
     fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
         match self {
             Self::Unary(node) => node.ast_fmt(f, prefix),

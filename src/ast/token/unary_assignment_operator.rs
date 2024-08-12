@@ -2,15 +2,15 @@ use std::fmt;
 
 use pest::iterators::Pairs;
 
-use crate::{ast::node::Build, error::AlthreadResult, no_rule, parser::Rule};
+use crate::{ast::node::AstNode, error::AlthreadResult, no_rule, parser::Rule};
 
 #[derive(Debug)]
-pub enum UnaryAssignOp {
+pub enum UnaryAssignmentOperator {
     Increment,
     Decrement,
 }
 
-impl Build for UnaryAssignOp {
+impl AstNode for UnaryAssignmentOperator {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let pair = pairs.next().unwrap();
         match pair.as_rule() {
@@ -21,7 +21,7 @@ impl Build for UnaryAssignOp {
     }
 }
 
-impl fmt::Display for UnaryAssignOp {
+impl fmt::Display for UnaryAssignmentOperator {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Increment => write!(f, "++"),

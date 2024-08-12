@@ -5,8 +5,8 @@ use pest::iterators::Pairs;
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{Build, Node},
-        stmt::Stmt,
+        node::{AstNode, Node},
+        statement::Statement,
     },
     error::AlthreadResult,
     parser::Rule,
@@ -14,14 +14,14 @@ use crate::{
 
 #[derive(Debug)]
 pub struct Scope {
-    pub children: Vec<Node<Stmt>>,
+    pub children: Vec<Node<Statement>>,
 }
 
-impl Build for Scope {
+impl AstNode for Scope {
     fn build(pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let children = pairs
             .map(Node::build)
-            .collect::<AlthreadResult<Vec<Node<Stmt>>>>()?;
+            .collect::<AlthreadResult<Vec<Node<Statement>>>>()?;
 
         Ok(Self { children })
     }

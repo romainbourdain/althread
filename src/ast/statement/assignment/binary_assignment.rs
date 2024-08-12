@@ -5,41 +5,46 @@ use pest::iterators::Pairs;
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{Build, Node},
-        token::{identifier::Identifier, unary_assign_op::UnaryAssignOp},
+        node::{AstNode, Node},
+        statement::expression::Expression,
+        token::{binary_assignment_operator::BinaryAssignmentOperator, identifier::Identifier},
     },
     error::AlthreadResult,
     parser::Rule,
 };
 
 #[derive(Debug)]
-pub struct UnaryAssign {
+pub struct BinaryAssignment {
     pub identifier: Node<Identifier>,
-    pub operator: Node<UnaryAssignOp>,
+    pub operator: Node<BinaryAssignmentOperator>,
+    pub value: Node<Expression>,
 }
 
-impl Build for UnaryAssign {
+impl AstNode for BinaryAssignment {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let identifier = Node::build(pairs.next().unwrap())?;
         let operator = Node::build(pairs.next().unwrap())?;
+        let value = Node::build(pairs.next().unwrap())?;
 
         Ok(Self {
             identifier,
             operator,
+            value,
         })
     }
 }
 
-impl AstDisplay for UnaryAssign {
+impl AstDisplay for BinaryAssignment {
     fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
-        writeln!(f, "{}unary_assign", prefix)?;
+        writeln!(f, "{}binary_assign", prefix)?;
 
-        let prefix = &prefix.add_branch();
+        let prefix = prefix.add_branch();
         writeln!(f, "{}ident: {}", prefix, self.identifier)?;
-
-        let prefix = &prefix.switch();
         writeln!(f, "{}op: {}", prefix, self.operator)?;
 
+        let prefix = &prefix.switch();
+        writeln!(f, "{}value: {}", prefix, self.operator)?;
+        self.value.ast_fmt(f, prefix)?;
         Ok(())
     }
 }

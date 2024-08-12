@@ -8,7 +8,7 @@ use pest::iterators::Pair;
 use crate::{
     ast::{
         display::AstDisplay,
-        node::{Build, Node},
+        node::{AstNode, Node},
         token::identifier::Identifier,
     },
     error::{AlthreadError, AlthreadResult, ErrorType},
@@ -16,20 +16,20 @@ use crate::{
     parser::Rule,
 };
 
-use super::Expr;
+use super::Expression;
 
 #[derive(Debug)]
-pub enum PrimaryExpr {
+pub enum PrimaryExpression {
     Null(),
     Bool(bool),
     Int(i64),
     Float(f64),
     String(String),
     Identifier(Identifier),
-    Expr(Box<Node<Expr>>),
+    Expr(Box<Node<Expression>>),
 }
 
-impl PrimaryExpr {
+impl PrimaryExpression {
     pub fn build(pair: Pair<Rule>) -> AlthreadResult<Node<Self>> {
         fn parse_with_error<T: FromStr>(pair: Pair<Rule>) -> AlthreadResult<T> {
             let (line, column) = pair.line_col();
@@ -60,16 +60,16 @@ impl PrimaryExpr {
     }
 }
 
-impl AstDisplay for PrimaryExpr {
+impl AstDisplay for PrimaryExpression {
     fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &crate::ast::display::Prefix) -> fmt::Result {
         match self {
-            PrimaryExpr::Null() => writeln!(f, "{prefix}null"),
-            PrimaryExpr::Bool(value) => writeln!(f, "{prefix}bool: {value}"),
-            PrimaryExpr::Int(value) => writeln!(f, "{prefix}int: {value}"),
-            PrimaryExpr::Float(value) => writeln!(f, "{prefix}float: {value}"),
-            PrimaryExpr::String(value) => writeln!(f, "{prefix}string: \"{value}\""),
-            PrimaryExpr::Identifier(value) => writeln!(f, "{prefix}ident: {value}"),
-            PrimaryExpr::Expr(node) => node.as_ref().ast_fmt(f, prefix),
+            PrimaryExpression::Null() => writeln!(f, "{prefix}null"),
+            PrimaryExpression::Bool(value) => writeln!(f, "{prefix}bool: {value}"),
+            PrimaryExpression::Int(value) => writeln!(f, "{prefix}int: {value}"),
+            PrimaryExpression::Float(value) => writeln!(f, "{prefix}float: {value}"),
+            PrimaryExpression::String(value) => writeln!(f, "{prefix}string: \"{value}\""),
+            PrimaryExpression::Identifier(value) => writeln!(f, "{prefix}ident: {value}"),
+            PrimaryExpression::Expr(node) => node.as_ref().ast_fmt(f, prefix),
         }
     }
 }

@@ -2,33 +2,33 @@ use std::fmt;
 
 use pest::iterators::Pairs;
 
-use crate::{ast::node::Build, error::AlthreadResult, no_rule, parser::Rule};
+use crate::{ast::node::AstNode, error::AlthreadResult, no_rule, parser::Rule};
 
 #[derive(Debug)]
-pub enum UnaryOp {
-    Pos,
-    Neg,
+pub enum UnaryOperator {
+    Positive,
+    Negative,
     Not,
 }
 
-impl Build for UnaryOp {
+impl AstNode for UnaryOperator {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let pair = pairs.next().unwrap();
         match pair.as_rule() {
-            Rule::POS_OP => Ok(Self::Pos),
-            Rule::NEG_OP => Ok(Self::Neg),
+            Rule::POS_OP => Ok(Self::Positive),
+            Rule::NEG_OP => Ok(Self::Negative),
             Rule::NOT_OP => Ok(Self::Not),
             _ => Err(no_rule!(pair)),
         }
     }
 }
 
-impl fmt::Display for UnaryOp {
+impl fmt::Display for UnaryOperator {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let op = match self {
-            UnaryOp::Pos => "+",
-            UnaryOp::Neg => "-",
-            UnaryOp::Not => "!",
+            UnaryOperator::Positive => "+",
+            UnaryOperator::Negative => "-",
+            UnaryOperator::Not => "!",
         };
 
         write!(f, "{}", op)

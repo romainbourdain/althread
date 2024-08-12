@@ -1,18 +1,18 @@
-pub mod binary_expr;
-pub mod primary_expr;
-pub mod unary_expr;
+pub mod binary_expression;
+pub mod primary_expression;
+pub mod unary_expression;
 
 use std::fmt;
 
-use binary_expr::BinaryExpr;
+use binary_expression::BinaryExpression;
 use pest::{iterators::Pairs, pratt_parser::PrattParser};
-use primary_expr::PrimaryExpr;
-use unary_expr::UnaryExpr;
+use primary_expression::PrimaryExpression;
+use unary_expression::UnaryExpression;
 
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{Build, Node},
+        node::{AstNode, Node},
     },
     error::AlthreadResult,
     parser::Rule,
@@ -34,45 +34,45 @@ lazy_static::lazy_static! {
 }
 
 #[derive(Debug)]
-pub enum Expr {
-    Binary(Node<BinaryExpr>),
-    Unary(Node<UnaryExpr>),
-    Primary(Node<PrimaryExpr>),
+pub enum Expression {
+    Binary(Node<BinaryExpression>),
+    Unary(Node<UnaryExpression>),
+    Primary(Node<PrimaryExpression>),
 }
 
-pub fn parse_expr(pairs: Pairs<Rule>) -> AlthreadResult<Node<Expr>> {
+pub fn parse_expr(pairs: Pairs<Rule>) -> AlthreadResult<Node<Expression>> {
     PRATT_PARSER
         .map_primary(|primary| {
             Ok(Node {
                 line: primary.line_col().0,
                 column: primary.line_col().1,
-                value: Expr::Primary(PrimaryExpr::build(primary)?),
+                value: Expression::Primary(PrimaryExpression::build(primary)?),
             })
         })
         .map_infix(|left, op, right| {
             Ok(Node {
                 line: op.line_col().0,
                 column: op.line_col().1,
-                value: Expr::Binary(BinaryExpr::build(left?, op, right?)?),
+                value: Expression::Binary(BinaryExpression::build(left?, op, right?)?),
             })
         })
         .map_prefix(|op, right| {
             Ok(Node {
                 line: op.line_col().0,
                 column: op.line_col().1,
-                value: Expr::Unary(UnaryExpr::build(op, right?)?),
+                value: Expression::Unary(UnaryExpression::build(op, right?)?),
             })
         })
         .parse(pairs)
 }
 
-impl Build for Expr {
+impl AstNode for Expression {
     fn build(pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         parse_expr(pairs).map(|node| node.value)
     }
 }
 
-impl AstDisplay for Expr {
+impl AstDisplay for Expression {
     fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
         match self {
             Self::Binary(node) => node.ast_fmt(f, prefix),

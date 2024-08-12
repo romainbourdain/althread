@@ -5,20 +5,20 @@ use pest::iterators::Pairs;
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{Build, Node},
+        node::{AstNode, Node},
     },
     error::AlthreadResult,
     parser::Rule,
 };
 
-use super::expr::Expr;
+use super::expression::Expression;
 
 #[derive(Debug)]
-pub struct Print {
-    pub value: Node<Expr>,
+pub struct PrintCall {
+    pub value: Node<Expression>,
 }
 
-impl Build for Print {
+impl AstNode for PrintCall {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let value = Node::build(pairs.next().unwrap())?;
 
@@ -26,7 +26,7 @@ impl Build for Print {
     }
 }
 
-impl AstDisplay for Print {
+impl AstDisplay for PrintCall {
     fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
         writeln!(f, "{prefix}print")?;
         self.value.ast_fmt(f, &prefix.add_leaf())?;

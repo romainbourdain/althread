@@ -6,26 +6,26 @@ use crate::{
     ast::{
         display::{AstDisplay, Prefix},
         node::Node,
-        token::binary_op::BinaryOp,
+        token::binary_operator::BinaryOperator,
     },
     error::AlthreadResult,
     parser::Rule,
 };
 
-use super::Expr;
+use super::Expression;
 
 #[derive(Debug)]
-pub struct BinaryExpr {
-    pub left: Box<Node<Expr>>,
-    pub operator: Node<BinaryOp>,
-    pub right: Box<Node<Expr>>,
+pub struct BinaryExpression {
+    pub left: Box<Node<Expression>>,
+    pub operator: Node<BinaryOperator>,
+    pub right: Box<Node<Expression>>,
 }
 
-impl BinaryExpr {
+impl BinaryExpression {
     pub fn build(
-        left: Node<Expr>,
+        left: Node<Expression>,
         operator: Pair<Rule>,
-        right: Node<Expr>,
+        right: Node<Expression>,
     ) -> AlthreadResult<Node<Self>> {
         Ok(Node {
             line: operator.line_col().0,
@@ -39,7 +39,7 @@ impl BinaryExpr {
     }
 }
 
-impl AstDisplay for BinaryExpr {
+impl AstDisplay for BinaryExpression {
     fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
         writeln!(f, "{prefix}binary_expr")?;
 

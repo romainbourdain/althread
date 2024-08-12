@@ -1,7 +1,7 @@
-pub mod brick;
+pub mod block;
 pub mod display;
 pub mod node;
-pub mod stmt;
+pub mod statement;
 pub mod token;
 
 use std::{
@@ -9,7 +9,7 @@ use std::{
     fmt::{self, Formatter},
 };
 
-use brick::Block;
+use block::Block;
 use display::{AstDisplay, Prefix};
 use node::Node;
 use pest::iterators::Pairs;
@@ -18,17 +18,17 @@ use crate::{error::AlthreadResult, no_rule, parser::Rule};
 
 #[derive(Debug)]
 pub struct Ast {
-    pub process_bricks: HashMap<String, Node<Block>>,
-    pub condition_bricks: HashMap<String, Node<Block>>,
-    pub global_brick: Option<Node<Block>>,
+    pub process_blocks: HashMap<String, Node<Block>>,
+    pub condition_blocks: HashMap<String, Node<Block>>,
+    pub global_block: Option<Node<Block>>,
 }
 
 impl Ast {
     pub fn new() -> Self {
         Self {
-            process_bricks: HashMap::new(),
-            condition_bricks: HashMap::new(),
-            global_brick: None,
+            process_blocks: HashMap::new(),
+            condition_blocks: HashMap::new(),
+            global_block: None,
         }
     }
 
@@ -39,29 +39,28 @@ impl Ast {
                 Rule::main_block => {
                     let mut pairs = pair.into_inner();
 
-                    let main_brick = Node::build(pairs.next().unwrap())?;
-                    ast.process_bricks.insert("main".to_string(), main_brick);
+                    let main_block = Node::build(pairs.next().unwrap())?;
+                    ast.process_blocks.insert("main".to_string(), main_block);
                 }
                 Rule::global_block => {
                     let mut pairs = pair.into_inner();
 
-                    let global_brick = Node::build(pairs.next().unwrap())?;
-                    ast.global_brick = Some(global_brick);
+                    let global_block = Node::build(pairs.next().unwrap())?;
+                    ast.global_block = Some(global_block);
                 }
                 Rule::condition_block => {
                     let mut pairs = pair.into_inner();
 
-                    let cond_brick_key = pairs.next().unwrap().as_str().to_string();
-                    let cond_brick = Node::build(pairs.next().unwrap())?;
-                    ast.condition_bricks.insert(cond_brick_key, cond_brick);
+                    let condition_key = pairs.next().unwrap().as_str().to_string();
+                    let condition_block = Node::build(pairs.next().unwrap())?;
+                    ast.condition_blocks.insert(condition_key, condition_block);
                 }
                 Rule::process_block => {
                     let mut pairs = pair.into_inner();
 
-                    let process_brick_ident = pairs.next().unwrap().as_str().to_string();
-                    let process_brick = Node::build(pairs.next().unwrap())?;
-                    ast.process_bricks
-                        .insert(process_brick_ident, process_brick);
+                    let process_identifier = pairs.next().unwrap().as_str().to_string();
+                    let process_block = Node::build(pairs.next().unwrap())?;
+                    ast.process_blocks.insert(process_identifier, process_block);
                 }
                 Rule::EOI => (),
                 _ => return Err(no_rule!(pair)),
@@ -80,14 +79,14 @@ impl fmt::Display for Ast {
 
 impl AstDisplay for Ast {
     fn ast_fmt(&self, f: &mut Formatter, prefix: &Prefix) -> fmt::Result {
-        if let Some(global_node) = &self.global_brick {
+        if let Some(global_node) = &self.global_block {
             writeln!(f, "{}shared", prefix)?;
             global_node.ast_fmt(f, &prefix.add_branch())?;
         }
 
         writeln!(f, "")?;
 
-        for (process_name, process_node) in &self.process_bricks {
+        for (process_name, process_node) in &self.process_blocks {
             writeln!(f, "{}{}", prefix, process_name)?;
             process_node.ast_fmt(f, &prefix.add_branch())?;
         }

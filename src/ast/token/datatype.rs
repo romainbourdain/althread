@@ -2,13 +2,13 @@ use std::fmt;
 
 use pest::iterators::Pairs;
 
-use crate::{ast::node::Build, error::AlthreadResult, no_rule, parser::Rule};
+use crate::{ast::node::AstNode, error::AlthreadResult, no_rule, parser::Rule};
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum DataType {
     Void,
-    Bool,
-    Int,
+    Boolean,
+    Integer,
     Float,
     String,
 }
@@ -106,12 +106,12 @@ pub enum DataType {
     }
 } */
 
-impl Build for DataType {
+impl AstNode for DataType {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let pair = pairs.next().unwrap();
         match pair.as_rule() {
-            Rule::BOOL_TYPE => Ok(Self::Bool),
-            Rule::INT_TYPE => Ok(Self::Int),
+            Rule::BOOL_TYPE => Ok(Self::Boolean),
+            Rule::INT_TYPE => Ok(Self::Integer),
             Rule::FLOAT_TYPE => Ok(Self::Float),
             Rule::STR_TYPE => Ok(Self::String),
             Rule::VOID_TYPE => Ok(Self::Void),
@@ -124,8 +124,8 @@ impl fmt::Display for DataType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let datatype = match self {
             DataType::Void => "void",
-            DataType::Bool => "bool",
-            DataType::Int => "int",
+            DataType::Boolean => "bool",
+            DataType::Integer => "int",
             DataType::Float => "float",
             DataType::String => "string",
         };

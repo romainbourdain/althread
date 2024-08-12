@@ -5,22 +5,22 @@ use pest::iterators::Pairs;
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{Build, Node},
+        node::{AstNode, Node},
     },
     error::AlthreadResult,
     parser::Rule,
 };
 
-use super::{expr::Expr, scope::Scope};
+use super::{expression::Expression, scope::Scope};
 
 #[derive(Debug)]
-pub struct IfStmt {
-    pub condition: Node<Expr>,
+pub struct IfControl {
+    pub condition: Node<Expression>,
     pub then_block: Node<Scope>,
     pub else_block: Option<Node<Scope>>,
 }
 
-impl Build for IfStmt {
+impl AstNode for IfControl {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let condition = Node::build(pairs.next().unwrap())?;
         let then_block = Node::build(pairs.next().unwrap())?;
@@ -34,7 +34,7 @@ impl Build for IfStmt {
     }
 }
 
-impl AstDisplay for IfStmt {
+impl AstDisplay for IfControl {
     fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
         writeln!(f, "{prefix}if_stmt")?;
 

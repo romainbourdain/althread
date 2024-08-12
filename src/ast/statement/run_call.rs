@@ -5,7 +5,7 @@ use pest::iterators::Pairs;
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{Build, Node},
+        node::{AstNode, Node},
         token::identifier::Identifier,
     },
     error::AlthreadResult,
@@ -13,11 +13,11 @@ use crate::{
 };
 
 #[derive(Debug)]
-pub struct RunStmt {
+pub struct RunCall {
     pub identifier: Node<Identifier>,
 }
 
-impl Build for RunStmt {
+impl AstNode for RunCall {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let identifier = Node::build(pairs.next().unwrap())?;
 
@@ -25,7 +25,7 @@ impl Build for RunStmt {
     }
 }
 
-impl AstDisplay for RunStmt {
+impl AstDisplay for RunCall {
     fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
         writeln!(f, "{prefix}run: {}", self.identifier)?;
 

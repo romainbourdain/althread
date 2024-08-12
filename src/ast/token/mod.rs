@@ -1,7 +1,7 @@
-pub mod binary_assign_op;
-pub mod binary_op;
+pub mod binary_assignment_operator;
+pub mod binary_operator;
 pub mod datatype;
-pub mod decl_keyword;
+pub mod declaration_keyword;
 pub mod identifier;
-pub mod unary_assign_op;
-pub mod unary_op;
+pub mod unary_assignment_operator;
+pub mod unary_operator;

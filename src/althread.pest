@@ -5,10 +5,10 @@ program = _{ SOI ~ blocks* ~ EOI }
 
 /// ## Program Structure
 /// The main building blocks of an Althread program are:
-/// - **Main Brick**: The entry point of the program.
-/// - **Shared Brick**: Declares global variables accessible across different parts of the program.
-/// - **Condition Brick**: Monitors conditions at each atomic step (e.g., always, never, eventually).
-/// - **Process Brick**: Encapsulates code that runs concurrently in parallel processes.
+/// - **Main Block**: The entry point of the program.
+/// - **Shared Block**: Declares global variables accessible across different parts of the program.
+/// - **Condition Block**: Monitors conditions at each atomic step (e.g., always, never, eventually).
+/// - **Process Block**: Encapsulates code that runs concurrently in parallel processes.
 blocks = _{ main_block | global_block | condition_block | process_block }
 
 global_block    = { GLOBAL_KW ~ "{" ~ declaration_statements ~ "}" }

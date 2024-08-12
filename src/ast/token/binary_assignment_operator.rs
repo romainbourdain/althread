@@ -2,42 +2,42 @@ use std::fmt;
 
 use pest::iterators::Pairs;
 
-use crate::{ast::node::Build, error::AlthreadResult, no_rule, parser::Rule};
+use crate::{ast::node::AstNode, error::AlthreadResult, no_rule, parser::Rule};
 
 #[derive(Debug)]
-pub enum BinaryAssignOp {
+pub enum BinaryAssignmentOperator {
     Assign,
     AddAssign,
-    SubAssign,
+    SubtractAssign,
     MulAssign,
-    DivAssign,
-    ModAssign,
+    DivideAssign,
+    ModuloAssign,
 }
 
-impl Build for BinaryAssignOp {
+impl AstNode for BinaryAssignmentOperator {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let pair = pairs.next().unwrap();
         match pair.as_rule() {
             Rule::ASSIGN_OP => Ok(Self::Assign),
             Rule::ADD_ASSIGN_OP => Ok(Self::AddAssign),
-            Rule::SUB_ASSIGN_OP => Ok(Self::SubAssign),
+            Rule::SUB_ASSIGN_OP => Ok(Self::SubtractAssign),
             Rule::MUL_ASSIGN_OP => Ok(Self::MulAssign),
-            Rule::DIV_ASSIGN_OP => Ok(Self::DivAssign),
-            Rule::MOD_ASSIGN_OP => Ok(Self::ModAssign),
+            Rule::DIV_ASSIGN_OP => Ok(Self::DivideAssign),
+            Rule::MOD_ASSIGN_OP => Ok(Self::ModuloAssign),
             _ => Err(no_rule!(pair)),
         }
     }
 }
 
-impl fmt::Display for BinaryAssignOp {
+impl fmt::Display for BinaryAssignmentOperator {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Assign => write!(f, "="),
             Self::AddAssign => write!(f, "+="),
-            Self::SubAssign => write!(f, "-="),
+            Self::SubtractAssign => write!(f, "-="),
             Self::MulAssign => write!(f, "*="),
-            Self::DivAssign => write!(f, "/="),
-            Self::ModAssign => write!(f, "%="),
+            Self::DivideAssign => write!(f, "/="),
+            Self::ModuloAssign => write!(f, "%="),
         }
     }
 }

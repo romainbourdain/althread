@@ -6,22 +6,22 @@ use crate::{
     ast::{
         display::{AstDisplay, Prefix},
         node::Node,
-        token::unary_op::UnaryOp,
+        token::unary_operator::UnaryOperator,
     },
     error::AlthreadResult,
     parser::Rule,
 };
 
-use super::Expr;
+use super::Expression;
 
 #[derive(Debug)]
-pub struct UnaryExpr {
-    pub operator: Node<UnaryOp>,
-    pub operand: Box<Node<Expr>>,
+pub struct UnaryExpression {
+    pub operator: Node<UnaryOperator>,
+    pub operand: Box<Node<Expression>>,
 }
 
-impl UnaryExpr {
-    pub fn build(operator: Pair<Rule>, operand: Node<Expr>) -> AlthreadResult<Node<Self>> {
+impl UnaryExpression {
+    pub fn build(operator: Pair<Rule>, operand: Node<Expression>) -> AlthreadResult<Node<Self>> {
         Ok(Node {
             line: operator.line_col().0,
             column: operator.line_col().1,
@@ -33,7 +33,7 @@ impl UnaryExpr {
     }
 }
 
-impl AstDisplay for UnaryExpr {
+impl AstDisplay for UnaryExpression {
     fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
         writeln!(f, "{}unary_expr", prefix)?;
         let prefix = &prefix.add_branch();
