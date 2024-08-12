@@ -6,11 +6,7 @@ use std::{
 use pest::iterators::Pair;
 
 use crate::{
-    ast::{
-        display::AstDisplay,
-        node::{AstNode, Node},
-        token::identifier::Identifier,
-    },
+    ast::{display::AstDisplay, node::Node, token::identifier::Identifier},
     error::{AlthreadError, AlthreadResult, ErrorType},
     no_rule,
     parser::Rule,
