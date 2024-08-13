@@ -5,9 +5,11 @@ use pest::iterators::Pairs;
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{AstNode, Node},
+        node::{Node, NodeBuilder, NodeExecutor},
         statement::Statement,
+        token::literal::Literal,
     },
+    env::Env,
     error::AlthreadResult,
     parser::Rule,
 };
@@ -17,13 +19,24 @@ pub struct Scope {
     pub children: Vec<Node<Statement>>,
 }
 
-impl AstNode for Scope {
+impl NodeBuilder for Scope {
     fn build(pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let children = pairs
             .map(Node::build)
             .collect::<AlthreadResult<Vec<Node<Statement>>>>()?;
 
         Ok(Self { children })
+    }
+}
+
+impl NodeExecutor for Scope {
+    fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
+        let node = &self.children[env.position];
+        if node.eval(env.get_child())?.is_some() {
+            env.consume();
+        }
+
+        Ok((env.position >= self.children.len()).then(|| Literal::Null))
     }
 }
 

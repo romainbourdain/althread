@@ -2,7 +2,7 @@ use std::fmt;
 
 use pest::iterators::Pairs;
 
-use crate::{ast::node::AstNode, error::AlthreadResult, no_rule, parser::Rule};
+use crate::{ast::node::NodeBuilder, error::AlthreadResult, no_rule, parser::Rule};
 
 #[derive(Debug)]
 pub enum BinaryOperator {
@@ -21,7 +21,7 @@ pub enum BinaryOperator {
     Or,
 }
 
-impl AstNode for BinaryOperator {
+impl NodeBuilder for BinaryOperator {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let pair = pairs.next().unwrap();
         match pair.as_rule() {

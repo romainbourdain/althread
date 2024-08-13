@@ -5,9 +5,10 @@ use pest::iterators::Pairs;
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{AstNode, Node},
-        token::identifier::Identifier,
+        node::{Node, NodeBuilder, NodeExecutor},
+        token::{identifier::Identifier, literal::Literal},
     },
+    env::Env,
     error::AlthreadResult,
     parser::Rule,
 };
@@ -17,11 +18,19 @@ pub struct RunCall {
     pub identifier: Node<Identifier>,
 }
 
-impl AstNode for RunCall {
+impl NodeBuilder for RunCall {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let identifier = Node::build(pairs.next().unwrap())?;
 
         Ok(Self { identifier })
+    }
+}
+
+impl NodeExecutor for RunCall {
+    fn eval(&self, _env: &mut Env) -> AlthreadResult<Option<Literal>> {
+        println!("run");
+
+        Ok(Some(Literal::Null))
     }
 }
 

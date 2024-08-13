@@ -5,11 +5,13 @@ use pest::iterators::Pairs;
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{AstNode, Node},
+        node::{Node, NodeBuilder, NodeExecutor},
         token::{
             datatype::DataType, declaration_keyword::DeclarationKeyword, identifier::Identifier,
+            literal::Literal,
         },
     },
+    env::Env,
     error::AlthreadResult,
     no_rule,
     parser::Rule,
@@ -25,7 +27,7 @@ pub struct Declaration {
     pub value: Option<Node<Expression>>,
 }
 
-impl AstNode for Declaration {
+impl NodeBuilder for Declaration {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let keyword = Node::build(pairs.next().unwrap())?;
         let identifier = Node::build(pairs.next().unwrap())?;
@@ -50,6 +52,14 @@ impl AstNode for Declaration {
             datatype,
             value,
         })
+    }
+}
+
+impl NodeExecutor for Declaration {
+    fn eval(&self, _env: &mut Env) -> AlthreadResult<Option<Literal>> {
+        println!("declaration");
+
+        Ok(Some(Literal::Null))
     }
 }
 

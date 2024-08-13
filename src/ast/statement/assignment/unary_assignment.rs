@@ -5,9 +5,13 @@ use pest::iterators::Pairs;
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{AstNode, Node},
-        token::{identifier::Identifier, unary_assignment_operator::UnaryAssignmentOperator},
+        node::{Node, NodeBuilder, NodeExecutor},
+        token::{
+            identifier::Identifier, literal::Literal,
+            unary_assignment_operator::UnaryAssignmentOperator,
+        },
     },
+    env::Env,
     error::AlthreadResult,
     parser::Rule,
 };
@@ -18,7 +22,7 @@ pub struct UnaryAssignment {
     pub operator: Node<UnaryAssignmentOperator>,
 }
 
-impl AstNode for UnaryAssignment {
+impl NodeBuilder for UnaryAssignment {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let identifier = Node::build(pairs.next().unwrap())?;
         let operator = Node::build(pairs.next().unwrap())?;
@@ -27,6 +31,12 @@ impl AstNode for UnaryAssignment {
             identifier,
             operator,
         })
+    }
+}
+
+impl NodeExecutor for UnaryAssignment {
+    fn eval(&self, _env: &mut Env) -> AlthreadResult<Option<Literal>> {
+        Ok(Some(Literal::Null))
     }
 }
 

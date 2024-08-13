@@ -5,10 +5,14 @@ use pest::iterators::Pairs;
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{AstNode, Node},
+        node::{Node, NodeBuilder, NodeExecutor},
         statement::expression::Expression,
-        token::{binary_assignment_operator::BinaryAssignmentOperator, identifier::Identifier},
+        token::{
+            binary_assignment_operator::BinaryAssignmentOperator, identifier::Identifier,
+            literal::Literal,
+        },
     },
+    env::Env,
     error::AlthreadResult,
     parser::Rule,
 };
@@ -20,7 +24,7 @@ pub struct BinaryAssignment {
     pub value: Node<Expression>,
 }
 
-impl AstNode for BinaryAssignment {
+impl NodeBuilder for BinaryAssignment {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let identifier = Node::build(pairs.next().unwrap())?;
         let operator = Node::build(pairs.next().unwrap())?;
@@ -31,6 +35,12 @@ impl AstNode for BinaryAssignment {
             operator,
             value,
         })
+    }
+}
+
+impl NodeExecutor for BinaryAssignment {
+    fn eval(&self, _env: &mut Env) -> AlthreadResult<Option<Literal>> {
+        Ok(Some(Literal::Null))
     }
 }
 

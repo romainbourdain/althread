@@ -5,8 +5,10 @@ use pest::iterators::Pairs;
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{AstNode, Node},
+        node::{Node, NodeBuilder, NodeExecutor},
+        token::literal::Literal,
     },
+    env::Env,
     error::AlthreadResult,
     parser::Rule,
 };
@@ -19,7 +21,7 @@ pub struct WhileControl {
     pub then_block: Node<Scope>,
 }
 
-impl AstNode for WhileControl {
+impl NodeBuilder for WhileControl {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let condition = Node::build(pairs.next().unwrap())?;
         let then_block = Node::build(pairs.next().unwrap())?;
@@ -28,6 +30,23 @@ impl AstNode for WhileControl {
             condition,
             then_block,
         })
+    }
+}
+
+impl NodeExecutor for WhileControl {
+    fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
+        match env.position {
+            0 => {
+                if self.condition.eval(env.get_child())?.is_some() {
+                    // TODO : Implement condition evaluation
+                    env.consume();
+                }
+                Ok(None)
+            }
+            // TODO : Implement loop at end of scope
+            1 => Ok(self.then_block.eval(env.get_child())?),
+            _ => unreachable!(),
+        }
     }
 }
 

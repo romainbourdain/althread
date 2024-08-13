@@ -52,7 +52,7 @@ declaration_keyword = { LET_KW | CONST_KW }
 /// Expressions evaluate values based on arithmetic and logical operations, following standard precedence rules.
 expression = { binary_expression | unary_expression | primary_expression }
 
-primary_expression = _{ BOOL | FLOAT | INT | STR | NULL | identifier | "(" ~ expression ~ ")" }
+primary_expression = _{ literal | identifier | "(" ~ expression ~ ")" }
 
 unary_expression = _{ unary_operator? ~ primary_expression }
 unary_operator   =  { POS_OP | NEG_OP | NOT_OP }
@@ -145,13 +145,14 @@ FLOAT_TYPE = { "float" }
 STR_TYPE   = { "string" }
 VOID_TYPE  = { "void" }
 
-/// ### Values
-/// Values include literals such as booleans, integers, floats, strings, and null.
-BOOL  = @{ TRUE_KW | FALSE_KW }
-INT   = @{ ASCII_DIGIT+ }
-FLOAT = @{ ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT* }
-STR   = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
-NULL  = @{ NULL_KW }
+/// ### Literals
+/// Include literals such as booleans, integers, floats, strings, and null.
+literal =  { BOOL | FLOAT | INT | STR | NULL }
+BOOL    = @{ TRUE_KW | FALSE_KW }
+INT     = @{ ASCII_DIGIT+ }
+FLOAT   = @{ ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT* }
+STR     = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
+NULL    = @{ NULL_KW }
 
 /// ### Identifiers
 /// Identifiers are used for naming variables, functions, and other constructs.

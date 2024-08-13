@@ -2,9 +2,12 @@ use std::fmt;
 
 use pest::iterators::{Pair, Pairs};
 
-use crate::{error::AlthreadResult, parser::Rule};
+use crate::{env::Env, error::AlthreadResult, parser::Rule};
 
-use super::display::{AstDisplay, Prefix};
+use super::{
+    display::{AstDisplay, Prefix},
+    token::literal::Literal,
+};
 
 #[derive(Debug, Clone)]
 pub struct Node<T> {
@@ -13,11 +16,15 @@ pub struct Node<T> {
     pub column: usize,
 }
 
-pub trait AstNode: Sized {
+pub trait NodeBuilder: Sized {
     fn build(pairs: Pairs<Rule>) -> AlthreadResult<Self>;
 }
 
-impl<T: AstNode> Node<T> {
+pub trait NodeExecutor: Sized {
+    fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>>;
+}
+
+impl<T: NodeBuilder> Node<T> {
     pub fn build(pair: Pair<Rule>) -> AlthreadResult<Self> {
         let (line, col) = pair.line_col();
         Ok(Node {
@@ -25,6 +32,12 @@ impl<T: AstNode> Node<T> {
             line,
             column: col,
         })
+    }
+}
+
+impl<T: NodeExecutor> Node<T> {
+    pub fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
+        self.value.eval(env)
     }
 }
 

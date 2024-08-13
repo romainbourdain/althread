@@ -5,8 +5,10 @@ use pest::iterators::Pairs;
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{AstNode, Node},
+        node::{Node, NodeBuilder, NodeExecutor},
+        token::literal::Literal,
     },
+    env::Env,
     error::AlthreadResult,
     parser::Rule,
 };
@@ -20,7 +22,7 @@ pub struct IfControl {
     pub else_block: Option<Node<Scope>>,
 }
 
-impl AstNode for IfControl {
+impl NodeBuilder for IfControl {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let condition = Node::build(pairs.next().unwrap())?;
         let then_block = Node::build(pairs.next().unwrap())?;
@@ -31,6 +33,30 @@ impl AstNode for IfControl {
             then_block,
             else_block,
         })
+    }
+}
+
+impl NodeExecutor for IfControl {
+    fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
+        match env.position {
+            0 => {
+                if self.condition.eval(env.get_child())?.is_some() {
+                    // TODO : Implement condition evaluation
+                    env.consume();
+                }
+                Ok(None)
+            }
+            1 => Ok(self
+                .then_block
+                .eval(env.get_child())?
+                .map(|_| Literal::Null)),
+            2 => Ok(if let Some(else_block) = &self.else_block {
+                else_block.eval(env.get_child())?.map(|_| Literal::Null)
+            } else {
+                Some(Literal::Null)
+            }),
+            _ => unreachable!(),
+        }
     }
 }
 

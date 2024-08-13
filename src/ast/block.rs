@@ -2,12 +2,13 @@ use std::fmt;
 
 use pest::iterators::Pairs;
 
-use crate::{error::AlthreadResult, parser::Rule};
+use crate::{env::Env, error::AlthreadResult, parser::Rule};
 
 use super::{
     display::{AstDisplay, Prefix},
-    node::{AstNode, Node},
+    node::{Node, NodeBuilder, NodeExecutor},
     statement::Statement,
+    token::literal::Literal,
 };
 
 #[derive(Debug)]
@@ -15,7 +16,7 @@ pub struct Block {
     pub children: Vec<Node<Statement>>,
 }
 
-impl AstNode for Block {
+impl NodeBuilder for Block {
     fn build(pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let mut block = Self::new();
 
@@ -25,6 +26,17 @@ impl AstNode for Block {
         }
 
         Ok(block)
+    }
+}
+
+impl NodeExecutor for Block {
+    fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
+        let node = &self.children[env.position];
+        if node.eval(env.get_child())?.is_some() {
+            env.consume();
+        }
+
+        Ok((env.position >= self.children.len()).then(|| Literal::Null))
     }
 }
 

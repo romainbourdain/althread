@@ -10,8 +10,10 @@ use unary_assignment::UnaryAssignment;
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{AstNode, Node},
+        node::{Node, NodeBuilder, NodeExecutor},
+        token::literal::Literal,
     },
+    env::Env,
     error::AlthreadResult,
     no_rule,
     parser::Rule,
@@ -23,7 +25,7 @@ pub enum Assignment {
     Binary(Node<BinaryAssignment>),
 }
 
-impl AstNode for Assignment {
+impl NodeBuilder for Assignment {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let pair = pairs.next().unwrap();
 
@@ -32,6 +34,13 @@ impl AstNode for Assignment {
             Rule::binary_assignment => Ok(Self::Binary(Node::build(pair)?)),
             _ => Err(no_rule!(pair)),
         }
+    }
+}
+
+impl NodeExecutor for Assignment {
+    fn eval(&self, _env: &mut Env) -> AlthreadResult<Option<Literal>> {
+        println!("assignment");
+        Ok(Some(Literal::Null))
     }
 }
 

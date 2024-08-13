@@ -2,7 +2,7 @@ use std::fmt;
 
 use pest::iterators::Pairs;
 
-use crate::{ast::node::AstNode, error::AlthreadResult, no_rule, parser::Rule};
+use crate::{ast::node::NodeBuilder, error::AlthreadResult, no_rule, parser::Rule};
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum DataType {
@@ -106,7 +106,7 @@ pub enum DataType {
     }
 } */
 
-impl AstNode for DataType {
+impl NodeBuilder for DataType {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let pair = pairs.next().unwrap();
         match pair.as_rule() {

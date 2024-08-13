@@ -12,8 +12,10 @@ use unary_expression::UnaryExpression;
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::{AstNode, Node},
+        node::{Node, NodeBuilder, NodeExecutor},
+        token::literal::Literal,
     },
+    env::Env,
     error::AlthreadResult,
     parser::Rule,
 };
@@ -66,9 +68,17 @@ pub fn parse_expr(pairs: Pairs<Rule>) -> AlthreadResult<Node<Expression>> {
         .parse(pairs)
 }
 
-impl AstNode for Expression {
+impl NodeBuilder for Expression {
     fn build(pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         parse_expr(pairs).map(|node| node.value)
+    }
+}
+
+impl NodeExecutor for Expression {
+    fn eval(&self, _env: &mut Env) -> AlthreadResult<Option<Literal>> {
+        println!("expression");
+
+        Ok(Some(Literal::Null))
     }
 }
 

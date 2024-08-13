@@ -19,11 +19,12 @@ use run_call::RunCall;
 use scope::Scope;
 use while_control::WhileControl;
 
-use crate::{error::AlthreadResult, no_rule, parser::Rule};
+use crate::{env::Env, error::AlthreadResult, no_rule, parser::Rule};
 
 use super::{
     display::{AstDisplay, Prefix},
-    node::{AstNode, Node},
+    node::{Node, NodeBuilder, NodeExecutor},
+    token::literal::Literal,
 };
 
 #[derive(Debug)]
@@ -38,7 +39,7 @@ pub enum Statement {
     Scope(Node<Scope>),
 }
 
-impl AstNode for Statement {
+impl NodeBuilder for Statement {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let pair = pairs.next().unwrap();
 
@@ -52,6 +53,21 @@ impl AstNode for Statement {
             Rule::while_control => Ok(Self::While(Node::build(pair)?)),
             Rule::scope => Ok(Self::Scope(Node::build(pair)?)),
             _ => Err(no_rule!(pair)),
+        }
+    }
+}
+
+impl NodeExecutor for Statement {
+    fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
+        match self {
+            Self::Assignment(node) => node.eval(env),
+            Self::Declaration(node) => node.eval(env),
+            Self::Expression(node) => node.eval(env),
+            Self::Print(node) => node.eval(env),
+            Self::Run(node) => node.eval(env),
+            Self::If(node) => node.eval(env),
+            Self::While(node) => node.eval(env),
+            Self::Scope(node) => node.eval(env),
         }
     }
 }

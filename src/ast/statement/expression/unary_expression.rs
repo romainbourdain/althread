@@ -5,10 +5,11 @@ use pest::iterators::Pair;
 use crate::{
     ast::{
         display::{AstDisplay, Prefix},
-        node::Node,
-        token::unary_operator::UnaryOperator,
+        node::{Node, NodeExecutor},
+        token::{literal::Literal, unary_operator::UnaryOperator},
     },
-    error::AlthreadResult,
+    env::Env,
+    error::{AlthreadError, AlthreadResult, ErrorType},
     parser::Rule,
 };
 
@@ -29,6 +30,27 @@ impl UnaryExpression {
                 operator: Node::build(operator)?,
                 operand: Box::new(operand),
             },
+        })
+    }
+}
+
+impl NodeExecutor for UnaryExpression {
+    fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
+        let operand = self.operand.eval(env)?.unwrap();
+
+        match self.operator.value {
+            UnaryOperator::Positive => operand.positive(),
+            UnaryOperator::Negative => operand.negative(),
+            UnaryOperator::Not => operand.not(),
+        }
+        .map(|res| Some(res))
+        .map_err(|e| {
+            AlthreadError::new(
+                ErrorType::TypeError,
+                self.operator.line,
+                self.operator.column,
+                format!("{}", e),
+            )
         })
     }
 }
