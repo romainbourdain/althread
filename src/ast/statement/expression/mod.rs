@@ -76,9 +76,11 @@ impl NodeBuilder for Expression {
 
 impl NodeExecutor for Expression {
     fn eval(&self, _env: &mut Env) -> AlthreadResult<Option<Literal>> {
-        println!("expression");
-
-        Ok(Some(Literal::Null))
+        match self {
+            Self::Binary(node) => node.eval(_env),
+            Self::Unary(node) => node.eval(_env),
+            Self::Primary(node) => node.eval(_env),
+        }
     }
 }
 

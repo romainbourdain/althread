@@ -1,12 +1,3 @@
 main {
-  c  = 8;
-  let d = 9;
-  3+4;
-  print(a);
-
-  if (c < 4) {
-   let a = 8;
-   run A();
-  } else {
-  }
+  3+5*4+20;
 }

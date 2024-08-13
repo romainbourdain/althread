@@ -24,6 +24,7 @@ impl NodeBuilder for Identifier {
 
 impl NodeExecutor for Identifier {
     fn eval(&self, _env: &mut Env) -> AlthreadResult<Option<Literal>> {
+        // TODO: Get the value of the identifier from the environment
         Ok(Some(Literal::Null))
     }
 }

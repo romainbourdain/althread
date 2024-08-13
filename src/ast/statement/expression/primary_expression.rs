@@ -5,9 +5,10 @@ use pest::iterators::Pair;
 use crate::{
     ast::{
         display::AstDisplay,
-        node::Node,
+        node::{Node, NodeExecutor},
         token::{identifier::Identifier, literal::Literal},
     },
+    env::Env,
     error::AlthreadResult,
     no_rule,
     parser::Rule,
@@ -19,7 +20,7 @@ use super::Expression;
 pub enum PrimaryExpression {
     Literal(Node<Literal>),
     Identifier(Node<Identifier>),
-    Expr(Box<Node<Expression>>),
+    Expression(Box<Node<Expression>>),
 }
 
 impl PrimaryExpression {
@@ -30,10 +31,20 @@ impl PrimaryExpression {
             value: match pair.as_rule() {
                 Rule::literal => Self::Literal(Node::build(pair)?),
                 Rule::identifier => Self::Identifier(Node::build(pair)?),
-                Rule::expression => Self::Expr(Box::new(Node::build(pair)?)),
+                Rule::expression => Self::Expression(Box::new(Node::build(pair)?)),
                 _ => return Err(no_rule!(pair)),
             },
         })
+    }
+}
+
+impl NodeExecutor for PrimaryExpression {
+    fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
+        match self {
+            Self::Literal(node) => node.eval(env),
+            Self::Identifier(node) => node.eval(env),
+            Self::Expression(node) => node.eval(env),
+        }
     }
 }
 
@@ -42,7 +53,7 @@ impl AstDisplay for PrimaryExpression {
         match self {
             Self::Literal(node) => node.ast_fmt(f, prefix),
             PrimaryExpression::Identifier(value) => writeln!(f, "{prefix}ident: {value}"),
-            PrimaryExpression::Expr(node) => node.ast_fmt(f, prefix),
+            PrimaryExpression::Expression(node) => node.ast_fmt(f, prefix),
         }
     }
 }

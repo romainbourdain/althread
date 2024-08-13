@@ -15,7 +15,7 @@ use crate::{
 
 use super::datatype::DataType;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Literal {
     Null,
     Bool(bool),
@@ -52,7 +52,7 @@ impl NodeBuilder for Literal {
 
 impl NodeExecutor for Literal {
     fn eval(&self, _env: &mut Env) -> AlthreadResult<Option<Literal>> {
-        Ok(Some(Literal::Null))
+        Ok(Some(self.clone()))
     }
 }
 
