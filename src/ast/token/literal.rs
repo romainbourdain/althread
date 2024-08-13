@@ -1,3 +1,4 @@
+use core::fmt;
 use std::{fmt::Formatter, str::FromStr};
 
 use pest::iterators::{Pair, Pairs};
@@ -67,14 +68,14 @@ impl Literal {
         }
     }
 
-    pub fn is_true(&self) -> Result<bool, String> {
+    pub fn is_true(&self) -> bool {
         match self {
-            Self::Null => Ok(false),
-            Self::Int(i) if *i == 0 => Ok(false),
-            Self::Float(f) if *f == 0.0 => Ok(false),
-            Self::Bool(b) if !*b => Ok(false),
-            Self::String(s) if s.is_empty() => Ok(false),
-            _ => Ok(true),
+            Self::Null => false,
+            Self::Int(i) if *i == 0 => false,
+            Self::Float(f) if *f == 0.0 => false,
+            Self::Bool(b) if !*b => false,
+            Self::String(s) if s.is_empty() => false,
+            _ => true,
         }
     }
 
@@ -140,8 +141,9 @@ impl Literal {
 
     pub fn divide(&self, other: &Self) -> Result<Self, String> {
         match (self, other) {
-            (Self::Int(i), Self::Int(j)) if *j != 0 => Ok(Self::Int(i / j)),
-            (Self::Float(i), Self::Float(j)) if *j != 0.0 => Ok(Self::Float(i / j)),
+            (_, Self::Int(0)) | (_, Self::Float(0.0)) => Err("Cannot divide by zero".to_string()),
+            (Self::Int(i), Self::Int(j)) => Ok(Self::Int(i / j)),
+            (Self::Float(i), Self::Float(j)) => Ok(Self::Float(i / j)),
             (i, j) => Err(format!(
                 "Cannot divide {} by {}",
                 i.get_data_type(),
@@ -178,7 +180,7 @@ impl Literal {
     }
 
     pub fn not_equals(&self, other: &Self) -> Result<Self, String> {
-        Ok(Self::Bool(!self.equals(other)?.is_true()?))
+        Ok(Self::Bool(!self.equals(other)?.is_true()))
     }
 
     pub fn less_than(&self, other: &Self) -> Result<Self, String> {
@@ -248,6 +250,18 @@ impl Literal {
                 i.get_data_type(),
                 j.get_data_type()
             )),
+        }
+    }
+}
+
+impl fmt::Display for Literal {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Null => write!(f, "null"),
+            Self::Bool(value) => write!(f, "{}", value),
+            Self::Int(value) => write!(f, "{}", value),
+            Self::Float(value) => write!(f, "{}", value),
+            Self::String(value) => write!(f, "{}", value),
         }
     }
 }

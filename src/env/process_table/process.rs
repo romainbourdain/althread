@@ -18,7 +18,7 @@ impl Process {
         running_process: &Rc<RefCell<RunningProcess>>,
     ) -> Self {
         Self {
-            symbol_table: SymbolTableStack::new(Rc::clone(global_table)),
+            symbol_table: SymbolTableStack::new(&global_table),
             process_table: Rc::clone(process_table),
             running_process: Rc::clone(running_process),
         }

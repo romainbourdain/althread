@@ -40,21 +40,26 @@ impl NodeExecutor for IfControl {
     fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
         match env.position {
             0 => {
-                if self.condition.eval(env.get_child())?.is_some() {
-                    // TODO : Implement condition evaluation
-                    env.consume();
-                }
+                let condition = self.condition.eval(env.get_child())?.unwrap();
+                env.position = if condition.is_true() {
+                    1
+                } else if self.else_block.is_some() {
+                    2
+                } else {
+                    return Ok(Some(Literal::Null));
+                };
                 Ok(None)
             }
             1 => Ok(self
                 .then_block
                 .eval(env.get_child())?
                 .map(|_| Literal::Null)),
-            2 => Ok(if let Some(else_block) = &self.else_block {
-                else_block.eval(env.get_child())?.map(|_| Literal::Null)
-            } else {
-                Some(Literal::Null)
-            }),
+            2 => Ok(self
+                .else_block
+                .as_ref()
+                .unwrap()
+                .eval(env.get_child())?
+                .map(|_| Literal::Null)),
             _ => unreachable!(),
         }
     }

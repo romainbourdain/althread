@@ -1,34 +1,9 @@
-// pub mod process_table;
-// pub mod symbol_table;
+pub mod process_table;
+pub mod symbol_table;
 
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
+use std::{cell::RefCell, rc::Rc};
 
-#[derive(Debug)]
-pub struct SymbolTable {
-    pub table: HashMap<String, ()>,
-}
-
-impl SymbolTable {
-    pub fn new() -> Self {
-        Self {
-            table: HashMap::new(),
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct SymbolTableStack {
-    pub stack: Vec<SymbolTable>,
-}
-
-impl SymbolTableStack {
-    pub fn new() -> Self {
-        Self { stack: Vec::new() }
-    }
-    pub fn push(&mut self) {
-        self.stack.push(SymbolTable::new());
-    }
-}
+use symbol_table::symbol_table_stack::SymbolTableStack;
 
 #[derive(Debug)]
 pub struct Env {
@@ -47,8 +22,17 @@ impl Env {
     }
 
     pub fn consume(&mut self) {
-        self.child = None;
+        self.clean();
         self.position += 1;
+    }
+
+    pub fn reset(&mut self) {
+        self.clean();
+        self.position = 0;
+    }
+
+    pub fn clean(&mut self) {
+        self.child = None;
     }
 
     pub fn get_child(&mut self) -> &mut Env {

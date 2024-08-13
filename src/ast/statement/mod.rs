@@ -62,12 +62,7 @@ impl NodeExecutor for Statement {
         match self {
             Self::Assignment(node) => node.eval(env),
             Self::Declaration(node) => node.eval(env),
-            Self::Expression(node) => {
-                if let Some(result) = node.eval(env)? {
-                    println!("{:?}", result);
-                }
-                node.eval(env)
-            }
+            Self::Expression(node) => node.eval(env),
             Self::Print(node) => node.eval(env),
             Self::Run(node) => node.eval(env),
             Self::If(node) => node.eval(env),

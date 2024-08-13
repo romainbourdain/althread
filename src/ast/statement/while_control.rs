@@ -37,14 +37,20 @@ impl NodeExecutor for WhileControl {
     fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
         match env.position {
             0 => {
-                if self.condition.eval(env.get_child())?.is_some() {
-                    // TODO : Implement condition evaluation
-                    env.consume();
+                let condition = self.condition.eval(env.get_child())?.unwrap();
+                if condition.is_true() {
+                    env.position = 1;
+                    Ok(None)
+                } else {
+                    Ok(Some(Literal::Null))
+                }
+            }
+            1 => {
+                if self.then_block.eval(env.get_child())?.is_some() {
+                    env.reset();
                 }
                 Ok(None)
             }
-            // TODO : Implement loop at end of scope
-            1 => Ok(self.then_block.eval(env.get_child())?),
             _ => unreachable!(),
         }
     }

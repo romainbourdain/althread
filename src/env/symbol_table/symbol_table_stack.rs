@@ -9,9 +9,9 @@ pub struct SymbolTableStack {
 }
 
 impl SymbolTableStack {
-    pub fn new(global: Rc<RefCell<SymbolTable>>) -> Self {
+    pub fn new(global: &Rc<RefCell<SymbolTable>>) -> Self {
         Self {
-            global,
+            global: Rc::clone(global),
             tables: Vec::new(),
         }
     }
