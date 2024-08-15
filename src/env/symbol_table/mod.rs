@@ -25,6 +25,14 @@ impl SymbolTable {
         self.symbols.get(name)
     }
 
+    pub fn get_mut(&mut self, name: &str) -> Option<&mut Symbol> {
+        self.symbols.get_mut(name)
+    }
+
+    pub fn update(&mut self, name: String, symbol: Symbol) {
+        self.symbols.insert(name, symbol);
+    }
+
     pub fn contains_key(&self, name: &str) -> bool {
         self.symbols.contains_key(name)
     }

@@ -12,7 +12,7 @@ use crate::{
         },
     },
     env::Env,
-    error::AlthreadResult,
+    error::{AlthreadError, AlthreadResult, ErrorType},
     parser::Rule,
 };
 
@@ -35,7 +35,46 @@ impl NodeBuilder for UnaryAssignment {
 }
 
 impl NodeExecutor for UnaryAssignment {
-    fn eval(&self, _env: &mut Env) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
+        let current_value: Literal = env
+            .symbol_table
+            .borrow()
+            .get(&self.identifier.value)
+            .map_err(|e| {
+                AlthreadError::new(
+                    ErrorType::VariableError,
+                    self.identifier.line,
+                    self.identifier.column,
+                    e,
+                )
+            })?
+            .value;
+
+        let value = match self.operator.value {
+            UnaryAssignmentOperator::Increment => current_value.increment(),
+            UnaryAssignmentOperator::Decrement => current_value.decrement(),
+        }
+        .map_err(|e| {
+            AlthreadError::new(
+                ErrorType::VariableError,
+                self.identifier.line,
+                self.identifier.column,
+                e,
+            )
+        })?;
+
+        env.symbol_table
+            .borrow_mut()
+            .update(&self.identifier.value, value)
+            .map_err(|e| {
+                AlthreadError::new(
+                    ErrorType::VariableError,
+                    self.identifier.line,
+                    self.identifier.column,
+                    e,
+                )
+            })?;
+
         Ok(Some(Literal::Null))
     }
 }

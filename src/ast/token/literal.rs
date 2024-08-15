@@ -262,6 +262,22 @@ impl Literal {
             )),
         }
     }
+
+    pub fn increment(&self) -> Result<Self, String> {
+        match self {
+            Self::Int(i) => Ok(Self::Int(i + 1)),
+            Self::Float(f) => Ok(Self::Float(f + 1.0)),
+            i => Err(format!("Cannot increment {}", i.get_datatype())),
+        }
+    }
+
+    pub fn decrement(&self) -> Result<Self, String> {
+        match self {
+            Self::Int(i) => Ok(Self::Int(i - 1)),
+            Self::Float(f) => Ok(Self::Float(f - 1.0)),
+            i => Err(format!("Cannot decrement {}", i.get_datatype())),
+        }
+    }
 }
 
 impl fmt::Display for Literal {

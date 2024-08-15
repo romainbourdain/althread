@@ -1,5 +1,6 @@
 main {
   let a: int = 5;
+  a-=8;
 
   print(a);
 }

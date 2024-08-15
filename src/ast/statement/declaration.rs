@@ -72,7 +72,12 @@ impl NodeExecutor for Declaration {
         let mut symbol_table = env.symbol_table.borrow_mut();
 
         symbol_table
-            .insert(true, &self.identifier.value, datatype, value)
+            .insert(
+                self.keyword.value == DeclarationKeyword::Let,
+                &self.identifier.value,
+                datatype,
+                value,
+            )
             .map_err(|e| {
                 AlthreadError::new(
                     ErrorType::VariableError,

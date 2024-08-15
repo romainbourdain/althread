@@ -9,7 +9,7 @@ pub enum BinaryAssignmentOperator {
     Assign,
     AddAssign,
     SubtractAssign,
-    MulAssign,
+    MultiplyAssign,
     DivideAssign,
     ModuloAssign,
 }
@@ -21,7 +21,7 @@ impl NodeBuilder for BinaryAssignmentOperator {
             Rule::ASSIGN_OP => Ok(Self::Assign),
             Rule::ADD_ASSIGN_OP => Ok(Self::AddAssign),
             Rule::SUB_ASSIGN_OP => Ok(Self::SubtractAssign),
-            Rule::MUL_ASSIGN_OP => Ok(Self::MulAssign),
+            Rule::MUL_ASSIGN_OP => Ok(Self::MultiplyAssign),
             Rule::DIV_ASSIGN_OP => Ok(Self::DivideAssign),
             Rule::MOD_ASSIGN_OP => Ok(Self::ModuloAssign),
             _ => Err(no_rule!(pair)),
@@ -35,7 +35,7 @@ impl fmt::Display for BinaryAssignmentOperator {
             Self::Assign => write!(f, "="),
             Self::AddAssign => write!(f, "+="),
             Self::SubtractAssign => write!(f, "-="),
-            Self::MulAssign => write!(f, "*="),
+            Self::MultiplyAssign => write!(f, "*="),
             Self::DivideAssign => write!(f, "/="),
             Self::ModuloAssign => write!(f, "%="),
         }

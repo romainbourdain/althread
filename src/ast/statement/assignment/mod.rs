@@ -38,9 +38,11 @@ impl NodeBuilder for Assignment {
 }
 
 impl NodeExecutor for Assignment {
-    fn eval(&self, _env: &mut Env) -> AlthreadResult<Option<Literal>> {
-        println!("assignment");
-        Ok(Some(Literal::Null))
+    fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
+        match self {
+            Self::Unary(node) => node.eval(env),
+            Self::Binary(node) => node.eval(env),
+        }
     }
 }
 

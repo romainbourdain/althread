@@ -56,6 +56,29 @@ impl SymbolTableStack {
         Ok(())
     }
 
+    pub fn update(&self, identifier: &Identifier, value: Literal) -> Result<(), String> {
+        for table in self.tables.iter().rev() {
+            if let Some(symbol) = table.borrow_mut().get_mut(&identifier.value) {
+                if !symbol.mutable {
+                    return Err(format!("Symbol {} is not mutable", identifier));
+                }
+
+                if symbol.datatype != value.get_datatype() {
+                    return Err(format!(
+                        "Cannot assign {} to {}",
+                        value.get_datatype(),
+                        symbol.datatype
+                    ));
+                }
+
+                symbol.value = value.clone();
+                break;
+            }
+        }
+
+        Ok(())
+    }
+
     pub fn get(&self, identifier: &Identifier) -> Result<Symbol, String> {
         self.tables
             .iter()
