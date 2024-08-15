@@ -8,7 +8,7 @@ use crate::{
         node::{Node, NodeExecutor},
         token::{literal::Literal, unary_operator::UnaryOperator},
     },
-    env::process_table::process::Process,
+    env::process_table::process_env::ProcessEnv,
     error::{AlthreadError, AlthreadResult, ErrorType},
     parser::Rule,
 };
@@ -35,7 +35,7 @@ impl UnaryExpression {
 }
 
 impl NodeExecutor for UnaryExpression {
-    fn eval(&self, env: &mut Process) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
         let operand = self.operand.eval(env)?.unwrap();
 
         match self.operator.value {

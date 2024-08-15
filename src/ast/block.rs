@@ -2,7 +2,7 @@ use std::fmt;
 
 use pest::iterators::Pairs;
 
-use crate::{env::process_table::process::Process, error::AlthreadResult, parser::Rule};
+use crate::{env::process_table::process_env::ProcessEnv, error::AlthreadResult, parser::Rule};
 
 use super::{
     display::{AstDisplay, Prefix},
@@ -30,7 +30,7 @@ impl NodeBuilder for Block {
 }
 
 impl NodeExecutor for Block {
-    fn eval(&self, env: &mut Process) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
         let node = &self.children[env.position];
         if node.eval(env.get_child())?.is_some() {
             env.consume();

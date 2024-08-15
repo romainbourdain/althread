@@ -3,13 +3,13 @@ use std::{cell::RefCell, rc::Rc};
 use crate::env::symbol_table::symbol_table_stack::SymbolTableStack;
 
 #[derive(Debug)]
-pub struct Process {
+pub struct ProcessEnv {
     pub symbol_table: Rc<RefCell<SymbolTableStack>>,
-    pub position: usize,             // the current position in the AST
-    pub child: Option<Box<Process>>, // the child scope environment
+    pub position: usize,                // the current position in the AST
+    pub child: Option<Box<ProcessEnv>>, // the child scope environment
 }
 
-impl Process {
+impl ProcessEnv {
     pub fn new(symbol_table: &Rc<RefCell<SymbolTableStack>>) -> Self {
         Self {
             position: 0,
@@ -32,7 +32,7 @@ impl Process {
         self.child = None;
     }
 
-    pub fn get_child(&mut self) -> &mut Process {
+    pub fn get_child(&mut self) -> &mut ProcessEnv {
         if self.child.is_none() {
             self.child = Some(Box::new(Self::new(&self.symbol_table)));
         }

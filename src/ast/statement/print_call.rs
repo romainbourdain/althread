@@ -8,7 +8,7 @@ use crate::{
         node::{Node, NodeBuilder, NodeExecutor},
         token::literal::Literal,
     },
-    env::process_table::process::Process,
+    env::process_table::process_env::ProcessEnv,
     error::AlthreadResult,
     parser::Rule,
 };
@@ -29,7 +29,7 @@ impl NodeBuilder for PrintCall {
 }
 
 impl NodeExecutor for PrintCall {
-    fn eval(&self, env: &mut Process) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
         if let Some(value) = self.value.eval(env)? {
             println!("{}", value);
         }
