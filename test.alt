@@ -1,9 +1,5 @@
-main {
-  let a = 8;
-  while (a > 0) {
-    a--;
-    print(a);
-  }
-
-  print("finished");
+process A() {
+  print("A");
+  print("B");
 }
+
