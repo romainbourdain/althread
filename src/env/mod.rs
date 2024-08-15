@@ -33,7 +33,7 @@ impl Env {
 
         self.running_process
             .borrow_mut()
-            .insert("main".to_string(), &self.global_table);
+            .insert("main".to_string(), &self);
 
         for (identifier, process) in self.running_process.borrow_mut().processes.iter_mut() {
             while ast.eval(identifier.clone(), process)?.is_none() {}
