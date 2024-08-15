@@ -12,7 +12,7 @@ use crate::{
         },
     },
     env::Env,
-    error::AlthreadResult,
+    error::{AlthreadError, AlthreadResult, ErrorType},
     no_rule,
     parser::Rule,
 };
@@ -56,8 +56,31 @@ impl NodeBuilder for Declaration {
 }
 
 impl NodeExecutor for Declaration {
-    fn eval(&self, _env: &mut Env) -> AlthreadResult<Option<Literal>> {
-        println!("declaration");
+    fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
+        let datatype = self
+            .datatype
+            .as_ref()
+            .map(|datatype| datatype.value.clone());
+
+        let value = self
+            .value
+            .as_ref()
+            .map(|value| value.eval(env))
+            .transpose()?
+            .unwrap();
+
+        let mut symbol_table = env.symbol_table.borrow_mut();
+
+        symbol_table
+            .insert(true, &self.identifier.value, datatype, value)
+            .map_err(|e| {
+                AlthreadError::new(
+                    ErrorType::VariableError,
+                    self.identifier.line,
+                    self.identifier.column,
+                    e,
+                )
+            })?;
 
         Ok(Some(Literal::Null))
     }

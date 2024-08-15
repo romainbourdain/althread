@@ -8,8 +8,8 @@ use symbol_table::symbol_table_stack::SymbolTableStack;
 #[derive(Debug)]
 pub struct Env {
     pub symbol_table: Rc<RefCell<SymbolTableStack>>,
-    pub position: usize,
-    pub child: Option<Box<Env>>,
+    pub position: usize,         // the current position in the AST
+    pub child: Option<Box<Env>>, // the child scope environment
 }
 
 impl Env {

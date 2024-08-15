@@ -4,6 +4,8 @@ use pest::iterators::Pairs;
 
 use crate::{ast::node::NodeBuilder, error::AlthreadResult, no_rule, parser::Rule};
 
+use super::literal::Literal;
+
 #[derive(Debug, PartialEq, Clone)]
 pub enum DataType {
     Void,
@@ -116,6 +118,18 @@ impl NodeBuilder for DataType {
             Rule::STR_TYPE => Ok(Self::String),
             Rule::VOID_TYPE => Ok(Self::Void),
             _ => Err(no_rule!(pair)),
+        }
+    }
+}
+
+impl DataType {
+    pub fn get_literal(&self) -> Literal {
+        match self {
+            DataType::Void => Literal::Null,
+            DataType::Boolean => Literal::Bool(false),
+            DataType::Integer => Literal::Int(0),
+            DataType::Float => Literal::Float(0.0),
+            DataType::String => Literal::String("".to_string()),
         }
     }
 }

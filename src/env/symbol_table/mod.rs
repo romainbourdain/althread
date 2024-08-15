@@ -24,4 +24,8 @@ impl SymbolTable {
     pub fn get(&self, name: &str) -> Option<&Symbol> {
         self.symbols.get(name)
     }
+
+    pub fn contains_key(&self, name: &str) -> bool {
+        self.symbols.contains_key(name)
+    }
 }

@@ -1,9 +1,5 @@
 main {
-  while (true) {
-    print(1);
-    print(2);
-    print(3);
-  }
+  let a: int = 5;
 
-  print(3);
+  print(a);
 }

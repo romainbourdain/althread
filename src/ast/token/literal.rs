@@ -58,7 +58,17 @@ impl NodeExecutor for Literal {
 }
 
 impl Literal {
-    pub fn get_data_type(&self) -> DataType {
+    pub fn from_datatype(datatype: &DataType) -> Self {
+        match datatype {
+            DataType::Void => Self::Null,
+            DataType::Boolean => Self::Bool(false),
+            DataType::Integer => Self::Int(0),
+            DataType::Float => Self::Float(0.0),
+            DataType::String => Self::String("".to_string()),
+        }
+    }
+
+    pub fn get_datatype(&self) -> DataType {
         match self {
             Self::Null => DataType::Void,
             Self::Bool(_) => DataType::Boolean,
@@ -83,7 +93,7 @@ impl Literal {
         match self {
             Self::Int(i) => Ok(Self::Int(*i)),
             Self::Float(f) => Ok(Self::Float(*f)),
-            i => Err(format!("Cannot make {} positive", i.get_data_type())),
+            i => Err(format!("Cannot make {} positive", i.get_datatype())),
         }
     }
 
@@ -91,14 +101,14 @@ impl Literal {
         match self {
             Self::Int(i) => Ok(Self::Int(-i)),
             Self::Float(f) => Ok(Self::Float(-f)),
-            i => Err(format!("Cannot negate {}", i.get_data_type())),
+            i => Err(format!("Cannot negate {}", i.get_datatype())),
         }
     }
 
     pub fn not(&self) -> Result<Self, String> {
         match self {
             Self::Bool(b) => Ok(Self::Bool(!b)),
-            i => Err(format!("Cannot negate {}", i.get_data_type())),
+            i => Err(format!("Cannot negate {}", i.get_datatype())),
         }
     }
 
@@ -109,8 +119,8 @@ impl Literal {
             (Self::String(i), Self::String(j)) => Ok(Self::String(format!("{}{}", i, j))),
             (i, j) => Err(format!(
                 "Cannot add {} and {}",
-                i.get_data_type(),
-                j.get_data_type()
+                i.get_datatype(),
+                j.get_datatype()
             )),
         }
     }
@@ -121,8 +131,8 @@ impl Literal {
             (Self::Float(i), Self::Float(j)) => Ok(Self::Float(i - j)),
             (i, j) => Err(format!(
                 "Cannot subtract {} by {}",
-                i.get_data_type(),
-                j.get_data_type()
+                i.get_datatype(),
+                j.get_datatype()
             )),
         }
     }
@@ -133,8 +143,8 @@ impl Literal {
             (Self::Float(i), Self::Float(j)) => Ok(Self::Float(i * j)),
             (i, j) => Err(format!(
                 "Cannot multiply {} by {}",
-                i.get_data_type(),
-                j.get_data_type()
+                i.get_datatype(),
+                j.get_datatype()
             )),
         }
     }
@@ -146,8 +156,8 @@ impl Literal {
             (Self::Float(i), Self::Float(j)) => Ok(Self::Float(i / j)),
             (i, j) => Err(format!(
                 "Cannot divide {} by {}",
-                i.get_data_type(),
-                j.get_data_type()
+                i.get_datatype(),
+                j.get_datatype()
             )),
         }
     }
@@ -158,8 +168,8 @@ impl Literal {
             (Self::Float(i), Self::Float(j)) if *j != 0.0 => Ok(Self::Float(i % j)),
             (i, j) => Err(format!(
                 "No modulo between {} and {}",
-                i.get_data_type(),
-                j.get_data_type()
+                i.get_datatype(),
+                j.get_datatype()
             )),
         }
     }
@@ -173,8 +183,8 @@ impl Literal {
             (Self::String(i), Self::String(j)) => Ok(Self::Bool(i == j)),
             (i, j) => Err(format!(
                 "Cannot compare {} and {}",
-                i.get_data_type(),
-                j.get_data_type()
+                i.get_datatype(),
+                j.get_datatype()
             )),
         }
     }
@@ -189,8 +199,8 @@ impl Literal {
             (Self::Float(i), Self::Float(j)) => Ok(Self::Bool(i < j)),
             (i, j) => Err(format!(
                 "Cannot compare {} and {}",
-                i.get_data_type(),
-                j.get_data_type()
+                i.get_datatype(),
+                j.get_datatype()
             )),
         }
     }
@@ -201,8 +211,8 @@ impl Literal {
             (Self::Float(i), Self::Float(j)) => Ok(Self::Bool(i <= j)),
             (i, j) => Err(format!(
                 "Cannot compare {} and {}",
-                i.get_data_type(),
-                j.get_data_type()
+                i.get_datatype(),
+                j.get_datatype()
             )),
         }
     }
@@ -213,8 +223,8 @@ impl Literal {
             (Self::Float(i), Self::Float(j)) => Ok(Self::Bool(i > j)),
             (i, j) => Err(format!(
                 "Cannot compare {} and {}",
-                i.get_data_type(),
-                j.get_data_type()
+                i.get_datatype(),
+                j.get_datatype()
             )),
         }
     }
@@ -225,8 +235,8 @@ impl Literal {
             (Self::Float(i), Self::Float(j)) => Ok(Self::Bool(i >= j)),
             (i, j) => Err(format!(
                 "Cannot compare {} and {}",
-                i.get_data_type(),
-                j.get_data_type()
+                i.get_datatype(),
+                j.get_datatype()
             )),
         }
     }
@@ -236,8 +246,8 @@ impl Literal {
             (Self::Bool(i), Self::Bool(j)) => Ok(Self::Bool(*i && *j)),
             (i, j) => Err(format!(
                 "Cannot perform AND operation between {} and {}",
-                i.get_data_type(),
-                j.get_data_type()
+                i.get_datatype(),
+                j.get_datatype()
             )),
         }
     }
@@ -247,8 +257,8 @@ impl Literal {
             (Self::Bool(i), Self::Bool(j)) => Ok(Self::Bool(*i || *j)),
             (i, j) => Err(format!(
                 "Cannot perform OR operation between {} and {}",
-                i.get_data_type(),
-                j.get_data_type()
+                i.get_datatype(),
+                j.get_datatype()
             )),
         }
     }
