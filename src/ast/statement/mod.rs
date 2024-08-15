@@ -19,7 +19,7 @@ use run_call::RunCall;
 use scope::Scope;
 use while_control::WhileControl;
 
-use crate::{env::Env, error::AlthreadResult, no_rule, parser::Rule};
+use crate::{env::process_table::process::Process, error::AlthreadResult, no_rule, parser::Rule};
 
 use super::{
     display::{AstDisplay, Prefix},
@@ -58,7 +58,7 @@ impl NodeBuilder for Statement {
 }
 
 impl NodeExecutor for Statement {
-    fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut Process) -> AlthreadResult<Option<Literal>> {
         match self {
             Self::Assignment(node) => node.eval(env),
             Self::Declaration(node) => node.eval(env),

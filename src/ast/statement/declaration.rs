@@ -11,7 +11,7 @@ use crate::{
             literal::Literal,
         },
     },
-    env::Env,
+    env::process_table::process::Process,
     error::{AlthreadError, AlthreadResult, ErrorType},
     no_rule,
     parser::Rule,
@@ -56,7 +56,7 @@ impl NodeBuilder for Declaration {
 }
 
 impl NodeExecutor for Declaration {
-    fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut Process) -> AlthreadResult<Option<Literal>> {
         let datatype = self
             .datatype
             .as_ref()

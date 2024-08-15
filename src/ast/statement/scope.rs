@@ -9,7 +9,7 @@ use crate::{
         statement::Statement,
         token::literal::Literal,
     },
-    env::Env,
+    env::process_table::process::Process,
     error::AlthreadResult,
     parser::Rule,
 };
@@ -30,7 +30,7 @@ impl NodeBuilder for Scope {
 }
 
 impl NodeExecutor for Scope {
-    fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut Process) -> AlthreadResult<Option<Literal>> {
         let node = &self.children[env.position];
         if node.eval(env.get_child())?.is_some() {
             env.consume();

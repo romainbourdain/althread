@@ -1,25 +1,24 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
-use super::ProcessTable;
+use crate::env::symbol_table::{symbol_table_stack::SymbolTableStack, SymbolTable};
+
+use super::process::Process;
 
 #[derive(Debug)]
 pub struct RunningProcess {
-    pub processes: Vec<String>,
+    pub processes: HashMap<String, Process>,
 }
 
 impl RunningProcess {
     pub fn new() -> Self {
         Self {
-            processes: Vec::new(),
+            processes: HashMap::new(),
         }
     }
 
-    pub fn push(&mut self, process: String, process_table: &Rc<RefCell<ProcessTable>>) {
-        let process_table = Rc::clone(process_table);
-        if process_table.borrow().processes.contains_key(&process) {
-            self.processes.push(process);
-        } else {
-            panic!("Process {} doesn't exist", process);
-        }
+    pub fn insert(&mut self, identifier: String, global_table: &Rc<RefCell<SymbolTable>>) {
+        let symbol_table = Rc::new(RefCell::new(SymbolTableStack::new(global_table)));
+        self.processes
+            .insert(identifier, Process::new(&symbol_table));
     }
 }

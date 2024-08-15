@@ -3,91 +3,41 @@ pub mod symbol_table;
 
 use std::{cell::RefCell, rc::Rc};
 
-use symbol_table::symbol_table_stack::SymbolTableStack;
+use process_table::{running_process::RunningProcess, ProcessTable};
+use symbol_table::SymbolTable;
+
+use crate::{ast::Ast, error::AlthreadResult};
 
 #[derive(Debug)]
 pub struct Env {
-    pub symbol_table: Rc<RefCell<SymbolTableStack>>,
-    pub position: usize,         // the current position in the AST
-    pub child: Option<Box<Env>>, // the child scope environment
+    pub process_table: Rc<RefCell<ProcessTable>>,
+    pub running_process: Rc<RefCell<RunningProcess>>,
+    pub global_table: Rc<RefCell<SymbolTable>>,
 }
 
 impl Env {
-    pub fn new(symbol_table: &Rc<RefCell<SymbolTableStack>>) -> Self {
+    pub fn new() -> Self {
+        let global_table = Rc::new(RefCell::new(SymbolTable::new()));
+        let process_table = Rc::new(RefCell::new(ProcessTable::new()));
+        let running_process = Rc::new(RefCell::new(RunningProcess::new()));
+
         Self {
-            position: 0,
-            child: None,
-            symbol_table: Rc::clone(symbol_table),
+            process_table,
+            running_process,
+            global_table,
         }
     }
 
-    pub fn consume(&mut self) {
-        self.clean();
-        self.position += 1;
-    }
+    pub fn run(&mut self, ast: &Ast) -> AlthreadResult<()> {
+        self.process_table.borrow_mut().push("main".to_string());
 
-    pub fn reset(&mut self) {
-        self.clean();
-        self.position = 0;
-    }
+        self.running_process
+            .borrow_mut()
+            .insert("main".to_string(), &self.global_table);
 
-    pub fn clean(&mut self) {
-        self.child = None;
-    }
-
-    pub fn get_child(&mut self) -> &mut Env {
-        if self.child.is_none() {
-            self.child = Some(Box::new(Self::new(&self.symbol_table)));
+        for (identifier, process) in self.running_process.borrow_mut().processes.iter_mut() {
+            while ast.eval(identifier.clone(), process)?.is_none() {}
         }
-
-        self.child.as_mut().unwrap()
+        Ok(())
     }
 }
-
-// #[derive(Debug)]
-// pub struct Env {
-//     pub process_table: Rc<RefCell<ProcessTable>>,
-//     pub global_table: Rc<RefCell<SymbolTable>>,
-//     pub running_process: Rc<RefCell<RunningProcess>>,
-// }
-
-// impl Env {
-//     pub fn new() -> Self {
-//         Self {
-//             process_table: Rc::new(RefCell::new(ProcessTable::new())),
-//             global_table: Rc::new(RefCell::new(SymbolTable::new())),
-//             running_process: Rc::new(RefCell::new(RunningProcess::new())),
-//         }
-//     }
-
-//     pub fn run(&mut self, ast: &Ast) {
-//         if let Some(_global_block) = &ast.global_block {
-//             println!("Run global block");
-//         }
-
-//         for (name, _block) in &ast.condition_blocks {
-//             println!("Run condition block {}", name);
-//         }
-
-//         for (name, _block) in &ast.process_blocks {
-//             let process = Process::new(
-//                 &self.global_table,
-//                 &self.process_table,
-//                 &self.running_process,
-//             );
-
-//             self.process_table
-//                 .borrow_mut()
-//                 .insert(name.clone(), process);
-//         }
-
-//         self.running_process
-//             .borrow_mut()
-//             .push("main".to_string(), &self.process_table);
-
-//         println!("{}", self.process_table.borrow());
-//         println!("{:?}", self.running_process.borrow());
-
-//         // TODO : Boucle principale
-//     }
-// }

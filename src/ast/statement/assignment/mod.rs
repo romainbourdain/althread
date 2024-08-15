@@ -13,7 +13,7 @@ use crate::{
         node::{Node, NodeBuilder, NodeExecutor},
         token::literal::Literal,
     },
-    env::Env,
+    env::process_table::process::Process,
     error::AlthreadResult,
     no_rule,
     parser::Rule,
@@ -38,7 +38,7 @@ impl NodeBuilder for Assignment {
 }
 
 impl NodeExecutor for Assignment {
-    fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut Process) -> AlthreadResult<Option<Literal>> {
         match self {
             Self::Unary(node) => node.eval(env),
             Self::Binary(node) => node.eval(env),

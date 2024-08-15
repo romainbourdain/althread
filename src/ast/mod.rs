@@ -13,8 +13,9 @@ use block::Block;
 use display::{AstDisplay, Prefix};
 use node::Node;
 use pest::iterators::Pairs;
+use token::literal::Literal;
 
-use crate::{error::AlthreadResult, no_rule, parser::Rule};
+use crate::{env::process_table::process::Process, error::AlthreadResult, no_rule, parser::Rule};
 
 #[derive(Debug)]
 pub struct Ast {
@@ -68,6 +69,15 @@ impl Ast {
         }
 
         Ok(ast)
+    }
+
+    pub fn eval(
+        &self,
+        identifier: String,
+        process: &mut Process,
+    ) -> AlthreadResult<Option<Literal>> {
+        let block = self.process_blocks.get(&identifier).unwrap();
+        block.eval(process)
     }
 }
 

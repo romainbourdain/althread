@@ -8,7 +8,7 @@ use crate::{
         node::{Node, NodeBuilder, NodeExecutor},
         token::literal::Literal,
     },
-    env::Env,
+    env::process_table::process::Process,
     error::AlthreadResult,
     parser::Rule,
 };
@@ -34,7 +34,7 @@ impl NodeBuilder for WhileControl {
 }
 
 impl NodeExecutor for WhileControl {
-    fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut Process) -> AlthreadResult<Option<Literal>> {
         match env.position {
             0 => {
                 let condition = self.condition.eval(env.get_child())?.unwrap();

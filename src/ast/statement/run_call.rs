@@ -8,7 +8,7 @@ use crate::{
         node::{Node, NodeBuilder, NodeExecutor},
         token::{identifier::Identifier, literal::Literal},
     },
-    env::Env,
+    env::process_table::process::Process,
     error::AlthreadResult,
     parser::Rule,
 };
@@ -27,7 +27,7 @@ impl NodeBuilder for RunCall {
 }
 
 impl NodeExecutor for RunCall {
-    fn eval(&self, _env: &mut Env) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, _env: &mut Process) -> AlthreadResult<Option<Literal>> {
         println!("run");
 
         Ok(Some(Literal::Null))

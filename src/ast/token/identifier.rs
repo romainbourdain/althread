@@ -2,7 +2,7 @@ use pest::iterators::Pairs;
 
 use crate::{
     ast::node::{Node, NodeBuilder, NodeExecutor},
-    env::Env,
+    env::process_table::process::Process,
     error::{AlthreadError, AlthreadResult, ErrorType},
     no_rule,
     parser::Rule,
@@ -27,7 +27,7 @@ impl NodeBuilder for Identifier {
 }
 
 impl NodeExecutor for Identifier {
-    fn eval(&self, env: &mut Env) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut Process) -> AlthreadResult<Option<Literal>> {
         let symbol =
             env.symbol_table.borrow().get(&self).map_err(|e| {
                 AlthreadError::new(ErrorType::VariableError, self.line, self.column, e)
