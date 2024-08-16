@@ -1,0 +1,4 @@
+{
+    "rust-analyzer.cargo.workspaceRoot": "./interpreter",
+    "rust-analyzer.cargo.targetDir": "./target"
+}
