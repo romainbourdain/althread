@@ -17,14 +17,24 @@ impl ProcessEnv {
     pub fn new(
         symbol_table: &Rc<RefCell<SymbolTableStack>>,
         process_table: &Rc<RefCell<ProcessTable>>,
-        running_process: &Rc<RefCell<RunningProcesses>>,
+        running_process: Rc<RefCell<RunningProcesses>>,
     ) -> Self {
         Self {
             position: 0,
             child: None,
             symbol_table: Rc::clone(symbol_table),
             process_table: Rc::clone(process_table),
-            running_process: Rc::clone(running_process),
+            running_process,
+        }
+    }
+
+    pub fn new_child(&self) -> Self {
+        Self {
+            position: 0,
+            child: None,
+            symbol_table: Rc::clone(&self.symbol_table),
+            process_table: Rc::clone(&self.process_table),
+            running_process: Rc::clone(&self.running_process),
         }
     }
 
@@ -44,11 +54,7 @@ impl ProcessEnv {
 
     pub fn get_child(&mut self) -> &mut ProcessEnv {
         if self.child.is_none() {
-            self.child = Some(Box::new(Self::new(
-                &self.symbol_table,
-                &self.process_table,
-                &self.running_process,
-            )));
+            self.child = Some(Box::new(self.new_child()));
         }
 
         self.child.as_mut().unwrap()

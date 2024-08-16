@@ -86,4 +86,8 @@ impl SymbolTableStack {
             .find_map(|table| table.borrow().get(&identifier.value).cloned())
             .ok_or_else(|| format!("Symbol {} not found", identifier))
     }
+
+    pub fn get_global_table(&self) -> Rc<RefCell<SymbolTable>> {
+        self.tables[0].clone()
+    }
 }

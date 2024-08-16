@@ -3,9 +3,9 @@ pub mod symbol_table;
 
 use std::{cell::RefCell, rc::Rc};
 
-use process_table::{running_process::RunningProcesses, ProcessTable};
+use process_table::{process_env::ProcessEnv, running_process::RunningProcesses, ProcessTable};
 use rand::{seq::IteratorRandom, thread_rng};
-use symbol_table::SymbolTable;
+use symbol_table::{symbol_table_stack::SymbolTableStack, SymbolTable};
 
 use crate::{
     ast::Ast,
@@ -35,7 +35,7 @@ impl Env {
 
         self.running_process
             .borrow_mut()
-            .insert("main".to_string(), &self)
+            .insert("main".to_string(), &self.process_table)
             .map_err(|_| {
                 AlthreadError::new(
                     ErrorType::SyntaxError,
@@ -62,11 +62,24 @@ impl Env {
 
             // get the random process
             let mut running_processes = self.running_process.borrow_mut();
+
             let running_process = &mut running_processes.processes[process_index];
+
+            if running_process.process.is_none() {
+                let new_process = ProcessEnv::new(
+                    &Rc::new(RefCell::new(SymbolTableStack::new(&self.global_table))),
+                    &self.process_table,
+                    Rc::clone(&self.running_process),
+                );
+                running_process.process = Some(new_process);
+            }
 
             // consume the process
             if ast
-                .eval(running_process.name.clone(), &mut running_process.process)?
+                .eval(
+                    running_process.name.clone(),
+                    running_process.process.as_mut().unwrap(), // create a new process env if it doesn't exist
+                )?
                 .is_some()
             {
                 running_processes.processes.remove(process_index);

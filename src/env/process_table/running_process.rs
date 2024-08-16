@@ -1,8 +1,8 @@
 use std::{cell::RefCell, rc::Rc};
 
-use crate::env::{symbol_table::symbol_table_stack::SymbolTableStack, Env};
+use crate::env::symbol_table::{symbol_table_stack::SymbolTableStack, SymbolTable};
 
-use super::process_env::ProcessEnv;
+use super::{process_env::ProcessEnv, ProcessTable};
 
 #[derive(Debug)]
 pub struct RunningProcesses {
@@ -16,16 +16,16 @@ impl RunningProcesses {
         }
     }
 
-    pub fn insert(&mut self, identifier: String, env: &Env) -> Result<(), String> {
-        if !env.process_table.borrow().processes.contains(&identifier) {
+    pub fn insert(
+        &mut self,
+        identifier: String,
+        process_table: &Rc<RefCell<ProcessTable>>,
+    ) -> Result<(), String> {
+        if !process_table.borrow().processes.contains(&identifier) {
             return Err(format!("Process {} not found", identifier));
         }
 
-        let symbol_table = Rc::new(RefCell::new(SymbolTableStack::new(&env.global_table)));
-        self.processes.push(RunningProcess::new(
-            identifier,
-            ProcessEnv::new(&symbol_table, &env.process_table, &env.running_process),
-        ));
+        self.processes.push(RunningProcess::new(identifier));
 
         Ok(())
     }
@@ -34,11 +34,14 @@ impl RunningProcesses {
 #[derive(Debug)]
 pub struct RunningProcess {
     pub name: String,
-    pub process: ProcessEnv,
+    pub process: Option<ProcessEnv>,
 }
 
 impl RunningProcess {
-    pub fn new(name: String, process: ProcessEnv) -> Self {
-        Self { name, process }
+    pub fn new(name: String) -> Self {
+        Self {
+            name,
+            process: None,
+        }
     }
 }
