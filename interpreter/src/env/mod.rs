@@ -33,21 +33,29 @@ impl Env {
             self.process_table.borrow_mut().push(name.clone());
         }
 
-        self.running_process
+        self.process_table
             .borrow_mut()
-            .insert("main".to_string(), &self.process_table)
-            .map_err(|_| {
-                AlthreadError::new(
-                    ErrorType::SyntaxError,
-                    1,
-                    1,
-                    "Program requires a main process".to_string(),
-                )
-            })?;
+            .queue
+            .push("main".to_string());
 
         // main loop : at each iteration, we choose a random process in self.running_process and we consume it
         loop {
             // choose a random process in self.running_process
+            for process_name in &self.process_table.borrow().queue {
+                self.running_process
+                    .borrow_mut()
+                    .insert(process_name.clone(), &self.process_table)
+                    .map_err(|_| {
+                        AlthreadError::new(
+                            ErrorType::SyntaxError,
+                            1,
+                            1,
+                            "Program requires a main process".to_string(),
+                        )
+                    })?;
+            }
+            self.process_table.borrow_mut().queue.clear();
+
             let process_index = {
                 let running_process = self.running_process.borrow();
                 if running_process.processes.is_empty() {
@@ -63,22 +71,23 @@ impl Env {
             // get the random process
             let mut running_processes = self.running_process.borrow_mut();
 
-            let running_process = &mut running_processes.processes[process_index];
+            let chosen_process = &mut running_processes.processes[process_index];
 
-            if running_process.process.is_none() {
+            // create a new process env if it doesn't exist
+            if chosen_process.process.is_none() {
                 let new_process = ProcessEnv::new(
                     &Rc::new(RefCell::new(SymbolTableStack::new(&self.global_table))),
                     &self.process_table,
                     Rc::clone(&self.running_process),
                 );
-                running_process.process = Some(new_process);
+                chosen_process.process = Some(new_process);
             }
 
             // consume the process
             if ast
                 .eval(
-                    running_process.name.clone(),
-                    running_process.process.as_mut().unwrap(), // create a new process env if it doesn't exist
+                    chosen_process.name.clone(),
+                    chosen_process.process.as_mut().unwrap(),
                 )?
                 .is_some()
             {

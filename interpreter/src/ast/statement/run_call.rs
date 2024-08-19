@@ -33,19 +33,10 @@ impl NodeBuilder for RunCall {
 
 impl NodeExecutor for RunCall {
     fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
-        let running_processes = &env.running_process;
-
-        running_processes
+        env.process_table
             .borrow_mut()
-            .insert(self.identifier.value.clone(), &env.process_table)
-            .map_err(|e| {
-                AlthreadError::new(
-                    ErrorType::VariableError,
-                    self.identifier.line,
-                    self.identifier.column,
-                    e,
-                )
-            })?;
+            .queue
+            .push(self.identifier.value.clone());
 
         Ok(Some(Literal::Null))
     }
