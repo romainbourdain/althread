@@ -8,7 +8,7 @@ use crate::{
         node::{Node, NodeExecutor},
         token::{identifier::Identifier, literal::Literal},
     },
-    env::process_table::process::Process,
+    env::process_env::ProcessEnv,
     error::AlthreadResult,
     no_rule,
     parser::Rule,
@@ -39,7 +39,7 @@ impl PrimaryExpression {
 }
 
 impl NodeExecutor for PrimaryExpression {
-    fn eval(&self, env: &mut Process) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
         match self {
             Self::Literal(node) => node.eval(env),
             Self::Identifier(node) => node.eval(env),

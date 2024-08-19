@@ -8,7 +8,7 @@ use crate::{
         node::{Node, NodeExecutor},
         token::{binary_operator::BinaryOperator, literal::Literal},
     },
-    env::process_table::process::Process,
+    env::process_env::ProcessEnv,
     error::{AlthreadError, AlthreadResult, ErrorType},
     parser::Rule,
 };
@@ -41,7 +41,7 @@ impl BinaryExpression {
 }
 
 impl NodeExecutor for BinaryExpression {
-    fn eval(&self, env: &mut Process) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
         let left = self.left.eval(env)?.unwrap();
         let right = self.right.eval(env)?.unwrap();
 

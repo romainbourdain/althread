@@ -1,3 +1,4 @@
+pub mod process_table;
 pub mod symbol;
 pub mod symbol_table_stack;
 

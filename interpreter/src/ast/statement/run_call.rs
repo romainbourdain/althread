@@ -6,29 +6,36 @@ use crate::{
     ast::{
         display::{AstDisplay, Prefix},
         node::{Node, NodeBuilder, NodeExecutor},
-        token::{identifier::Identifier, literal::Literal},
+        token::literal::Literal,
     },
-    env::process_table::process::Process,
+    env::process_env::ProcessEnv,
     error::AlthreadResult,
     parser::Rule,
 };
 
 #[derive(Debug)]
 pub struct RunCall {
-    pub identifier: Node<Identifier>,
+    pub identifier: Node<String>,
 }
 
 impl NodeBuilder for RunCall {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
-        let identifier = Node::build(pairs.next().unwrap())?;
+        let pair = pairs.next().unwrap();
+        let identifier = Node {
+            line: pair.line_col().0,
+            column: pair.line_col().1,
+            value: pair.as_str().to_string(),
+        };
 
         Ok(Self { identifier })
     }
 }
 
 impl NodeExecutor for RunCall {
-    fn eval(&self, _env: &mut Process) -> AlthreadResult<Option<Literal>> {
-        println!("run");
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
+        env.process_table
+            .borrow_mut()
+            .queue(self.identifier.value.to_string());
 
         Ok(Some(Literal::Null))
     }
