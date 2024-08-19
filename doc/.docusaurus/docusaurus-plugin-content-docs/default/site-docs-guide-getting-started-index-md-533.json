@@ -1,0 +1,24 @@
+{
+  "id": "guide/getting-started/index",
+  "title": "Démarrage",
+  "description": "",
+  "source": "@site/docs/guide/getting-started/index.md",
+  "sourceDirName": "guide/getting-started",
+  "slug": "/guide/getting-started/",
+  "permalink": "/docs/guide/getting-started/",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/romainbourdain/althread/docs/guide/getting-started/index.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "guideSidebar",
+  "previous": {
+    "title": "Introduction",
+    "permalink": "/docs/guide/intro"
+  },
+  "next": {
+    "title": "Installation",
+    "permalink": "/docs/guide/getting-started/installation"
+  }
+}

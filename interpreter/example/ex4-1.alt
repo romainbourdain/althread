@@ -1,0 +1,18 @@
+shared {
+    chan q: int[1];
+}
+
+process rand() {
+    var r: int;
+    select {
+        option r = 0;
+        option r = 1;
+    }
+    q.send(r);
+}
+
+main {
+    run rand();
+    var r = q.receive();
+    printf("Nombre choisi: %d\n", r);
+}

@@ -1,0 +1,38 @@
+shared {
+    const Aturn = false;
+    const Bturn = true;
+
+    let x: bool;
+    let y: bool;
+    let t: bool;
+    let nbSC: int;
+}
+
+process A() {
+    x = true;
+    t = Bturn;
+    wait(y == false || t == Aturn);
+    nbSC++;
+    nbSC--;
+    x = false;
+}
+
+process B() {
+    y = true;
+    t = Aturn;
+    wait(x == false || t == Bturn);
+    nbSC++;
+    nbSC--;
+    y = false;
+}
+
+always {
+    nbSC == 0 || nbSC == 1;
+}
+
+main {
+    atomic {
+        run A();
+        run B();
+    }
+}

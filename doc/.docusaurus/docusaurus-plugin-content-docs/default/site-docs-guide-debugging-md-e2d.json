@@ -1,0 +1,23 @@
+{
+  "id": "guide/debugging",
+  "title": "Débogage",
+  "description": "",
+  "source": "@site/docs/guide/debugging.md",
+  "sourceDirName": "guide",
+  "slug": "/guide/debugging",
+  "permalink": "/docs/guide/debugging",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/romainbourdain/althread/docs/guide/debugging.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 6,
+  "frontMatter": {
+    "sidebar_position": 6
+  },
+  "sidebar": "guideSidebar",
+  "previous": {
+    "title": "Créer des tests",
+    "permalink": "/docs/guide/test"
+  }
+}

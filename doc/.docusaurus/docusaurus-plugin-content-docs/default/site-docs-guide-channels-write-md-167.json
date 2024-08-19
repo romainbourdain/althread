@@ -1,0 +1,26 @@
+{
+  "id": "guide/channels/write",
+  "title": "Écrire dans un canal",
+  "description": "",
+  "source": "@site/docs/guide/channels/write.md",
+  "sourceDirName": "guide/channels",
+  "slug": "/guide/channels/write",
+  "permalink": "/docs/guide/channels/write",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/romainbourdain/althread/docs/guide/channels/write.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "sidebar_pos": 1
+  },
+  "sidebar": "guideSidebar",
+  "previous": {
+    "title": "Lire dans un canal",
+    "permalink": "/docs/guide/channels/read"
+  },
+  "next": {
+    "title": "Créer des tests",
+    "permalink": "/docs/guide/test"
+  }
+}

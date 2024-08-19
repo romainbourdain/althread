@@ -1,0 +1,19 @@
+{
+  "id": "example/example",
+  "title": "Exemples",
+  "description": "",
+  "source": "@site/docs/example/example.md",
+  "sourceDirName": "example",
+  "slug": "/example/",
+  "permalink": "/docs/example/",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/romainbourdain/althread/docs/example/example.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1
+  },
+  "sidebar": "exampleSidebar"
+}

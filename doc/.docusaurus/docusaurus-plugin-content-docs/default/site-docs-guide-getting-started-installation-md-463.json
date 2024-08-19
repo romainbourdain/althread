@@ -1,0 +1,27 @@
+{
+  "id": "guide/getting-started/installation",
+  "title": "Installation",
+  "description": "",
+  "source": "@site/docs/guide/getting-started/installation.md",
+  "sourceDirName": "guide/getting-started",
+  "slug": "/guide/getting-started/installation",
+  "permalink": "/docs/guide/getting-started/installation",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/romainbourdain/althread/docs/guide/getting-started/installation.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1
+  },
+  "sidebar": "guideSidebar",
+  "previous": {
+    "title": "Introduction",
+    "permalink": "/docs/guide/intro"
+  },
+  "next": {
+    "title": "Hello World",
+    "permalink": "/docs/guide/getting-started/hello-world"
+  }
+}

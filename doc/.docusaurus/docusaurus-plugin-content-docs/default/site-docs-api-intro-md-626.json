@@ -1,0 +1,19 @@
+{
+  "id": "api/intro",
+  "title": "Test",
+  "description": "",
+  "source": "@site/docs/api/intro.md",
+  "sourceDirName": "api",
+  "slug": "/api/intro",
+  "permalink": "/docs/api/intro",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/romainbourdain/althread/docs/api/intro.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1
+  },
+  "sidebar": "apiSidebar"
+}

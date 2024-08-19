@@ -1,0 +1,23 @@
+{
+  "id": "introduction/demo",
+  "title": "demo",
+  "description": "",
+  "source": "@site/docs/introduction/demo.md",
+  "sourceDirName": "introduction",
+  "slug": "/introduction/demo",
+  "permalink": "/docs/introduction/demo",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/romainbourdain/althread/docs/introduction/demo.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Translate your site",
+    "permalink": "/docs/tutorial-extras/translate-your-site"
+  }
+}

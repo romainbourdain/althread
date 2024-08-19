@@ -1,0 +1,68 @@
+const {
+    var ALLUMETTES = 15;
+}
+
+shared {
+    enum mtype = { create, created };
+}
+
+shared {
+     var allumettes_retirees: int;
+     var allumettes_restantes = ALLUMETTES;
+}
+
+process joueur(var proc, chan in, chan out) {
+    var nb_allumettes: int;
+    var res: int;
+    repeat select {
+        option res = in.receive(joue) {
+            wait res > 0;
+
+            select {
+                option nb_allumettes = 1;
+                option nb_allumettes = 2;
+                option nb_allumettes = 3;
+            }
+
+            if (res - nb_allumettes <= 0) {
+                atomic {
+                    allumettes_restantes -= res;
+                    allumettes_retirees += res;
+                }
+                printf("(%d) : je retire les %d dernières allumettes",proc,res);
+                out.send(fin, proc);
+                break;
+            }
+
+            atomic {
+                allumettes_restantes = res - nb_allumettes;
+                allumettes_retirees += nb_allumettes;
+            }
+            printf("(%d) : je retire %d allumettes,il en reste %d\n",proc,nb_allumettes,allumettes_restantes);
+            out.send(joue, allumettes_restantes);
+        }
+
+        option res = in.receive(fin) {
+            printf("(%d) : le gagnant est %d\n",proc,res);
+            break;
+        }
+    }
+}
+
+end {
+    allumettes_restantes == 0;
+}
+
+always {
+    allumettes_restantes + allumettes == ALLUMETTES;
+}
+
+main {
+    chan j1j2: (mtype, int)[1];
+    chan j2j1: (mtype, int)[1];
+    atomic {
+        run joueur(1, j2j1, j1j2);
+        run joueur(2, j1j2, j2j1);
+        j2j1.send(joue, ALLUMETTES);
+    }
+}

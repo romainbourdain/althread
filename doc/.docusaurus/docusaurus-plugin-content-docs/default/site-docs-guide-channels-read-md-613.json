@@ -1,0 +1,27 @@
+{
+  "id": "guide/channels/read",
+  "title": "Lire dans un canal",
+  "description": "",
+  "source": "@site/docs/guide/channels/read.md",
+  "sourceDirName": "guide/channels",
+  "slug": "/guide/channels/read",
+  "permalink": "/docs/guide/channels/read",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/romainbourdain/althread/docs/guide/channels/read.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "sidebar_position": 2
+  },
+  "sidebar": "guideSidebar",
+  "previous": {
+    "title": "Variables partagées",
+    "permalink": "/docs/guide/process/global"
+  },
+  "next": {
+    "title": "Écrire dans un canal",
+    "permalink": "/docs/guide/channels/write"
+  }
+}

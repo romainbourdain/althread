@@ -1,0 +1,30 @@
+const {
+    var N = 5;
+}
+
+shared {
+    tab t: int[5];
+}
+
+process maxtab() {
+    var max = -1;
+    var i = 0;
+
+    while (i < N) {
+        if t[i] > max {
+            max = t[i];
+        }
+        i++;
+    }
+
+    printf("max: %d\n", max);
+}
+
+main {
+    t[0] = 1;
+    t[1] = 2;
+    t[2] = 0;
+    t[3] = 4;
+    t[4] = 3;
+    run maxtab();
+}

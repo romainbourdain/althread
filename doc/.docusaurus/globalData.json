@@ -1,0 +1,100 @@
+{
+  "docusaurus-plugin-content-docs": {
+    "default": {
+      "path": "/docs",
+      "versions": [
+        {
+          "name": "current",
+          "label": "Next",
+          "isLast": true,
+          "path": "/docs",
+          "mainDocId": "guide/intro",
+          "docs": [
+            {
+              "id": "api/intro",
+              "path": "/docs/api/intro",
+              "sidebar": "apiSidebar"
+            },
+            {
+              "id": "example/example",
+              "path": "/docs/example/",
+              "sidebar": "exampleSidebar"
+            },
+            {
+              "id": "guide/channels/read",
+              "path": "/docs/guide/channels/read",
+              "sidebar": "guideSidebar"
+            },
+            {
+              "id": "guide/channels/write",
+              "path": "/docs/guide/channels/write",
+              "sidebar": "guideSidebar"
+            },
+            {
+              "id": "guide/debugging",
+              "path": "/docs/guide/debugging",
+              "sidebar": "guideSidebar"
+            },
+            {
+              "id": "guide/getting-started/hello-world",
+              "path": "/docs/guide/getting-started/hello-world",
+              "sidebar": "guideSidebar"
+            },
+            {
+              "id": "guide/getting-started/installation",
+              "path": "/docs/guide/getting-started/installation",
+              "sidebar": "guideSidebar"
+            },
+            {
+              "id": "guide/intro",
+              "path": "/docs/guide/intro",
+              "sidebar": "guideSidebar"
+            },
+            {
+              "id": "guide/process/arguments",
+              "path": "/docs/guide/process/arguments",
+              "sidebar": "guideSidebar"
+            },
+            {
+              "id": "guide/process/global",
+              "path": "/docs/guide/process/global",
+              "sidebar": "guideSidebar"
+            },
+            {
+              "id": "guide/process/simple-process",
+              "path": "/docs/guide/process/simple-process",
+              "sidebar": "guideSidebar"
+            },
+            {
+              "id": "guide/test",
+              "path": "/docs/guide/test",
+              "sidebar": "guideSidebar"
+            }
+          ],
+          "draftIds": [],
+          "sidebars": {
+            "guideSidebar": {
+              "link": {
+                "path": "/docs/guide/intro",
+                "label": "guide/intro"
+              }
+            },
+            "apiSidebar": {
+              "link": {
+                "path": "/docs/api/intro",
+                "label": "api/intro"
+              }
+            },
+            "exampleSidebar": {
+              "link": {
+                "path": "/docs/example/",
+                "label": "example/example"
+              }
+            }
+          }
+        }
+      ],
+      "breadcrumbs": true
+    }
+  }
+}

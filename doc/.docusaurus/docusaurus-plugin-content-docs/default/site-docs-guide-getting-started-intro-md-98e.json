@@ -1,0 +1,23 @@
+{
+  "id": "guide/getting-started/intro",
+  "title": "Introduction",
+  "description": "",
+  "source": "@site/docs/guide/getting-started/intro.md",
+  "sourceDirName": "guide/getting-started",
+  "slug": "/guide/getting-started/intro",
+  "permalink": "/docs/guide/getting-started/intro",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/romainbourdain/althread/docs/guide/getting-started/intro.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1
+  },
+  "sidebar": "guideSidebar",
+  "previous": {
+    "title": "Introduction",
+    "permalink": "/docs/guide/intro"
+  }
+}

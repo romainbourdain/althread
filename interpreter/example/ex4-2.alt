@@ -1,0 +1,23 @@
+shared {
+    chan c: int[1];
+}
+
+process rand(var n: int) {
+    var total: int;
+    var r: int;
+
+    for (i in 0..n) {
+        select {
+            option r = 0;
+            option r = 1;
+        }
+        total = total * 2 + r;
+    }
+    c.send(total);
+}
+
+main {
+    run rand(8);
+    var r = c.receive();
+    printf("Le nombre choisi vaut : %d\n", r);
+}
