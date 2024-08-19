@@ -2,7 +2,7 @@ use std::{cell::RefCell, rc::Rc};
 
 use crate::env::symbol_table::{process_table::ProcessTable, symbol_table_stack::SymbolTableStack};
 
-use super::{symbol_table::SymbolTable, Env};
+use super::Env;
 
 #[derive(Debug)]
 pub struct ProcessEnv {

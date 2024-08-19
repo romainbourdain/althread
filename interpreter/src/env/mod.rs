@@ -4,15 +4,12 @@ pub mod symbol_table;
 
 use std::{cell::RefCell, rc::Rc};
 
-use process_env::ProcessEnv;
 use rand::{seq::IteratorRandom, thread_rng};
 use running_process::{RunningProcess, RunningProcesses};
-use symbol_table::{
-    process_table::ProcessTable, symbol_table_stack::SymbolTableStack, SymbolTable,
-};
+use symbol_table::{process_table::ProcessTable, SymbolTable};
 
 use crate::{
-    ast::{token::condition_keyword::ConditionKeyword, Ast},
+    ast::Ast,
     error::{AlthreadError, AlthreadResult, ErrorType},
 };
 
