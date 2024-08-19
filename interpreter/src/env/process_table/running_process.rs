@@ -1,7 +1,5 @@
 use std::{cell::RefCell, rc::Rc};
 
-use crate::env::symbol_table::{symbol_table_stack::SymbolTableStack, SymbolTable};
-
 use super::{process_env::ProcessEnv, ProcessTable};
 
 #[derive(Debug)]
