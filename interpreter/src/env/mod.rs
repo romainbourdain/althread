@@ -4,6 +4,7 @@ pub mod symbol_table;
 use std::{cell::RefCell, rc::Rc};
 
 use process_table::{
+    process_env::ProcessEnv,
     running_process::{RunningProcess, RunningProcesses},
     ProcessTable,
 };
@@ -39,6 +40,8 @@ impl Env {
         let mut running_processes = RunningProcesses::new();
         loop {
             self.dequeue_process(&mut running_processes)?;
+
+            // eval conditions
 
             let (chosen_process, process_index) = match self.choose_process(&mut running_processes)
             {
