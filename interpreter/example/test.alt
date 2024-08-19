@@ -1,9 +1,7 @@
 main {
-  let a = 8;
-  while (a > 0) {
-    a--;
-    print(a);
-  }
-
-  print("finished");
+    print("a");
+    print("b");
+    print("c");
+    print("d");
+    print("e");
 }
