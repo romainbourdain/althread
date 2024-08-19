@@ -1,8 +1,8 @@
 use std::{cell::RefCell, rc::Rc};
 
-use crate::env::symbol_table::symbol_table_stack::SymbolTableStack;
+use crate::env::symbol_table::{process_table::ProcessTable, symbol_table_stack::SymbolTableStack};
 
-use super::ProcessTable;
+use super::{symbol_table::SymbolTable, Env};
 
 #[derive(Debug)]
 pub struct ProcessEnv {
@@ -31,6 +31,15 @@ impl ProcessEnv {
             child: None,
             symbol_table: Rc::clone(&self.symbol_table),
             process_table: Rc::clone(&self.process_table),
+        }
+    }
+
+    pub fn new_global(env: &Env) -> Self {
+        Self {
+            position: 0,
+            child: None,
+            symbol_table: Rc::new(RefCell::new(SymbolTableStack::new(&env.global_table))),
+            process_table: Rc::clone(&env.process_table),
         }
     }
 

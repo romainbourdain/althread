@@ -2,7 +2,7 @@ use pest::iterators::Pairs;
 
 use crate::{
     ast::node::{Node, NodeBuilder, NodeExecutor},
-    env::process_table::process_env::ProcessEnv,
+    env::process_env::ProcessEnv,
     error::{AlthreadError, AlthreadResult, ErrorType},
     no_rule,
     parser::Rule,

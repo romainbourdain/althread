@@ -2,7 +2,7 @@ use std::fmt;
 
 use pest::iterators::Pairs;
 
-use crate::{env::process_table::process_env::ProcessEnv, error::AlthreadResult, parser::Rule};
+use crate::{env::process_env::ProcessEnv, error::AlthreadResult, parser::Rule};
 
 use super::{
     display::{AstDisplay, Prefix},

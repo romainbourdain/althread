@@ -8,7 +8,7 @@ use crate::{
         node::{Node, NodeExecutor},
         token::{literal::Literal, unary_operator::UnaryOperator},
     },
-    env::process_table::process_env::ProcessEnv,
+    env::process_env::ProcessEnv,
     error::{AlthreadError, AlthreadResult, ErrorType},
     parser::Rule,
 };

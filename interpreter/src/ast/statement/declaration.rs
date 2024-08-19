@@ -11,7 +11,7 @@ use crate::{
             literal::Literal,
         },
     },
-    env::process_table::process_env::ProcessEnv,
+    env::process_env::ProcessEnv,
     error::{AlthreadError, AlthreadResult, ErrorType},
     no_rule,
     parser::Rule,

@@ -9,7 +9,7 @@ use crate::{
         statement::Statement,
         token::literal::Literal,
     },
-    env::process_table::process_env::ProcessEnv,
+    env::process_env::ProcessEnv,
     error::AlthreadResult,
     parser::Rule,
 };

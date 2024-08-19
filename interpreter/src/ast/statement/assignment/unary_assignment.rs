@@ -11,7 +11,7 @@ use crate::{
             unary_assignment_operator::UnaryAssignmentOperator,
         },
     },
-    env::process_table::process_env::ProcessEnv,
+    env::process_env::ProcessEnv,
     error::{AlthreadError, AlthreadResult, ErrorType},
     parser::Rule,
 };

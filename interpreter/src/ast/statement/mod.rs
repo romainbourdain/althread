@@ -19,9 +19,7 @@ use run_call::RunCall;
 use scope::Scope;
 use while_control::WhileControl;
 
-use crate::{
-    env::process_table::process_env::ProcessEnv, error::AlthreadResult, no_rule, parser::Rule,
-};
+use crate::{env::process_env::ProcessEnv, error::AlthreadResult, no_rule, parser::Rule};
 
 use super::{
     display::{AstDisplay, Prefix},

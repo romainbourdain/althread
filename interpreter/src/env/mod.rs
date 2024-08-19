@@ -1,18 +1,18 @@
-pub mod process_table;
+pub mod process_env;
+pub mod running_process;
 pub mod symbol_table;
 
 use std::{cell::RefCell, rc::Rc};
 
-use process_table::{
-    process_env::ProcessEnv,
-    running_process::{RunningProcess, RunningProcesses},
-    ProcessTable,
-};
+use process_env::ProcessEnv;
 use rand::{seq::IteratorRandom, thread_rng};
-use symbol_table::SymbolTable;
+use running_process::{RunningProcess, RunningProcesses};
+use symbol_table::{
+    process_table::ProcessTable, symbol_table_stack::SymbolTableStack, SymbolTable,
+};
 
 use crate::{
-    ast::Ast,
+    ast::{token::condition_keyword::ConditionKeyword, Ast},
     error::{AlthreadError, AlthreadResult, ErrorType},
 };
 
@@ -37,11 +37,13 @@ impl Env {
 
         self.process_table.borrow_mut().queue("main".to_string());
 
+        ast.eval_globals(self)?;
+
         let mut running_processes = RunningProcesses::new();
         loop {
             self.dequeue_process(&mut running_processes)?;
 
-            // eval conditions
+            ast.eval_conditions(self)?;
 
             let (chosen_process, process_index) = match self.choose_process(&mut running_processes)
             {
@@ -50,7 +52,7 @@ impl Env {
             };
 
             if ast
-                .eval(chosen_process.name.to_string(), &mut chosen_process.process)?
+                .eval_process(chosen_process.name.to_string(), &mut chosen_process.process)?
                 .is_some()
             {
                 running_processes.processes.remove(process_index);
