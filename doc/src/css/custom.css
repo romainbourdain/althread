@@ -1,0 +1,30 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary-lightest: hsla(28.766, 79.806%, 62.207%);
+  --ifm-color-primary-lighter: hsla(29.409, 74.725%, 58.813%);
+  --ifm-color-primary-light: hsla(29.344, 70.337%, 55.704%);
+  --ifm-color-primary: hsla(29.329, 66.552%, 52.544%);
+  --ifm-color-primary-dark: hsla(28.876, 64.273%, 49.816%);
+  --ifm-color-primary-darker: hsla(28.979, 69.4%, 46.923%);
+  --ifm-color-primary-darkest: hsla(29.062, 74.06%, 44.061%);
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme="dark"] {
+  --ifm-color-primary-lightest: hsla(28.766, 79.806%, 62.207%);
+  --ifm-color-primary-lighter: hsla(29.409, 74.725%, 58.813%);
+  --ifm-color-primary-light: hsla(29.344, 70.337%, 55.704%);
+  --ifm-color-primary: hsla(29.329, 66.552%, 52.544%);
+  --ifm-color-primary-dark: hsla(28.876, 64.273%, 49.816%);
+  --ifm-color-primary-darker: hsla(28.979, 69.4%, 46.923%);
+  --ifm-color-primary-darkest: hsla(29.062, 74.06%, 44.061%);
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
