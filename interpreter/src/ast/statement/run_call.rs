@@ -9,7 +9,7 @@ use crate::{
         token::literal::Literal,
     },
     env::process_table::process_env::ProcessEnv,
-    error::{AlthreadError, AlthreadResult, ErrorType},
+    error::AlthreadResult,
     parser::Rule,
 };
 
@@ -35,8 +35,7 @@ impl NodeExecutor for RunCall {
     fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
         env.process_table
             .borrow_mut()
-            .queue
-            .push(self.identifier.value.clone());
+            .queue(self.identifier.value.to_string());
 
         Ok(Some(Literal::Null))
     }

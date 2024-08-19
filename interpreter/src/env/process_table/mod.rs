@@ -18,6 +18,10 @@ impl ProcessTable {
     pub fn push(&mut self, name: String) {
         self.processes.push(name);
     }
+
+    pub fn queue(&mut self, name: String) {
+        self.queue.push(name);
+    }
 }
 
 impl std::fmt::Display for ProcessTable {

@@ -3,9 +3,12 @@ pub mod symbol_table;
 
 use std::{cell::RefCell, rc::Rc};
 
-use process_table::{process_env::ProcessEnv, running_process::RunningProcesses, ProcessTable};
+use process_table::{
+    running_process::{RunningProcess, RunningProcesses},
+    ProcessTable,
+};
 use rand::{seq::IteratorRandom, thread_rng};
-use symbol_table::{symbol_table_stack::SymbolTableStack, SymbolTable};
+use symbol_table::SymbolTable;
 
 use crate::{
     ast::Ast,
@@ -14,8 +17,7 @@ use crate::{
 
 #[derive(Debug)]
 pub struct Env {
-    pub process_table: Rc<RefCell<ProcessTable>>, // contains all the process declared one time
-    pub running_process: Rc<RefCell<RunningProcesses>>, // contains the process that are currently running (can be similar)
+    pub process_table: Rc<RefCell<ProcessTable>>,
     pub global_table: Rc<RefCell<SymbolTable>>,
 }
 
@@ -24,71 +26,28 @@ impl Env {
         Self {
             global_table: Rc::new(RefCell::new(SymbolTable::new())),
             process_table: Rc::new(RefCell::new(ProcessTable::new())),
-            running_process: Rc::new(RefCell::new(RunningProcesses::new())),
         }
     }
 
     pub fn run(&mut self, ast: &Ast) -> AlthreadResult<()> {
         for (name, _) in &ast.process_blocks {
-            self.process_table.borrow_mut().push(name.clone());
+            self.process_table.borrow_mut().push(name.to_string());
         }
 
-        self.process_table
-            .borrow_mut()
-            .queue
-            .push("main".to_string());
+        self.process_table.borrow_mut().queue("main".to_string());
 
-        // main loop : at each iteration, we choose a random process in self.running_process and we consume it
+        let mut running_processes = RunningProcesses::new();
         loop {
-            // choose a random process in self.running_process
-            for process_name in &self.process_table.borrow().queue {
-                self.running_process
-                    .borrow_mut()
-                    .insert(process_name.clone(), &self.process_table)
-                    .map_err(|_| {
-                        AlthreadError::new(
-                            ErrorType::SyntaxError,
-                            1,
-                            1,
-                            "Program requires a main process".to_string(),
-                        )
-                    })?;
-            }
-            self.process_table.borrow_mut().queue.clear();
+            self.dequeue_process(&mut running_processes)?;
 
-            let process_index = {
-                let running_process = self.running_process.borrow();
-                if running_process.processes.is_empty() {
-                    break;
-                }
-
-                let mut rng = thread_rng();
-                (0..running_process.processes.len())
-                    .choose(&mut rng)
-                    .unwrap()
+            let (chosen_process, process_index) = match self.choose_process(&mut running_processes)
+            {
+                Some(res) => res,
+                None => break,
             };
 
-            // get the random process
-            let mut running_processes = self.running_process.borrow_mut();
-
-            let chosen_process = &mut running_processes.processes[process_index];
-
-            // create a new process env if it doesn't exist
-            if chosen_process.process.is_none() {
-                let new_process = ProcessEnv::new(
-                    &Rc::new(RefCell::new(SymbolTableStack::new(&self.global_table))),
-                    &self.process_table,
-                    Rc::clone(&self.running_process),
-                );
-                chosen_process.process = Some(new_process);
-            }
-
-            // consume the process
             if ast
-                .eval(
-                    chosen_process.name.clone(),
-                    chosen_process.process.as_mut().unwrap(),
-                )?
+                .eval(chosen_process.name.to_string(), &mut chosen_process.process)?
                 .is_some()
             {
                 running_processes.processes.remove(process_index);
@@ -99,5 +58,39 @@ impl Env {
         }
 
         Ok(())
+    }
+
+    pub fn dequeue_process(
+        &mut self,
+        running_processes: &mut RunningProcesses,
+    ) -> AlthreadResult<()> {
+        for process_name in &self.process_table.borrow().queue {
+            running_processes
+                .insert(process_name.to_string(), &self)
+                .map_err(|e| AlthreadError::new(ErrorType::SyntaxError, 1, 1, e))?;
+        }
+        self.process_table.borrow_mut().queue.clear();
+        Ok(())
+    }
+
+    pub fn choose_process<'a>(
+        &self,
+        running_processes: &'a mut RunningProcesses,
+    ) -> Option<(&'a mut RunningProcess, usize)> {
+        let process_index = {
+            if running_processes.processes.is_empty() {
+                return None;
+            }
+
+            let mut rng = thread_rng();
+            (0..running_processes.processes.len())
+                .choose(&mut rng)
+                .unwrap()
+        };
+
+        Some((
+            &mut running_processes.processes[process_index],
+            process_index,
+        ))
     }
 }

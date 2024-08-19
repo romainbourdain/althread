@@ -49,7 +49,7 @@ impl SymbolTableStack {
         };
 
         current_symbol_table.borrow_mut().insert(
-            identifier.value.clone(),
+            identifier.value.to_string(),
             Symbol::new(mutable, datatype.clone(), value.clone())?,
         );
 
