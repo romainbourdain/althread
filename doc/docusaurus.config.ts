@@ -7,11 +7,12 @@ const config: Config = {
   tagline: "Documentation officielle du langage de programmation Althread",
   favicon: "img/favicon.ico",
 
-  url: "https://your-docusaurus-site.example.com",
-  baseUrl: "/",
+  url: "https://romainbourdain.github.io",
+  baseUrl: "/althread/",
 
   organizationName: "romainbourdain",
   projectName: "althread",
+  deploymentBranch: "main",
 
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -27,7 +28,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: "./sidebars.ts",
-          editUrl: "https://github.com/romainbourdain/althread/",
+          editUrl: "https://github.com/romainbourdain/althread/tree/main/",
         },
         theme: {
           customCss: "./src/css/custom.css",
@@ -104,7 +105,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Althread.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Romain Bourdain.`,
     },
     prism: {
       theme: prismThemes.github,
