@@ -39,7 +39,7 @@ main {
 ```
 
 ## Full Documentation
-- Check out the [full documentation]() for more examples, guides and a reference of symbols.
+- Check out the [full documentation](https://romainbourdain.github.io/althread/) for more examples, guides and a reference of symbols.
 
 ## Sources
 - https://www.rust-lang.org/fr
