@@ -23,10 +23,10 @@ jobs:
             node-version: 20
   
         - name: Install dependencies
-          run: npm --prefix ./doc install
+          run: pnpm --prefix ./doc install
   
         - name: Build site
-          run: npm --prefix ./doc run build
+          run: pnpm --prefix ./doc run build
   
         - name: Deploy to GitHub Pages
           uses: peaceiris/actions-gh-pages@v3
