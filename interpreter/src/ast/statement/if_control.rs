@@ -8,7 +8,7 @@ use crate::{
         node::{Node, NodeBuilder, NodeExecutor},
         token::literal::Literal,
     },
-    env::process_table::process::Process,
+    env::process_env::ProcessEnv,
     error::AlthreadResult,
     parser::Rule,
 };
@@ -37,7 +37,7 @@ impl NodeBuilder for IfControl {
 }
 
 impl NodeExecutor for IfControl {
-    fn eval(&self, env: &mut Process) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
         match env.position {
             0 => {
                 let condition = self.condition.eval(env.get_child())?.unwrap();

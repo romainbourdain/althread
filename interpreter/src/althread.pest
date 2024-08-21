@@ -16,7 +16,7 @@ condition_block = { condition_keywords ~ "{" ~ statements ~ "}" }
 process_block   = { PROCESS_KW ~ identifier ~ "(" ~ ")" ~ "{" ~ statements ~ "}" }
 main_block      = { MAIN_KW ~ "{" ~ statements ~ "}" }
 
-condition_keywords = { ALWAYS_KW | NEVER_KW | EVENTUALLY_KW }
+condition_keywords = _{ ALWAYS_KW | NEVER_KW }
 
 /// ## Statements
 /// Statements are the executable instructions in the language.
@@ -82,14 +82,13 @@ while_control = { WHILE_KW ~ "(" ~ expression ~ ")" ~ scope }
 
 /// ### Keywords
 /// Keywords define the core constructs of the language.
-KEYWORDS = _{ MAIN_KW | GLOBAL_KW | PROCESS_KW | ALWAYS_KW | NEVER_KW | EVENTUALLY_KW | LET_KW | CONST_KW | IF_KW | ELSE_KW | WHILE_KW | RUN_KW | PRINT_KW | BOOL | INT_TYPE | FLOAT_TYPE | STR_TYPE | VOID_TYPE }
+KEYWORDS = _{ MAIN_KW | GLOBAL_KW | PROCESS_KW | ALWAYS_KW | NEVER_KW | LET_KW | CONST_KW | IF_KW | ELSE_KW | WHILE_KW | RUN_KW | PRINT_KW | BOOL | INT_TYPE | FLOAT_TYPE | STR_TYPE | VOID_TYPE }
 
-MAIN_KW       = _{ "main" }
-GLOBAL_KW     = _{ "shared" }
-PROCESS_KW    = _{ "process" }
-ALWAYS_KW     =  { "always" }
-NEVER_KW      =  { "never" }
-EVENTUALLY_KW =  { "eventually" }
+MAIN_KW    = _{ "main" }
+GLOBAL_KW  = _{ "shared" }
+PROCESS_KW = _{ "process" }
+ALWAYS_KW  =  { "always" }
+NEVER_KW   =  { "never" }
 
 LET_KW   = { "let" }
 CONST_KW = { "const" }

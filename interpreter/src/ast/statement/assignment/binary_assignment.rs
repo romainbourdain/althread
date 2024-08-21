@@ -12,7 +12,7 @@ use crate::{
             literal::Literal,
         },
     },
-    env::process_table::process::Process,
+    env::process_env::ProcessEnv,
     error::{AlthreadError, AlthreadResult, ErrorType},
     parser::Rule,
 };
@@ -39,7 +39,7 @@ impl NodeBuilder for BinaryAssignment {
 }
 
 impl NodeExecutor for BinaryAssignment {
-    fn eval(&self, env: &mut Process) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
         let current_value: Literal = env
             .symbol_table
             .borrow()

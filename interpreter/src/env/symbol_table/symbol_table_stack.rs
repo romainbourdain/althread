@@ -49,7 +49,7 @@ impl SymbolTableStack {
         };
 
         current_symbol_table.borrow_mut().insert(
-            identifier.value.clone(),
+            identifier.value.to_string(),
             Symbol::new(mutable, datatype.clone(), value.clone())?,
         );
 
@@ -85,5 +85,9 @@ impl SymbolTableStack {
             .rev()
             .find_map(|table| table.borrow().get(&identifier.value).cloned())
             .ok_or_else(|| format!("Symbol {} not found", identifier))
+    }
+
+    pub fn get_global_table(&self) -> Rc<RefCell<SymbolTable>> {
+        self.tables[0].clone()
     }
 }
