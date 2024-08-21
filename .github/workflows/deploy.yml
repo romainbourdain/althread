@@ -11,8 +11,8 @@ jobs:
         - name: Checkout code
           uses: actions/checkout@v4
 
-        - name: Install pnpm
-          uses: pnpm/action-setup@v4
+        - uses: pnpm/action-setup@v4
+          name: Install pnpm
           with:
             version: 9
             run_install: false
@@ -21,13 +21,12 @@ jobs:
           uses: actions/setup-node@v4
           with:
             node-version: 20
-            cache: 'pnpm'
   
         - name: Install dependencies
-          run: pnpm --prefix ./doc install
+          run: npm --prefix ./doc install
   
         - name: Build site
-          run: pnpm --prefix ./doc run build
+          run: npm --prefix ./doc run build
   
         - name: Deploy to GitHub Pages
           uses: peaceiris/actions-gh-pages@v3
