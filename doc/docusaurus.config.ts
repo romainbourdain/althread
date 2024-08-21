@@ -28,7 +28,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: "./sidebars.ts",
-          editUrl: "https://github.com/romainbourdain/althread/tree/main/",
+          editUrl: "https://github.com/romainbourdain/althread/tree/main/doc",
         },
         theme: {
           customCss: "./src/css/custom.css",
@@ -64,14 +64,14 @@ const config: Config = {
           label: "Exemples",
         },
         {
-          href: "https://github.com/facebook/docusaurus",
+          href: "https://github.com/romainbourdain/althread/",
           label: "GitHub",
           position: "right",
         },
-        {
+/*         {
           type: "localeDropdown",
           position: "right",
-        },
+        }, */
       ],
     },
     footer: {

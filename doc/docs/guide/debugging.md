@@ -2,4 +2,7 @@
 sidebar_position: 6
 ---
 
-# Débogage
+# Déboguer
+
+Cette page est en cours de rédaction. Merci de votre compréhension.
+

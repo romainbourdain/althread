@@ -8,7 +8,9 @@ sidebar_position: 1
 
 Althread est un langage de programmation pédagogique conçu pour modéliser et vérifier des systèmes concurrents et distribués. Inspiré du langage [PROMELA](https://fr.wikipedia.org/wiki/PROMELA), Althread offre une syntaxe simplifiée tout en préservant des fonctionnalités essentielles à la vérification de systèmes distribués comme la modélisation de processus parallèles, de communications entre ces processus et de comportements non déterministes.
 
+:::info
 Ce langage est particulièrement adapté à l'enseignement des bases de la programmation concurrente et à la vérification formelle, permettant aux étudiants et aux développeurs débutants de se familiariser avec ces concepts complexes dans un environnement accessible.
+:::
 
 ## Objectifs d'Althread
 

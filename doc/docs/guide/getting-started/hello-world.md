@@ -15,6 +15,10 @@ main {
 }
 ```
 
+## Exécution
+
+Cette section n'est pas encore implémentée.
+
 ## Explication
 
 - `main` est le nom du processus principal de votre programme. C'est à partir de lui que l'exécution de votre programme commence.

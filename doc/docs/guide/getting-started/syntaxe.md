@@ -20,7 +20,9 @@ Un programme est structuré en plusieurs blocks, qui peuvent correspondre à 3 t
 - **Vérification de conditions** : `always { ... }` ou `never { ... }`
 - **Définition de processus** : `process A() { ... }` ou `main { ... }`
 
+:::note
 Le block main est le processus principal. Il est exécuté en premier et sert de point d'entrée au programme.
+:::
 
 ## Type de données
 
@@ -60,7 +62,9 @@ Une expression atomique est la plus petite unité d'exécution. En althread, il 
 - **Appel de fonction** : `print("Hello world");`, `wait(x == 5);`
 - **Exécution de processus** : `run A();`
 
+:::note
 Les expressions atomiques ne peuvent pas être interrompues par un autre processus. Cela signifie que pendant qu'un processus exécute une expression atomique, aucun autre processus ne peut prendre la main.
+:::
 
 ## Structures de contrôle et portée des variables
 
@@ -69,6 +73,10 @@ Althread propose plusieurs structures de contrôle pour gérer le flux d'exécut
 - **Boucle** : `while (condition) { ... }`
 - **Scope** : `{ ... }`
 
+:::info
 Les variables déclarées dans une structure de contrôle sont visibles uniquement à l'intérieur de cette structure. Cela permet de limiter la portée des variables et d'éviter les conflits de noms. 
+:::
 
-Il est possible au sein d'une structure de contrôle de déclarer une variable avec le même nom qu'une variable globale. Dans ce cas, la variable locale masque la variable globale.
+:::note
+Il est possible au sein d'une structure de contrôle de déclarer une variable avec le même nom qu'une variable globale. Dans ce cas, la variable locale "masque" la variable globale.
+:::
