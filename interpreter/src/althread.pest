@@ -24,12 +24,11 @@ condition_keywords = _{ ALWAYS_KW | NEVER_KW }
 /// function calls, and control flow structures.
 statements = { statement* }
 
-statement             =  { assignment_statement | declaration_statement | expression_statement | print_statement | run_statement | if_control | while_control | scope }
+statement             =  { assignment_statement | declaration_statement | expression_statement | call_statement | if_control | while_control | scope }
 assignment_statement  = _{ assignment ~ ";" }
 declaration_statement = _{ declaration ~ ";" }
 expression_statement  = _{ expression ~ ";" }
-run_statement         = _{ run_call ~ ";" }
-print_statement       = _{ print_call ~ ";" }
+call_statement        = _{ call ~ ";" }
 
 /// ### Assignments
 /// Assignments assign values to variables.
@@ -68,8 +67,11 @@ factor_operator     =  { MUL_OP | DIV_OP | MOD_OP }
 
 /// ### Function Calls
 /// Function calls include running parallel processes and printing to the console.
-run_call   = { RUN_KW ~ identifier ~ "(" ~ ")" }
-print_call = { PRINT_KW ~ "(" ~ expression ~ ")" }
+call        = { run_call | print_call | wait_call | assert_call }
+run_call    = { RUN_KW ~ identifier ~ "(" ~ ")" }
+print_call  = { PRINT_KW ~ "(" ~ expression ~ ")" }
+wait_call   = { WAIT_KW ~ "(" ~ expression ~ ")" }
+assert_call = { ASSERT_KW ~ "(" ~ expression ~ ")" }
 
 /// ### Control Flow
 /// Control flow structures include conditional execution and loops.
@@ -97,8 +99,10 @@ IF_KW    = _{ "if" }
 ELSE_KW  = _{ "else" }
 WHILE_KW = _{ "while" }
 
-RUN_KW   = _{ "run" }
-PRINT_KW = _{ "print" }
+RUN_KW    = _{ "run" }
+PRINT_KW  = _{ "print" }
+WAIT_KW   = _{ "wait" }
+ASSERT_KW = _{ "assert" }
 
 TRUE_KW  = _{ "true" }
 FALSE_KW = _{ "false" }

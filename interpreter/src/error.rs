@@ -36,6 +36,7 @@ pub enum ErrorType {
     DivisionByZero,
     ArithmeticError,
     ProcessError,
+    AssertionFailed,
 }
 
 impl fmt::Display for ErrorType {
@@ -48,6 +49,7 @@ impl fmt::Display for ErrorType {
             ErrorType::DivisionByZero => write!(f, "Division by zero"),
             ErrorType::ArithmeticError => write!(f, "Arithmetic Error"),
             ErrorType::ProcessError => write!(f, "Process Error"),
+            ErrorType::AssertionFailed => write!(f, "Assertion Failed"),
         }
     }
 }

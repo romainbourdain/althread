@@ -6,21 +6,20 @@ use crate::{
     ast::{
         display::{AstDisplay, Prefix},
         node::{Node, NodeBuilder, NodeExecutor},
+        statement::expression::Expression,
         token::literal::Literal,
     },
     env::process_env::ProcessEnv,
-    error::AlthreadResult,
+    error::{AlthreadError, AlthreadResult, ErrorType},
     parser::Rule,
 };
 
-use super::expression::Expression;
-
 #[derive(Debug)]
-pub struct PrintCall {
+pub struct AssertCall {
     pub value: Node<Expression>,
 }
 
-impl NodeBuilder for PrintCall {
+impl NodeBuilder for AssertCall {
     fn build(mut pairs: Pairs<Rule>) -> AlthreadResult<Self> {
         let value = Node::build(pairs.next().unwrap())?;
 
@@ -28,17 +27,24 @@ impl NodeBuilder for PrintCall {
     }
 }
 
-impl NodeExecutor for PrintCall {
+impl NodeExecutor for AssertCall {
     fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
         if let Some(value) = self.value.eval(env)? {
-            println!("{}", value);
+            if !value.is_true() {
+                return Err(AlthreadError::new(
+                    ErrorType::AssertionFailed,
+                    self.value.line,
+                    self.value.column,
+                    format!("Condition is false"),
+                ));
+            }
         }
 
         Ok(Some(Literal::Null))
     }
 }
 
-impl AstDisplay for PrintCall {
+impl AstDisplay for AssertCall {
     fn ast_fmt(&self, f: &mut fmt::Formatter, prefix: &Prefix) -> fmt::Result {
         writeln!(f, "{prefix}print")?;
         self.value.ast_fmt(f, &prefix.add_leaf())?;
