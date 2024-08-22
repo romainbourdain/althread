@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-clap = { version = "4.5.11", features = ["cargo"] }
+clap = { version = "4.5.16", features = ["cargo"] }
 lazy_static = "1.5.0"
-pest = "2.7.10"
-pest_derive = "2.7.10"
+pest = "2.7.11"
+pest_derive = "2.7.11"
 rand = "0.8.5"

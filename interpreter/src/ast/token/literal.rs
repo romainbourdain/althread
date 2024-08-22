@@ -299,7 +299,7 @@ impl AstDisplay for Literal {
             Self::Bool(value) => writeln!(f, "{prefix}bool: {value}"),
             Self::Int(value) => writeln!(f, "{prefix}int: {value}"),
             Self::Float(value) => writeln!(f, "{prefix}float: {value}"),
-            Self::String(value) => writeln!(f, "{prefix}string: \"{value}\""),
+            Self::String(value) => writeln!(f, "{prefix}string: {value}"),
         }
     }
 }

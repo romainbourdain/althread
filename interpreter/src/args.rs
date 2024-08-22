@@ -3,13 +3,15 @@ use std::{ffi::OsStr, fs, path::PathBuf};
 use clap::{
     arg,
     builder::{OsStringValueParser, TypedValueParser},
-    command, ArgMatches,
+    command, value_parser, ArgMatches,
 };
+use rand::Rng;
 
 #[derive(Debug)]
 pub struct Config {
     pub debug: bool,
     pub input: String,
+    pub seed: u64,
 }
 
 impl Config {
@@ -23,6 +25,10 @@ impl Config {
                 .as_path()
                 .to_string_lossy()
                 .to_string(),
+            seed: matches
+                .get_one::<u64>("seed")
+                .copied()
+                .unwrap_or(rand::thread_rng().gen()),
         }
     }
 }
@@ -51,4 +57,8 @@ pub fn cmd() -> clap::Command {
         .arg(arg!(
             -d --debug "Open debug mode"
         ))
+        .arg(
+            arg!(-s --seed <seed> "Run program with specific seed")
+                .value_parser(value_parser!(u64)),
+        )
 }
