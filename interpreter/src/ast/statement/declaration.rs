@@ -65,9 +65,7 @@ impl NodeExecutor for Declaration {
         let value = self
             .value
             .as_ref()
-            .map(|value| value.eval(env))
-            .transpose()?
-            .unwrap();
+            .map_or(Ok(None), |value| value.eval(env))?;
 
         let mut symbol_table = env.symbol_table.borrow_mut();
 

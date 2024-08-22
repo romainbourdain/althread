@@ -29,7 +29,7 @@ impl NodeBuilder for WaitCall {
 
 impl NodeExecutor for WaitCall {
     fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
-        if let Some(value) = self.value.eval(env)? {
+        if let Some(_value) = self.value.eval(env)? {
             // Todo: Implement wait
         }
 

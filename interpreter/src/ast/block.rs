@@ -31,6 +31,9 @@ impl NodeBuilder for Block {
 
 impl NodeExecutor for Block {
     fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
+        if self.children.is_empty() {
+            return Ok(Some(Literal::Null));
+        }
         let node = &self.children[env.position];
         if node.eval(env.get_child())?.is_some() {
             env.consume();

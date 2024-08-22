@@ -53,7 +53,9 @@ pub fn cmd() -> clap::Command {
                     Ok(path)
                 })),
         )
-        // debug flag
+        .arg(arg!(
+            -c --check "Check syntax only"
+        ))
         .arg(arg!(
             -d --debug "Open debug mode"
         ))
