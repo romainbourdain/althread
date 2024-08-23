@@ -7,9 +7,8 @@ use crate::{
         display::{AstDisplay, Prefix},
         node::{Node, NodeBuilder, NodeExecutor},
         statement::expression::Expression,
-        token::literal::Literal,
     },
-    env::process_env::ProcessEnv,
+    env::{node_result::NodeResult, process_env::ProcessEnv},
     error::AlthreadResult,
     parser::Rule,
 };
@@ -28,12 +27,12 @@ impl NodeBuilder for WaitCall {
 }
 
 impl NodeExecutor for WaitCall {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
         if let Some(_value) = self.value.eval(env)? {
             // Todo: Implement wait
         }
 
-        Ok(Some(Literal::Null))
+        Ok(Some(NodeResult::Null))
     }
 }
 

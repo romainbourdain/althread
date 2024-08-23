@@ -7,9 +7,8 @@ use crate::{
         display::{AstDisplay, Prefix},
         node::{Node, NodeBuilder, NodeExecutor},
         statement::Statement,
-        token::literal::Literal,
     },
-    env::process_env::ProcessEnv,
+    env::{node_result::NodeResult, process_env::ProcessEnv},
     error::AlthreadResult,
     parser::Rule,
 };
@@ -30,9 +29,9 @@ impl NodeBuilder for Scope {
 }
 
 impl NodeExecutor for Scope {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
         if self.children.is_empty() {
-            return Ok(Some(Literal::Null));
+            return Ok(Some(NodeResult::Null));
         }
 
         let node = &self.children[env.position];
@@ -40,7 +39,7 @@ impl NodeExecutor for Scope {
             env.consume();
         }
 
-        Ok((env.position >= self.children.len()).then(|| Literal::Null))
+        Ok((env.position >= self.children.len()).then(|| NodeResult::Null))
     }
 }
 

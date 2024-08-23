@@ -7,9 +7,8 @@ use crate::{
         display::{AstDisplay, Prefix},
         node::{Node, NodeBuilder, NodeExecutor},
         statement::expression::Expression,
-        token::literal::Literal,
     },
-    env::process_env::ProcessEnv,
+    env::{node_result::NodeResult, process_env::ProcessEnv},
     error::{AlthreadError, AlthreadResult, ErrorType},
     parser::Rule,
 };
@@ -28,9 +27,9 @@ impl NodeBuilder for AssertCall {
 }
 
 impl NodeExecutor for AssertCall {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
         if let Some(value) = self.value.eval(env)? {
-            if !value.is_true() {
+            if !value.get_literal().is_true() {
                 return Err(AlthreadError::new(
                     ErrorType::AssertionFailed,
                     self.value.line,
@@ -40,7 +39,7 @@ impl NodeExecutor for AssertCall {
             }
         }
 
-        Ok(Some(Literal::Null))
+        Ok(Some(NodeResult::Null))
     }
 }
 

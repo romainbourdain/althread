@@ -6,9 +6,8 @@ use crate::{
     ast::{
         display::{AstDisplay, Prefix},
         node::{Node, NodeBuilder, NodeExecutor},
-        token::literal::Literal,
     },
-    env::process_env::ProcessEnv,
+    env::{node_result::NodeResult, process_env::ProcessEnv},
     error::AlthreadResult,
     parser::Rule,
 };
@@ -34,15 +33,15 @@ impl NodeBuilder for WhileControl {
 }
 
 impl NodeExecutor for WhileControl {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
         match env.position {
             0 => {
                 let condition = self.condition.eval(env.get_child())?.unwrap();
-                if condition.is_true() {
+                if condition.get_literal().is_true() {
                     env.position = 1;
                     Ok(None)
                 } else {
-                    Ok(Some(Literal::Null))
+                    Ok(Some(NodeResult::Null))
                 }
             }
             1 => {

@@ -6,9 +6,8 @@ use crate::{
     ast::{
         display::{AstDisplay, Prefix},
         node::{Node, NodeBuilder, NodeExecutor},
-        token::literal::Literal,
     },
-    env::process_env::ProcessEnv,
+    env::{node_result::NodeResult, process_env::ProcessEnv},
     error::AlthreadResult,
     parser::Rule,
 };
@@ -37,29 +36,29 @@ impl NodeBuilder for IfControl {
 }
 
 impl NodeExecutor for IfControl {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
         match env.position {
             0 => {
                 let condition = self.condition.eval(env.get_child())?.unwrap();
-                env.position = if condition.is_true() {
+                env.position = if condition.get_literal().is_true() {
                     1
                 } else if self.else_block.is_some() {
                     2
                 } else {
-                    return Ok(Some(Literal::Null));
+                    return Ok(Some(NodeResult::Null));
                 };
                 Ok(None)
             }
             1 => Ok(self
                 .then_block
                 .eval(env.get_child())?
-                .map(|_| Literal::Null)),
+                .map(|_| NodeResult::Null)),
             2 => Ok(self
                 .else_block
                 .as_ref()
                 .unwrap()
                 .eval(env.get_child())?
-                .map(|_| Literal::Null)),
+                .map(|_| NodeResult::Null)),
             _ => unreachable!(),
         }
     }

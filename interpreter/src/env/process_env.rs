@@ -10,14 +10,17 @@ pub struct ProcessEnv {
     pub process_table: Rc<RefCell<ProcessTable>>,
     pub position: usize,                // the current position in the AST
     pub child: Option<Box<ProcessEnv>>, // the child scope environment
+    pub id: usize,
 }
 
 impl ProcessEnv {
     pub fn new(
+        id: usize,
         symbol_table: &Rc<RefCell<SymbolTableStack>>,
         process_table: &Rc<RefCell<ProcessTable>>,
     ) -> Self {
         Self {
+            id,
             position: 0,
             child: None,
             symbol_table: Rc::clone(symbol_table),
@@ -27,6 +30,7 @@ impl ProcessEnv {
 
     pub fn new_child(&self) -> Self {
         Self {
+            id: self.id,
             position: 0,
             child: None,
             symbol_table: Rc::clone(&self.symbol_table),
@@ -34,8 +38,9 @@ impl ProcessEnv {
         }
     }
 
-    pub fn new_global(env: &Env) -> Self {
+    pub fn new_global(env: &Env, id: usize) -> Self {
         Self {
+            id,
             position: 0,
             child: None,
             symbol_table: Rc::new(RefCell::new(SymbolTableStack::new(&env.global_table))),

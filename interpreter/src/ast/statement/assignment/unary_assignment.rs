@@ -11,7 +11,7 @@ use crate::{
             unary_assignment_operator::UnaryAssignmentOperator,
         },
     },
-    env::process_env::ProcessEnv,
+    env::{node_result::NodeResult, process_env::ProcessEnv},
     error::{AlthreadError, AlthreadResult, ErrorType},
     parser::Rule,
 };
@@ -35,7 +35,7 @@ impl NodeBuilder for UnaryAssignment {
 }
 
 impl NodeExecutor for UnaryAssignment {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
         let current_value: Literal = env
             .symbol_table
             .borrow()
@@ -75,7 +75,7 @@ impl NodeExecutor for UnaryAssignment {
                 )
             })?;
 
-        Ok(Some(Literal::Null))
+        Ok(Some(NodeResult::Null))
     }
 }
 

@@ -2,13 +2,16 @@ use std::fmt;
 
 use pest::iterators::Pairs;
 
-use crate::{env::process_env::ProcessEnv, error::AlthreadResult, parser::Rule};
+use crate::{
+    env::{node_result::NodeResult, process_env::ProcessEnv},
+    error::AlthreadResult,
+    parser::Rule,
+};
 
 use super::{
     display::{AstDisplay, Prefix},
     node::{Node, NodeBuilder, NodeExecutor},
     statement::Statement,
-    token::literal::Literal,
 };
 
 #[derive(Debug)]
@@ -30,16 +33,16 @@ impl NodeBuilder for Block {
 }
 
 impl NodeExecutor for Block {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
         if self.children.is_empty() {
-            return Ok(Some(Literal::Null));
+            return Ok(Some(NodeResult::Null));
         }
         let node = &self.children[env.position];
         if node.eval(env.get_child())?.is_some() {
             env.consume();
         }
 
-        Ok((env.position >= self.children.len()).then(|| Literal::Null))
+        Ok((env.position >= self.children.len()).then(|| NodeResult::Null))
     }
 }
 

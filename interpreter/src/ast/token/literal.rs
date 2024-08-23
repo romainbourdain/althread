@@ -8,7 +8,7 @@ use crate::{
         display::{AstDisplay, Prefix},
         node::{NodeBuilder, NodeExecutor},
     },
-    env::process_env::ProcessEnv,
+    env::{node_result::NodeResult, process_env::ProcessEnv},
     error::{AlthreadError, AlthreadResult, ErrorType},
     no_rule,
     parser::Rule,
@@ -52,8 +52,8 @@ impl NodeBuilder for Literal {
 }
 
 impl NodeExecutor for Literal {
-    fn eval(&self, _env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
-        Ok(Some(self.clone()))
+    fn eval(&self, _env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
+        Ok(Some(NodeResult::Literal(self.clone())))
     }
 }
 

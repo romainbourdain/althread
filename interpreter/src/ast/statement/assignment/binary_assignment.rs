@@ -12,7 +12,7 @@ use crate::{
             literal::Literal,
         },
     },
-    env::process_env::ProcessEnv,
+    env::{node_result::NodeResult, process_env::ProcessEnv},
     error::{AlthreadError, AlthreadResult, ErrorType},
     parser::Rule,
 };
@@ -39,7 +39,7 @@ impl NodeBuilder for BinaryAssignment {
 }
 
 impl NodeExecutor for BinaryAssignment {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
         let current_value: Literal = env
             .symbol_table
             .borrow()
@@ -54,7 +54,7 @@ impl NodeExecutor for BinaryAssignment {
             })?
             .value;
 
-        let value = self.value.eval(env)?.unwrap();
+        let value = self.value.eval(env)?.unwrap().get_literal();
 
         let value = match self.operator.value {
             BinaryAssignmentOperator::Assign => Ok(value),
@@ -85,7 +85,7 @@ impl NodeExecutor for BinaryAssignment {
                 )
             })?;
 
-        Ok(Some(Literal::Null))
+        Ok(Some(NodeResult::Null))
     }
 }
 

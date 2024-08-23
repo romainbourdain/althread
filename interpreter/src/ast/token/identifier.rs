@@ -2,13 +2,11 @@ use pest::iterators::Pairs;
 
 use crate::{
     ast::node::{Node, NodeBuilder, NodeExecutor},
-    env::process_env::ProcessEnv,
+    env::{node_result::NodeResult, process_env::ProcessEnv},
     error::{AlthreadError, AlthreadResult, ErrorType},
     no_rule,
     parser::Rule,
 };
-
-use super::literal::Literal;
 
 pub type Identifier = Node<String>;
 
@@ -27,12 +25,12 @@ impl NodeBuilder for Identifier {
 }
 
 impl NodeExecutor for Identifier {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
         let symbol =
             env.symbol_table.borrow().get(&self).map_err(|e| {
                 AlthreadError::new(ErrorType::VariableError, self.line, self.column, e)
             })?;
 
-        Ok(Some(symbol.value))
+        Ok(Some(NodeResult::Literal(symbol.value)))
     }
 }

@@ -13,9 +13,8 @@ use crate::{
     ast::{
         display::{AstDisplay, Prefix},
         node::{Node, NodeBuilder, NodeExecutor},
-        token::literal::Literal,
     },
-    env::process_env::ProcessEnv,
+    env::{node_result::NodeResult, process_env::ProcessEnv},
     error::AlthreadResult,
     parser::Rule,
 };
@@ -75,11 +74,11 @@ impl NodeBuilder for Expression {
 }
 
 impl NodeExecutor for Expression {
-    fn eval(&self, _env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
         match self {
-            Self::Binary(node) => node.eval(_env),
-            Self::Unary(node) => node.eval(_env),
-            Self::Primary(node) => node.eval(_env),
+            Self::Binary(node) => node.eval(env),
+            Self::Unary(node) => node.eval(env),
+            Self::Primary(node) => node.eval(env),
         }
     }
 }

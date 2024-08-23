@@ -7,9 +7,8 @@ use crate::{
         display::{AstDisplay, Prefix},
         node::{Node, NodeBuilder, NodeExecutor},
         statement::Statement,
-        token::literal::Literal,
     },
-    env::process_env::ProcessEnv,
+    env::{node_result::NodeResult, process_env::ProcessEnv},
     error::AlthreadResult,
     parser::Rule,
 };
@@ -30,16 +29,16 @@ impl NodeBuilder for AtomicScope {
 }
 
 impl NodeExecutor for AtomicScope {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
         if self.children.is_empty() {
-            return Ok(Some(Literal::Null));
+            return Ok(Some(NodeResult::Null));
         }
 
         for child in &self.children {
             child.eval(env.get_child())?;
         }
 
-        Ok(Some(Literal::Null))
+        Ok(Some(NodeResult::Null))
     }
 }
 

@@ -13,10 +13,10 @@ use block::Block;
 use display::{AstDisplay, Prefix};
 use node::Node;
 use pest::iterators::Pairs;
-use token::{condition_keyword::ConditionKeyword, literal::Literal};
+use token::condition_keyword::ConditionKeyword;
 
 use crate::{
-    env::{process_env::ProcessEnv, Env},
+    env::{get_process_id, node_result::NodeResult, process_env::ProcessEnv, Env},
     error::{AlthreadError, AlthreadResult, ErrorType},
     no_rule,
     parser::Rule,
@@ -86,14 +86,14 @@ impl Ast {
         &self,
         identifier: String,
         process: &mut ProcessEnv,
-    ) -> AlthreadResult<Option<Literal>> {
+    ) -> AlthreadResult<Option<NodeResult>> {
         let block = self.process_blocks.get(&identifier).unwrap();
         block.eval(process)
     }
 
     pub fn eval_globals(&self, env: &Env) -> AlthreadResult<()> {
         if let Some(global) = &self.global_block {
-            let mut global_env = ProcessEnv::new_global(env);
+            let mut global_env = ProcessEnv::new_global(env, get_process_id());
             while global.eval(&mut global_env)?.is_none() {}
         }
 
@@ -102,7 +102,7 @@ impl Ast {
 
     pub fn eval_conditions(&self, env: &Env) -> AlthreadResult<()> {
         for (keyword, condition_block) in &self.condition_blocks {
-            let mut condition_env = ProcessEnv::new_global(env);
+            let mut condition_env = ProcessEnv::new_global(env, get_process_id());
 
             let condition = Self::eval_condition_block(condition_block, &mut condition_env)?;
 
@@ -131,7 +131,12 @@ impl Ast {
         process_env: &mut ProcessEnv,
     ) -> AlthreadResult<bool> {
         for condition in &condition_block.value.children {
-            if !condition.eval(process_env)?.unwrap().is_true() {
+            if !condition
+                .eval(process_env)?
+                .unwrap()
+                .get_literal()
+                .is_true()
+            {
                 return Ok(false);
             }
         }

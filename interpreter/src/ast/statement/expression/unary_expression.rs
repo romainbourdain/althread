@@ -6,9 +6,9 @@ use crate::{
     ast::{
         display::{AstDisplay, Prefix},
         node::{Node, NodeExecutor},
-        token::{literal::Literal, unary_operator::UnaryOperator},
+        token::unary_operator::UnaryOperator,
     },
-    env::process_env::ProcessEnv,
+    env::{node_result::NodeResult, process_env::ProcessEnv},
     error::{AlthreadError, AlthreadResult, ErrorType},
     parser::Rule,
 };
@@ -35,15 +35,15 @@ impl UnaryExpression {
 }
 
 impl NodeExecutor for UnaryExpression {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
-        let operand = self.operand.eval(env)?.unwrap();
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
+        let operand = self.operand.eval(env)?.unwrap().get_literal();
 
         match self.operator.value {
             UnaryOperator::Positive => operand.positive(),
             UnaryOperator::Negative => operand.negative(),
             UnaryOperator::Not => operand.not(),
         }
-        .map(|res| Some(res))
+        .map(|res| Some(NodeResult::Literal(res)))
         .map_err(|e| {
             AlthreadError::new(
                 ErrorType::TypeError,

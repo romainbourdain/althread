@@ -6,9 +6,9 @@ use crate::{
     ast::{
         display::{AstDisplay, Prefix},
         node::{Node, NodeExecutor},
-        token::{binary_operator::BinaryOperator, literal::Literal},
+        token::binary_operator::BinaryOperator,
     },
-    env::process_env::ProcessEnv,
+    env::{node_result::NodeResult, process_env::ProcessEnv},
     error::{AlthreadError, AlthreadResult, ErrorType},
     parser::Rule,
 };
@@ -41,9 +41,9 @@ impl BinaryExpression {
 }
 
 impl NodeExecutor for BinaryExpression {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
-        let left = self.left.eval(env)?.unwrap();
-        let right = self.right.eval(env)?.unwrap();
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
+        let left = self.left.eval(env)?.unwrap().get_literal();
+        let right = self.right.eval(env)?.unwrap().get_literal();
 
         match self.operator.value {
             BinaryOperator::Add => left.add(&right),
@@ -60,7 +60,7 @@ impl NodeExecutor for BinaryExpression {
             BinaryOperator::And => left.and(&right),
             BinaryOperator::Or => left.or(&right),
         }
-        .map(|res| Some(res))
+        .map(|res| Some(NodeResult::Literal(res)))
         .map_err(|e| {
             AlthreadError::new(
                 ErrorType::TypeError,

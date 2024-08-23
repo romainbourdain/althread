@@ -1,3 +1,4 @@
+pub mod node_result;
 pub mod process_env;
 pub mod running_process;
 pub mod symbol_table;
@@ -13,6 +14,16 @@ use crate::{
     ast::Ast,
     error::{AlthreadError, AlthreadResult, ErrorType},
 };
+
+pub static mut PROCESS_COUNT: usize = 0;
+
+pub fn get_process_id() -> usize {
+    unsafe {
+        let id = PROCESS_COUNT;
+        PROCESS_COUNT += 1;
+        id
+    }
+}
 
 #[derive(Debug)]
 pub struct Env {
@@ -57,6 +68,11 @@ impl Env {
                     None => break,
                 };
 
+            println!(
+                "Running process: {} #{}",
+                chosen_process.name, chosen_process.process.id
+            );
+
             if ast
                 .eval_process(chosen_process.name.to_string(), &mut chosen_process.process)?
                 .is_some()
@@ -74,7 +90,7 @@ impl Env {
     ) -> AlthreadResult<()> {
         for process_name in &self.process_table.borrow().queue {
             running_processes
-                .insert(process_name.to_string(), &self)
+                .insert(process_name.to_string(), get_process_id(), &self)
                 .map_err(|e| AlthreadError::new(ErrorType::SyntaxError, 1, 1, e))?;
         }
         self.process_table.borrow_mut().queue.clear();

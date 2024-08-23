@@ -6,9 +6,8 @@ use crate::{
     ast::{
         display::{AstDisplay, Prefix},
         node::{Node, NodeBuilder, NodeExecutor},
-        token::literal::Literal,
     },
-    env::process_env::ProcessEnv,
+    env::{node_result::NodeResult, process_env::ProcessEnv},
     error::AlthreadResult,
     parser::Rule,
 };
@@ -32,12 +31,12 @@ impl NodeBuilder for RunCall {
 }
 
 impl NodeExecutor for RunCall {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
         env.process_table
             .borrow_mut()
             .queue(self.identifier.value.to_string());
 
-        Ok(Some(Literal::Null))
+        Ok(Some(NodeResult::Null))
     }
 }
 

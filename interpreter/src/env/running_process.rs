@@ -16,12 +16,13 @@ impl RunningProcesses {
         }
     }
 
-    pub fn insert(&mut self, identifier: String, env: &Env) -> Result<(), String> {
+    pub fn insert(&mut self, identifier: String, id: usize, env: &Env) -> Result<(), String> {
         if !env.process_table.borrow().processes.contains(&identifier) {
             return Err(format!("Process {} not found", identifier));
         }
 
-        self.processes.push(RunningProcess::new(identifier, env));
+        self.processes
+            .push(RunningProcess::new(identifier, id, env));
 
         Ok(())
     }
@@ -34,10 +35,11 @@ pub struct RunningProcess {
 }
 
 impl RunningProcess {
-    pub fn new(name: String, env: &Env) -> Self {
+    pub fn new(name: String, id: usize, env: &Env) -> Self {
         Self {
             name,
             process: ProcessEnv::new(
+                id,
                 &Rc::new(RefCell::new(SymbolTableStack::new(&env.global_table))),
                 &env.process_table,
             ),

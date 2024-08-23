@@ -2,12 +2,13 @@ use std::fmt;
 
 use pest::iterators::{Pair, Pairs};
 
-use crate::{env::process_env::ProcessEnv, error::AlthreadResult, parser::Rule};
-
-use super::{
-    display::{AstDisplay, Prefix},
-    token::literal::Literal,
+use crate::{
+    env::{node_result::NodeResult, process_env::ProcessEnv},
+    error::AlthreadResult,
+    parser::Rule,
 };
+
+use super::display::{AstDisplay, Prefix};
 
 #[derive(Debug, Clone)]
 pub struct Node<T> {
@@ -21,7 +22,7 @@ pub trait NodeBuilder: Sized {
 }
 
 pub trait NodeExecutor: Sized {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>>;
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>>;
 }
 
 impl<T: NodeBuilder> Node<T> {
@@ -36,7 +37,7 @@ impl<T: NodeBuilder> Node<T> {
 }
 
 impl<T: NodeExecutor> Node<T> {
-    pub fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
+    pub fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
         self.value.eval(env)
     }
 }

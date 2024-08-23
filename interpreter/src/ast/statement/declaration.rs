@@ -8,10 +8,9 @@ use crate::{
         node::{Node, NodeBuilder, NodeExecutor},
         token::{
             datatype::DataType, declaration_keyword::DeclarationKeyword, identifier::Identifier,
-            literal::Literal,
         },
     },
-    env::process_env::ProcessEnv,
+    env::{node_result::NodeResult, process_env::ProcessEnv},
     error::{AlthreadError, AlthreadResult, ErrorType},
     no_rule,
     parser::Rule,
@@ -56,16 +55,19 @@ impl NodeBuilder for Declaration {
 }
 
 impl NodeExecutor for Declaration {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<Literal>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
         let datatype = self
             .datatype
             .as_ref()
             .map(|datatype| datatype.value.clone());
 
-        let value = self
-            .value
-            .as_ref()
-            .map_or(Ok(None), |value| value.eval(env))?;
+        let value = self.value.as_ref().map_or(Ok(None), |value| {
+            if let Some(value) = value.eval(env)? {
+                Ok(Some(value.get_literal()))
+            } else {
+                Ok(None)
+            }
+        })?;
 
         let mut symbol_table = env.symbol_table.borrow_mut();
 
@@ -85,7 +87,7 @@ impl NodeExecutor for Declaration {
                 )
             })?;
 
-        Ok(Some(Literal::Null))
+        Ok(Some(NodeResult::Null))
     }
 }
 
