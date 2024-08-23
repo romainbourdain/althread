@@ -1,23 +1,41 @@
-use crate::ast::{statement::expression::Expression, token::literal::Literal};
+use crate::ast::{node::Node, statement::expression::Expression, token::literal::Literal};
 
 #[derive(Debug)]
 pub enum NodeResult {
-    Null,
-    Literal(Literal),
-    Wait(WaitResult),
+    Incomplete,
+    Finished(Literal),
+    Suspend(Suspend),
 }
 
 impl NodeResult {
-    pub fn get_literal(self) -> Literal {
+    pub fn get_return(self) -> Literal {
         match self {
-            NodeResult::Literal(literal) => literal,
+            NodeResult::Finished(literal) => literal,
             _ => panic!("NodeResult is not a Literal"),
+        }
+    }
+
+    pub fn is_finished(&self) -> bool {
+        match self {
+            NodeResult::Finished(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn null() -> Self {
+        NodeResult::Finished(Literal::Null)
+    }
+
+    pub fn is_null(&self) -> bool {
+        match self {
+            NodeResult::Finished(Literal::Null) => true,
+            _ => false,
         }
     }
 }
 
 #[derive(Debug)]
-pub struct WaitResult {
+pub struct Suspend {
     pub process_id: usize,
-    pub condition: Expression,
+    pub condition: Node<Expression>,
 }

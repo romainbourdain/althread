@@ -31,12 +31,12 @@ impl NodeBuilder for RunCall {
 }
 
 impl NodeExecutor for RunCall {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
         env.process_table
             .borrow_mut()
             .queue(self.identifier.value.to_string());
 
-        Ok(Some(NodeResult::Null))
+        Ok(NodeResult::null())
     }
 }
 

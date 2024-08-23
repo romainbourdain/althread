@@ -33,16 +33,23 @@ impl NodeBuilder for Block {
 }
 
 impl NodeExecutor for Block {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
         if self.children.is_empty() {
-            return Ok(Some(NodeResult::Null));
+            return Ok(NodeResult::null());
         }
         let node = &self.children[env.position];
-        if node.eval(env.get_child())?.is_some() {
-            env.consume();
+
+        match node.eval(env.get_child())? {
+            NodeResult::Finished(_) => env.consume(),
+            NodeResult::Suspend(suspend) => return Ok(NodeResult::Suspend(suspend)),
+            _ => {}
         }
 
-        Ok((env.position >= self.children.len()).then(|| NodeResult::Null))
+        Ok(if env.position >= self.children.len() {
+            NodeResult::null()
+        } else {
+            NodeResult::Incomplete
+        })
     }
 }
 

@@ -25,12 +25,12 @@ impl NodeBuilder for Identifier {
 }
 
 impl NodeExecutor for Identifier {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
         let symbol =
             env.symbol_table.borrow().get(&self).map_err(|e| {
                 AlthreadError::new(ErrorType::VariableError, self.line, self.column, e)
             })?;
 
-        Ok(Some(NodeResult::Literal(symbol.value)))
+        Ok(NodeResult::Finished(symbol.value))
     }
 }

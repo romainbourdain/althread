@@ -16,7 +16,7 @@ use crate::{
 
 use super::Expression;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum PrimaryExpression {
     Literal(Node<Literal>),
     Identifier(Node<Identifier>),
@@ -39,7 +39,7 @@ impl PrimaryExpression {
 }
 
 impl NodeExecutor for PrimaryExpression {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
         match self {
             Self::Literal(node) => node.eval(env),
             Self::Identifier(node) => node.eval(env),

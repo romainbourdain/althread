@@ -33,23 +33,25 @@ impl NodeBuilder for WhileControl {
 }
 
 impl NodeExecutor for WhileControl {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
         match env.position {
             0 => {
-                let condition = self.condition.eval(env.get_child())?.unwrap();
-                if condition.get_literal().is_true() {
+                let condition = self.condition.eval(env.get_child())?;
+                if condition.get_return().is_true() {
                     env.position = 1;
-                    Ok(None)
+                    Ok(NodeResult::Incomplete)
                 } else {
-                    Ok(Some(NodeResult::Null))
+                    Ok(NodeResult::null())
                 }
             }
-            1 => {
-                if self.then_block.eval(env.get_child())?.is_some() {
+            1 => match self.then_block.eval(env.get_child())? {
+                NodeResult::Finished(_) => {
                     env.reset();
+                    Ok(NodeResult::Incomplete)
                 }
-                Ok(None)
-            }
+                NodeResult::Suspend(suspend) => Ok(NodeResult::Suspend(suspend)),
+                _ => Ok(NodeResult::Incomplete),
+            },
             _ => unreachable!(),
         }
     }

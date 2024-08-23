@@ -75,7 +75,7 @@ impl Env {
 
             if ast
                 .eval_process(chosen_process.name.to_string(), &mut chosen_process.process)?
-                .is_some()
+                .is_finished()
             {
                 running_processes.processes.remove(process_index);
             }

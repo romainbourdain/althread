@@ -34,7 +34,7 @@ lazy_static::lazy_static! {
     };
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Expression {
     Binary(Node<BinaryExpression>),
     Unary(Node<UnaryExpression>),
@@ -74,7 +74,7 @@ impl NodeBuilder for Expression {
 }
 
 impl NodeExecutor for Expression {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
         match self {
             Self::Binary(node) => node.eval(env),
             Self::Unary(node) => node.eval(env),

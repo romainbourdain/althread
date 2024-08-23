@@ -36,29 +36,21 @@ impl NodeBuilder for IfControl {
 }
 
 impl NodeExecutor for IfControl {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
         match env.position {
             0 => {
-                let condition = self.condition.eval(env.get_child())?.unwrap();
-                env.position = if condition.get_literal().is_true() {
+                let condition = self.condition.eval(env.get_child())?;
+                env.position = if condition.get_return().is_true() {
                     1
                 } else if self.else_block.is_some() {
                     2
                 } else {
-                    return Ok(Some(NodeResult::Null));
+                    return Ok(NodeResult::null());
                 };
-                Ok(None)
+                Ok(NodeResult::Incomplete)
             }
-            1 => Ok(self
-                .then_block
-                .eval(env.get_child())?
-                .map(|_| NodeResult::Null)),
-            2 => Ok(self
-                .else_block
-                .as_ref()
-                .unwrap()
-                .eval(env.get_child())?
-                .map(|_| NodeResult::Null)),
+            1 => Ok(self.then_block.eval(env.get_child())?),
+            2 => Ok(self.else_block.as_ref().unwrap().eval(env.get_child())?),
             _ => unreachable!(),
         }
     }

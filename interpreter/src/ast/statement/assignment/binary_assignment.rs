@@ -39,7 +39,7 @@ impl NodeBuilder for BinaryAssignment {
 }
 
 impl NodeExecutor for BinaryAssignment {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
         let current_value: Literal = env
             .symbol_table
             .borrow()
@@ -54,7 +54,7 @@ impl NodeExecutor for BinaryAssignment {
             })?
             .value;
 
-        let value = self.value.eval(env)?.unwrap().get_literal();
+        let value = self.value.eval(env)?.get_return();
 
         let value = match self.operator.value {
             BinaryAssignmentOperator::Assign => Ok(value),
@@ -85,7 +85,7 @@ impl NodeExecutor for BinaryAssignment {
                 )
             })?;
 
-        Ok(Some(NodeResult::Null))
+        Ok(NodeResult::null())
     }
 }
 

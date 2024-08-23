@@ -27,19 +27,18 @@ impl NodeBuilder for AssertCall {
 }
 
 impl NodeExecutor for AssertCall {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
-        if let Some(value) = self.value.eval(env)? {
-            if !value.get_literal().is_true() {
-                return Err(AlthreadError::new(
-                    ErrorType::AssertionFailed,
-                    self.value.line,
-                    self.value.column,
-                    format!("Condition is false"),
-                ));
-            }
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
+        let value = self.value.eval(env)?;
+        if !value.get_return().is_true() {
+            return Err(AlthreadError::new(
+                ErrorType::AssertionFailed,
+                self.value.line,
+                self.value.column,
+                format!("Condition is false"),
+            ));
         }
 
-        Ok(Some(NodeResult::Null))
+        Ok(NodeResult::null())
     }
 }
 

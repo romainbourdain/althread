@@ -22,7 +22,7 @@ pub trait NodeBuilder: Sized {
 }
 
 pub trait NodeExecutor: Sized {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>>;
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult>;
 }
 
 impl<T: NodeBuilder> Node<T> {
@@ -37,7 +37,7 @@ impl<T: NodeBuilder> Node<T> {
 }
 
 impl<T: NodeExecutor> Node<T> {
-    pub fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
+    pub fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
         self.value.eval(env)
     }
 }

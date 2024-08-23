@@ -52,8 +52,8 @@ impl NodeBuilder for Literal {
 }
 
 impl NodeExecutor for Literal {
-    fn eval(&self, _env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
-        Ok(Some(NodeResult::Literal(self.clone())))
+    fn eval(&self, _env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
+        Ok(NodeResult::Finished(self.clone()))
     }
 }
 

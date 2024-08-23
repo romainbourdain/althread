@@ -86,7 +86,11 @@ impl Ast {
         &self,
         identifier: String,
         process: &mut ProcessEnv,
-    ) -> AlthreadResult<Option<NodeResult>> {
+    ) -> AlthreadResult<NodeResult> {
+        if process.position == 0 {
+            process.symbol_table.borrow_mut().push();
+        }
+
         let block = self.process_blocks.get(&identifier).unwrap();
         block.eval(process)
     }
@@ -94,7 +98,7 @@ impl Ast {
     pub fn eval_globals(&self, env: &Env) -> AlthreadResult<()> {
         if let Some(global) = &self.global_block {
             let mut global_env = ProcessEnv::new_global(env, get_process_id());
-            while global.eval(&mut global_env)?.is_none() {}
+            while !global.eval(&mut global_env)?.is_finished() {}
         }
 
         Ok(())
@@ -131,12 +135,7 @@ impl Ast {
         process_env: &mut ProcessEnv,
     ) -> AlthreadResult<bool> {
         for condition in &condition_block.value.children {
-            if !condition
-                .eval(process_env)?
-                .unwrap()
-                .get_literal()
-                .is_true()
-            {
+            if !condition.eval(process_env)?.get_return().is_true() {
                 return Ok(false);
             }
         }

@@ -90,4 +90,12 @@ impl SymbolTableStack {
     pub fn get_global_table(&self) -> Rc<RefCell<SymbolTable>> {
         self.tables[0].clone()
     }
+
+    pub fn push(&mut self) {
+        self.tables.push(Rc::new(RefCell::new(SymbolTable::new())));
+    }
+
+    pub fn pop(&mut self) {
+        self.tables.pop();
+    }
 }

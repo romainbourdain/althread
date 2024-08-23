@@ -15,7 +15,7 @@ use crate::{
 
 use super::Expression;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BinaryExpression {
     pub left: Box<Node<Expression>>,
     pub operator: Node<BinaryOperator>,
@@ -41,9 +41,9 @@ impl BinaryExpression {
 }
 
 impl NodeExecutor for BinaryExpression {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
-        let left = self.left.eval(env)?.unwrap().get_literal();
-        let right = self.right.eval(env)?.unwrap().get_literal();
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
+        let left = self.left.eval(env)?.get_return();
+        let right = self.right.eval(env)?.get_return();
 
         match self.operator.value {
             BinaryOperator::Add => left.add(&right),
@@ -60,7 +60,7 @@ impl NodeExecutor for BinaryExpression {
             BinaryOperator::And => left.and(&right),
             BinaryOperator::Or => left.or(&right),
         }
-        .map(|res| Some(NodeResult::Literal(res)))
+        .map(|res| NodeResult::Finished(res))
         .map_err(|e| {
             AlthreadError::new(
                 ErrorType::TypeError,

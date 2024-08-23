@@ -15,7 +15,7 @@ use crate::{
 
 use super::Expression;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UnaryExpression {
     pub operator: Node<UnaryOperator>,
     pub operand: Box<Node<Expression>>,
@@ -35,15 +35,15 @@ impl UnaryExpression {
 }
 
 impl NodeExecutor for UnaryExpression {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
-        let operand = self.operand.eval(env)?.unwrap().get_literal();
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
+        let operand = self.operand.eval(env)?.get_return();
 
         match self.operator.value {
             UnaryOperator::Positive => operand.positive(),
             UnaryOperator::Negative => operand.negative(),
             UnaryOperator::Not => operand.not(),
         }
-        .map(|res| Some(NodeResult::Literal(res)))
+        .map(|res| NodeResult::Finished(res))
         .map_err(|e| {
             AlthreadError::new(
                 ErrorType::TypeError,

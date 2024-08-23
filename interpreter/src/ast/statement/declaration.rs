@@ -55,19 +55,19 @@ impl NodeBuilder for Declaration {
 }
 
 impl NodeExecutor for Declaration {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
         let datatype = self
             .datatype
             .as_ref()
             .map(|datatype| datatype.value.clone());
 
-        let value = self.value.as_ref().map_or(Ok(None), |value| {
-            if let Some(value) = value.eval(env)? {
-                Ok(Some(value.get_literal()))
-            } else {
-                Ok(None)
-            }
-        })?;
+        let value = self
+            .value
+            .as_ref()
+            .map_or(Ok(None), |expr| match expr.eval(env)? {
+                NodeResult::Finished(value) => Ok(Some(value)),
+                _ => Ok(None),
+            })?;
 
         let mut symbol_table = env.symbol_table.borrow_mut();
 
@@ -87,7 +87,7 @@ impl NodeExecutor for Declaration {
                 )
             })?;
 
-        Ok(Some(NodeResult::Null))
+        Ok(NodeResult::null())
     }
 }
 

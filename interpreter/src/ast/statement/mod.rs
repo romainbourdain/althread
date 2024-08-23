@@ -62,7 +62,7 @@ impl NodeBuilder for Statement {
 }
 
 impl NodeExecutor for Statement {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
         match self {
             Self::Assignment(node) => node.eval(env),
             Self::Declaration(node) => node.eval(env),

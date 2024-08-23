@@ -45,7 +45,7 @@ impl NodeBuilder for Call {
 }
 
 impl NodeExecutor for Call {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
         match self {
             Self::Run(node) => node.eval(env),
             Self::Print(node) => node.eval(env),

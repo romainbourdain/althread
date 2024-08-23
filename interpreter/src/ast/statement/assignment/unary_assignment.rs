@@ -35,7 +35,7 @@ impl NodeBuilder for UnaryAssignment {
 }
 
 impl NodeExecutor for UnaryAssignment {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
         let current_value: Literal = env
             .symbol_table
             .borrow()
@@ -75,7 +75,7 @@ impl NodeExecutor for UnaryAssignment {
                 )
             })?;
 
-        Ok(Some(NodeResult::Null))
+        Ok(NodeResult::null())
     }
 }
 

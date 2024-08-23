@@ -29,16 +29,16 @@ impl NodeBuilder for AtomicScope {
 }
 
 impl NodeExecutor for AtomicScope {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
         if self.children.is_empty() {
-            return Ok(Some(NodeResult::Null));
+            return Ok(NodeResult::null());
         }
 
         for child in &self.children {
             child.eval(env.get_child())?;
         }
 
-        Ok(Some(NodeResult::Null))
+        Ok(NodeResult::null())
     }
 }
 

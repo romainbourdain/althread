@@ -37,7 +37,7 @@ impl NodeBuilder for Assignment {
 }
 
 impl NodeExecutor for Assignment {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
         match self {
             Self::Unary(node) => node.eval(env),
             Self::Binary(node) => node.eval(env),

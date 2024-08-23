@@ -27,12 +27,10 @@ impl NodeBuilder for PrintCall {
 }
 
 impl NodeExecutor for PrintCall {
-    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<Option<NodeResult>> {
-        if let Some(value) = self.value.eval(env)? {
-            println!("{}", value.get_literal());
-        }
+    fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
+        println!("{}", self.value.eval(env)?.get_return());
 
-        Ok(Some(NodeResult::Null))
+        Ok(NodeResult::null())
     }
 }
 
