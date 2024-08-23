@@ -4,7 +4,7 @@ use crate::ast::{node::Node, statement::expression::Expression, token::literal::
 pub enum NodeResult {
     Incomplete,
     Finished(Literal),
-    Suspend(Suspend),
+    Suspend(Node<Expression>),
 }
 
 impl NodeResult {
@@ -32,10 +32,4 @@ impl NodeResult {
             _ => false,
         }
     }
-}
-
-#[derive(Debug)]
-pub struct Suspend {
-    pub process_id: usize,
-    pub condition: Node<Expression>,
 }

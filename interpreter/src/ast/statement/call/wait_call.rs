@@ -8,10 +8,7 @@ use crate::{
         node::{Node, NodeBuilder, NodeExecutor},
         statement::expression::Expression,
     },
-    env::{
-        node_result::{NodeResult, Suspend},
-        process_env::ProcessEnv,
-    },
+    env::{node_result::NodeResult, process_env::ProcessEnv},
     error::AlthreadResult,
     parser::Rule,
 };
@@ -32,10 +29,7 @@ impl NodeBuilder for WaitCall {
 impl NodeExecutor for WaitCall {
     fn eval(&self, env: &mut ProcessEnv) -> AlthreadResult<NodeResult> {
         if !self.value.eval(env)?.get_return().is_true() {
-            Ok(NodeResult::Suspend(Suspend {
-                process_id: env.id,
-                condition: self.value.clone(),
-            }))
+            Ok(NodeResult::Suspend(self.value.clone()))
         } else {
             Ok(NodeResult::null())
         }

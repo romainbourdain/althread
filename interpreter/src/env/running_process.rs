@@ -1,6 +1,9 @@
 use std::{cell::RefCell, rc::Rc};
 
-use crate::env::{symbol_table::symbol_table_stack::SymbolTableStack, Env};
+use crate::{
+    ast::{node::Node, statement::expression::Expression},
+    env::{symbol_table::symbol_table_stack::SymbolTableStack, Env},
+};
 
 use super::process_env::ProcessEnv;
 
@@ -32,6 +35,7 @@ impl RunningProcesses {
 pub struct RunningProcess {
     pub name: String,
     pub process: ProcessEnv,
+    pub condition: Option<Node<Expression>>,
 }
 
 impl RunningProcess {
@@ -43,6 +47,7 @@ impl RunningProcess {
                 &Rc::new(RefCell::new(SymbolTableStack::new(&env.global_table))),
                 &env.process_table,
             ),
+            condition: None,
         }
     }
 }

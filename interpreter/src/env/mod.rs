@@ -5,6 +5,7 @@ pub mod symbol_table;
 
 use std::{cell::RefCell, rc::Rc};
 
+use node_result::NodeResult;
 use rand::{rngs::StdRng, seq::IteratorRandom, SeedableRng};
 use running_process::{RunningProcess, RunningProcesses};
 use symbol_table::{process_table::ProcessTable, SymbolTable};
@@ -68,16 +69,19 @@ impl Env {
                     None => break,
                 };
 
-            println!(
+            /*             println!(
                 "Running process: {} #{}",
                 chosen_process.name, chosen_process.process.id
-            );
+            ); */
 
-            if ast
-                .eval_process(chosen_process.name.to_string(), &mut chosen_process.process)?
-                .is_finished()
-            {
-                running_processes.processes.remove(process_index);
+            match ast.eval_process(chosen_process.name.to_string(), &mut chosen_process.process)? {
+                NodeResult::Finished(_) => {
+                    running_processes.processes.remove(process_index);
+                }
+                NodeResult::Suspend(cond) => {
+                    running_processes.processes[process_index].condition = Some(cond);
+                }
+                _ => {}
             }
         }
 
@@ -102,16 +106,29 @@ impl Env {
         running_processes: &'a mut RunningProcesses,
         rng: &mut StdRng,
     ) -> Option<(&'a mut RunningProcess, usize)> {
-        let process_index = {
-            if running_processes.processes.is_empty() {
-                return None;
-            }
-            (0..running_processes.processes.len()).choose(rng).unwrap()
-        };
+        loop {
+            let process_index = {
+                if running_processes.processes.is_empty() {
+                    return None;
+                }
+                (0..running_processes.processes.len()).choose(rng).unwrap()
+            };
 
-        Some((
-            &mut running_processes.processes[process_index],
-            process_index,
-        ))
+            if running_processes.processes[process_index]
+                .condition
+                .is_some()
+            {
+                println!(
+                    "Condition not met :\n{:#?}",
+                    running_processes.processes[process_index].condition
+                );
+                continue;
+            }
+
+            return Some((
+                &mut running_processes.processes[process_index],
+                process_index,
+            ));
+        }
     }
 }
