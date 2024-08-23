@@ -1,4 +1,5 @@
 pub mod assignment;
+pub mod atomic_scope;
 pub mod call;
 pub mod declaration;
 pub mod expression;
@@ -9,6 +10,7 @@ pub mod while_control;
 use std::fmt;
 
 use assignment::Assignment;
+use atomic_scope::AtomicScope;
 use call::Call;
 use declaration::Declaration;
 use expression::Expression;
@@ -34,6 +36,7 @@ pub enum Statement {
     If(Node<IfControl>),
     While(Node<WhileControl>),
     Scope(Node<Scope>),
+    Atomic(Node<AtomicScope>),
 }
 
 impl NodeBuilder for Statement {
@@ -48,6 +51,7 @@ impl NodeBuilder for Statement {
             Rule::if_control => Ok(Self::If(Node::build(pair)?)),
             Rule::while_control => Ok(Self::While(Node::build(pair)?)),
             Rule::scope => Ok(Self::Scope(Node::build(pair)?)),
+            Rule::atomic_scope => Ok(Self::Atomic(Node::build(pair)?)),
             _ => Err(no_rule!(pair)),
         }
     }
@@ -63,6 +67,7 @@ impl NodeExecutor for Statement {
             Self::If(node) => node.eval(env),
             Self::While(node) => node.eval(env),
             Self::Scope(node) => node.eval(env),
+            Self::Atomic(node) => node.eval(env),
         }
     }
 }
@@ -77,6 +82,7 @@ impl AstDisplay for Statement {
             Statement::If(node) => node.ast_fmt(f, prefix),
             Statement::While(node) => node.ast_fmt(f, prefix),
             Statement::Scope(node) => node.ast_fmt(f, prefix),
+            Statement::Atomic(node) => node.ast_fmt(f, prefix),
         }
     }
 }

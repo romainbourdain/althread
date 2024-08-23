@@ -24,7 +24,7 @@ condition_keywords = _{ ALWAYS_KW | NEVER_KW }
 /// function calls, and control flow structures.
 statements = { statement* }
 
-statement             =  { assignment_statement | declaration_statement | expression_statement | call_statement | if_control | while_control | scope }
+statement             =  { assignment_statement | declaration_statement | expression_statement | call_statement | if_control | while_control | scope | atomic_scope }
 assignment_statement  = _{ assignment ~ ";" }
 declaration_statement = _{ declaration ~ ";" }
 expression_statement  = _{ expression ~ ";" }
@@ -76,6 +76,7 @@ assert_call = { ASSERT_KW ~ "(" ~ expression ~ ")" }
 /// ### Control Flow
 /// Control flow structures include conditional execution and loops.
 scope         = { "{" ~ statement* ~ "}" }
+atomic_scope  = { "atomic" ~ "{" ~ statement* ~ "}" }
 if_control    = { IF_KW ~ "(" ~ expression ~ ")" ~ scope ~ (ELSE_KW ~ scope)? }
 while_control = { WHILE_KW ~ "(" ~ expression ~ ")" ~ scope }
 
